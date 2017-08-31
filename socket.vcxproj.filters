@@ -1,0 +1,162 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="源文件">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="头文件">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    </Filter>
+    <Filter Include="资源文件">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="socket">
+      <UniqueIdentifier>{2886406b-2249-46ea-8cec-0785fec26e19}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="源文件\demo">
+      <UniqueIdentifier>{e780dab5-b60f-4c46-8f43-55906660816e}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="ReadMe.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="stdafx.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="targetver.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="socket\config.hpp">
+      <Filter>socket</Filter>
+    </ClInclude>
+    <ClInclude Include="socket\linux_config.hpp">
+      <Filter>socket</Filter>
+    </ClInclude>
+    <ClInclude Include="socket\win_config.hpp">
+      <Filter>socket</Filter>
+    </ClInclude>
+    <ClInclude Include="socket\socket.hpp">
+      <Filter>socket</Filter>
+    </ClInclude>
+    <ClInclude Include="socket\error.hpp">
+      <Filter>socket</Filter>
+    </ClInclude>
+    <ClInclude Include="socket\gfunction.hpp">
+      <Filter>socket</Filter>
+    </ClInclude>
+    <ClInclude Include="socket\type.hpp">
+      <Filter>socket</Filter>
+    </ClInclude>
+    <ClInclude Include="socket\hdr_helper.hpp">
+      <Filter>socket</Filter>
+    </ClInclude>
+    <ClInclude Include="socket\io_object.hpp">
+      <Filter>socket</Filter>
+    </ClInclude>
+    <ClInclude Include="socket\option.hpp">
+      <Filter>socket</Filter>
+    </ClInclude>
+    <ClInclude Include="socket\pro_hdr.hpp">
+      <Filter>socket</Filter>
+    </ClInclude>
+    <ClInclude Include="socket\socket_service.hpp">
+      <Filter>socket</Filter>
+    </ClInclude>
+    <ClInclude Include="socket\address.hpp">
+      <Filter>socket</Filter>
+    </ClInclude>
+    <ClInclude Include="socket\endpoint.hpp">
+      <Filter>socket</Filter>
+    </ClInclude>
+    <ClInclude Include="socket\protocol.hpp">
+      <Filter>socket</Filter>
+    </ClInclude>
+    <ClInclude Include="socket\util.hpp">
+      <Filter>socket</Filter>
+    </ClInclude>
+    <ClInclude Include="socket\acceptor_service.hpp">
+      <Filter>socket</Filter>
+    </ClInclude>
+    <ClInclude Include="socket\basic_socket.hpp">
+      <Filter>socket</Filter>
+    </ClInclude>
+    <ClInclude Include="socket\connector_service.hpp">
+      <Filter>socket</Filter>
+    </ClInclude>
+    <ClInclude Include="socket\epoll_access.hpp">
+      <Filter>socket</Filter>
+    </ClInclude>
+    <ClInclude Include="socket\linux_epoll.hpp">
+      <Filter>socket</Filter>
+    </ClInclude>
+    <ClInclude Include="socket\service.hpp">
+      <Filter>socket</Filter>
+    </ClInclude>
+    <ClInclude Include="socket\socket_acceptor.hpp">
+      <Filter>socket</Filter>
+    </ClInclude>
+    <ClInclude Include="socket\socket_connector.hpp">
+      <Filter>socket</Filter>
+    </ClInclude>
+    <ClInclude Include="socket\socket_stream.hpp">
+      <Filter>socket</Filter>
+    </ClInclude>
+    <ClInclude Include="socket\socket_tcp.hpp">
+      <Filter>socket</Filter>
+    </ClInclude>
+    <ClInclude Include="socket\stream_service.hpp">
+      <Filter>socket</Filter>
+    </ClInclude>
+    <ClInclude Include="socket\win_access.hpp">
+      <Filter>socket</Filter>
+    </ClInclude>
+    <ClInclude Include="socket\win_iocp.hpp">
+      <Filter>socket</Filter>
+    </ClInclude>
+    <ClInclude Include="socket\winsock_init.hpp">
+      <Filter>socket</Filter>
+    </ClInclude>
+    <ClInclude Include="thread.hpp">
+      <Filter>源文件</Filter>
+    </ClInclude>
+    <ClInclude Include="socket\mutexlock.hpp">
+      <Filter>socket</Filter>
+    </ClInclude>
+    <ClInclude Include="socket\linuxsock_init.hpp">
+      <Filter>socket</Filter>
+    </ClInclude>
+    <ClInclude Include="socket\lock_dispatcher.hpp">
+      <Filter>socket</Filter>
+    </ClInclude>
+    <ClInclude Include="demo\async_server_demo.h">
+      <Filter>源文件\demo</Filter>
+    </ClInclude>
+    <ClInclude Include="demo\async_client_demo.h">
+      <Filter>源文件\demo</Filter>
+    </ClInclude>
+    <ClInclude Include="socket\iocp_access.hpp">
+      <Filter>socket</Filter>
+    </ClInclude>
+    <ClInclude Include="socket\win_iocp2.hpp">
+      <Filter>socket</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="socket.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="thread.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="demo\async_server_demo.cpp">
+      <Filter>源文件\demo</Filter>
+    </ClCompile>
+    <ClCompile Include="demo\async_client_demo.cpp">
+      <Filter>源文件\demo</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>
