@@ -96,10 +96,10 @@ void AsyncClient::ConnectHandler(TcpConnectorPtr connector, SocketError error)
 {
 	if (error)
 	{
-		print_func("try to reconnect :",error);
-		Tcp::EndPoint ep(AddressV4("127.0.0.1"), 2001);
+		print_func("connect fail :",error);
+		/*Tcp::EndPoint ep(AddressV4("127.0.0.1"), 2001);
 		connector.reset(new TcpConnector<IoService>(m_ioservice));
-		connector->AsyncConnect(ep, m_connect_handler);
+		connector->AsyncConnect(ep, m_connect_handler);*/
 	}
 	else
 	{
