@@ -94,7 +94,7 @@ void AsyncServer::WriteHandler(TcpSocketPtr sock, const s_byte_t* data, s_uint32
 		if (str.size())
 		{
 			memcpy(pdata->write_ptr, str.c_str(), str.length());
-			sock->AsyncSendSome(pdata->write_ptr, str.length(),m_write_handler, error);
+			sock->AsyncSendSome(pdata->write_ptr, (s_uint32_t)str.length(),m_write_handler, error);
 			if (error)
 				print_error(error);
 		}
@@ -120,7 +120,7 @@ void AsyncServer::ReadHandler(TcpSocketPtr sock, s_byte_t* data, s_uint32_t max,
 		++pdata->read_cnt;
 		M_PRINT_WITH_LOCK("server receive max : " << max << " trans : " << trans << " data : " << data << endl);
 		data[0] = 0;
-		sock->AsyncRecvSome(data, strlen(gContent), m_read_handler, error);
+		sock->AsyncRecvSome(data, (s_uint32_t)strlen(gContent), m_read_handler, error);
 		if (error)
 		{
 			print_error(error);
@@ -131,7 +131,7 @@ void AsyncServer::ReadHandler(TcpSocketPtr sock, s_byte_t* data, s_uint32_t max,
 		{
 			pdata->is_writing = true;
 			memcpy(pdata->write_ptr, reply.c_str(), reply.length());
-			sock->AsyncSendSome(pdata->write_ptr, reply.length(), m_write_handler, error);
+			sock->AsyncSendSome(pdata->write_ptr, (s_uint32_t)reply.length(), m_write_handler, error);
 		}
 		else			
 			pdata->reply.push_back(reply);
@@ -153,7 +153,7 @@ void AsyncServer::AcceptHandler(TcpAcceptorPtr acceptor, TcpSocketPtr sock, Sock
 		sock->DestroyHandler(bind_t(&AsyncServer::DestroyHandler, this, (s_byte_t*)data->read_ptr, (s_byte_t*)data->write_ptr, data));
 
 		SocketError error2;
-		sock->AsyncRecvSome((s_byte_t*)data->read_ptr, strlen(gContent), m_read_handler, error2);
+		sock->AsyncRecvSome((s_byte_t*)data->read_ptr, (s_uint32_t)strlen(gContent), m_read_handler, error2);
 		if (error2)
 		{
 			print_func("recv error", error2);

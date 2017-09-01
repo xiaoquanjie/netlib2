@@ -51,6 +51,7 @@
 #include <tr1/functional>
 #include <sys/epoll.h>
 #include <string.h>
+#include <signal.h>
 #endif
 
 // print debug info

@@ -49,6 +49,7 @@ M_SOCKET_DECL LinuxSockInit<Version>::LinuxSockInit()
 {
 	if (::__sync_add_and_fetch(&_data._init_cnt,1)==1)
 	{
+		signal(SIGPIPE, SIG_IGN);
 		_lockdispatcher = new LockDispatcher<>();
 	}
 }

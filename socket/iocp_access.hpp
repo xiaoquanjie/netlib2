@@ -630,7 +630,7 @@ M_SOCKET_DECL void IocpService2::Access::BindIocp(IocpService2& service, Impl& i
 		}
 
 		service._implidx++;
-		s_int32_t size = service._implvector.size();
+		s_int32_t size = (s_int32_t)service._implvector.size();
 		IocpService2::IoServiceImpl& serviceimpl = *(service._implvector[service._implidx%size]);
 		service._mutex.unlock();
 
@@ -746,7 +746,7 @@ M_SOCKET_DECL IocpService2::IoServiceImpl* IocpService2::Access::GetIoServiceImp
 M_SOCKET_DECL s_uint32_t IocpService2::Access::GetServiceCount(const IocpService2& service)
 {
 	ScopedLock scoped(service._mutex);
-	return service._implvector.size();
+	return (s_uint32_t)service._implvector.size();
 }
 
 M_SOCKET_DECL IocpService2::Operation::Operation() :_oper(0) {}

@@ -130,13 +130,13 @@ M_SOCKET_DECL LockDispatcher<>* WinSockInit<Major, Minor>::GetLockDispatcher()co
 static const WinSockInit<>& gWinSockInstance = WinSockInit<>();
 
 #define M_DISPATCHER_LOCK(idx)\
-	gWinSockInstance.GetLockDispatcher()->GetLock(idx)
+	gWinSockInstance.GetLockDispatcher()->GetLock((s_uint32_t)idx)
 #define M_DISPATCHER_SCOPED_LOCK(idx)\
-	ScopedLock scoped_lock_##LINE(gWinSockInstance.GetLockDispatcher()->GetLock(idx))
+	ScopedLock scoped_lock_##LINE(gWinSockInstance.GetLockDispatcher()->GetLock((s_uint32_t)idx))
 #define M_DISPATCHER_LOCK_LOCK(idx)\
-	gWinSockInstance.GetLockDispatcher()->GetLock(idx).lock()
+	gWinSockInstance.GetLockDispatcher()->GetLock((s_uint32_t)idx).lock()
 #define M_DISPATCHER_LOCK_UNLOCK(idx)\
-	gWinSockInstance.GetLockDispatcher()->GetLock(idx).unlock()
+	gWinSockInstance.GetLockDispatcher()->GetLock((s_uint32_t)idx).unlock()
 
 
 static LPFN_ACCEPTEX  gAcceptEx = gWinSockInstance.GetAcceptEx();
