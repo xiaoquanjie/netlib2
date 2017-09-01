@@ -156,6 +156,7 @@
     <ClInclude Include="socket\acceptor_service.hpp" />
     <ClInclude Include="socket\address.hpp" />
     <ClInclude Include="socket\basic_socket.hpp" />
+    <ClInclude Include="socket\buffer.hpp" />
     <ClInclude Include="socket\config.hpp" />
     <ClInclude Include="socket\connector_service.hpp" />
     <ClInclude Include="socket\endpoint.hpp" />

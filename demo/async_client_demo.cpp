@@ -61,7 +61,7 @@ std::pair<const char*, int> GetRandWord()
 {
 	int idx = sizeof(gWords) / sizeof(char*);
 	idx = 0 + rand() % (idx - 1);
-	return std::pair<const char*, int>(gWords[idx], strlen(gWords[idx]));
+	return std::pair<const char*, int>(gWords[idx], (int)strlen(gWords[idx]));
 }
 
 AsyncClient::AsyncClient(IoService& ioservice):m_ioservice(ioservice)
@@ -109,7 +109,7 @@ void AsyncClient::ConnectHandler(TcpConnectorPtr connector, SocketError error)
 		connector->DestroyHandler(bind_t(&AsyncClient::DestroyHandler, this, pdata->read_ptr, pdata->write_ptr, pdata));
 
 		SocketError error;
-		connector->AsyncRecvSome(pdata->read_ptr, strlen(gContent), m_read_handler, error);
+		connector->AsyncRecvSome(pdata->read_ptr, (s_uint32_t)strlen(gContent), m_read_handler, error);
 		if (error)
 		{
 			print_func("async recv some error :", error);
@@ -174,7 +174,7 @@ void AsyncClient::ReadHandler(TcpConnectorPtr connector, s_byte_t* data, s_uint3
 		data[trans] = 0;
 		M_PRINT_WITH_LOCK("cli ReadHandler recv max :" << max << " trans :" << trans << "  data :" << data << endl);
 		data[0] = 0;
-		connector->AsyncRecvSome(data, strlen(gContent), m_read_handler,error);
+		connector->AsyncRecvSome(data, (s_uint32_t)strlen(gContent), m_read_handler,error);
 		if (error)
 		{
 			print_func("async recv some error", error);

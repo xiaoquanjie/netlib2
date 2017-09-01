@@ -144,6 +144,9 @@
     <ClInclude Include="socket\win_iocp2.hpp">
       <Filter>socket</Filter>
     </ClInclude>
+    <ClInclude Include="socket\buffer.hpp">
+      <Filter>socket</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="socket.cpp">
