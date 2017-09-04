@@ -698,7 +698,7 @@ M_SOCKET_DECL void IocpService2::Access::Run(IocpService2& service, SocketError&
 				1;// time out
 
 			M_DEFAULT_SOCKET_ERROR2(error);
-			return;
+			break;
 		}
 	}
 
