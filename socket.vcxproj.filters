@@ -19,6 +19,9 @@
     <Filter Include="源文件\demo">
       <UniqueIdentifier>{e780dab5-b60f-4c46-8f43-55906660816e}</UniqueIdentifier>
     </Filter>
+    <Filter Include="sync_call">
+      <UniqueIdentifier>{8b3bb306-3e89-45b6-b47c-f52d6f87c5d9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -146,6 +149,24 @@
     </ClInclude>
     <ClInclude Include="socket\buffer.hpp">
       <Filter>socket</Filter>
+    </ClInclude>
+    <ClInclude Include="sync_call\server_handler.hpp">
+      <Filter>sync_call</Filter>
+    </ClInclude>
+    <ClInclude Include="sync_call\sync_client.hpp">
+      <Filter>sync_call</Filter>
+    </ClInclude>
+    <ClInclude Include="sync_call\sync_server.hpp">
+      <Filter>sync_call</Filter>
+    </ClInclude>
+    <ClInclude Include="sync_call\config.hpp">
+      <Filter>sync_call</Filter>
+    </ClInclude>
+    <ClInclude Include="sync_call\ioservice.hpp">
+      <Filter>sync_call</Filter>
+    </ClInclude>
+    <ClInclude Include="sync_call\sync_call.hpp">
+      <Filter>sync_call</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

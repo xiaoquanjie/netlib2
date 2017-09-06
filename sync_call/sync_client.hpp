@@ -1,0 +1,11 @@
+#ifndef M_SYNC_CALL_SYNC_CLIENT_INCLUDE
+#define M_SYNC_CALL_SYNC_CLIENT_INCLUDE
+
+#include "config.hpp"
+M_SYNCCALLNAMESPACE_BEGIN
+
+template<typename IoServiceType>
+
+
+M_SYNCCALLNAMESPACE_END
+#endif
