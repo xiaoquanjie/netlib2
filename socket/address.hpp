@@ -24,7 +24,7 @@ struct in4_addr_type
 
 struct in6_addr_type 
 { 
-	IN6_ADDR _addr;
+	in6_addr _addr;
 };
 
 struct AddressV4
@@ -108,13 +108,13 @@ struct AddressV4
 
 	explicit AddressV4(const char* addr)
 	{
-		if (g_inet_pton(M_AF_INET, addr, (void*)&_addr) == NULL)
+		if (g_inet_pton(M_AF_INET, addr, (void*)&_addr) != 1)
 			_addr._addr = M_INADDR_ANY;
 	}
 
 	AddressV4(const std::string& addr)
 	{
-		if (g_inet_pton(M_AF_INET, addr.c_str(), (void*)&_addr) == NULL)
+		if (g_inet_pton(M_AF_INET, addr.c_str(), (void*)&_addr) != 1)
 			_addr._addr = M_INADDR_ANY;
 	}
 
@@ -259,13 +259,13 @@ struct AddressV6
 
 	explicit AddressV6(const char* addr)
 	{
-		if (g_inet_pton(M_AF_INET6, addr, (void*)&_addr) == NULL)
+		if (g_inet_pton(M_AF_INET6, addr, (void*)&_addr) != 1)
 			_addr._addr = in6addr_any;
 	}
 
 	AddressV6(const std::string& addr)
 	{
-		if (g_inet_pton(M_AF_INET6, addr.c_str(), (void*)&_addr) == NULL)
+		if (g_inet_pton(M_AF_INET6, addr.c_str(), (void*)&_addr) != 1)
 			_addr._addr = in6addr_any;
 	}
 

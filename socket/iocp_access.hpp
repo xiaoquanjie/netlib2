@@ -632,10 +632,9 @@ M_SOCKET_DECL void IocpService2::Access::BindIocp(IocpService2& service, Impl& i
 		service._implidx++;
 		s_int32_t size = (s_int32_t)service._implvector.size();
 		IocpService2::IoServiceImpl& serviceimpl = *(service._implvector[service._implidx%size]);
-		service._mutex.unlock();
-
-		::InterlockedIncrement(&serviceimpl._fdcnt);
 		impl._iocp = serviceimpl._handler;
+		::InterlockedIncrement(&serviceimpl._fdcnt);
+		service._mutex.unlock();
 	}
 	if (impl._iocp == 0)
 	{

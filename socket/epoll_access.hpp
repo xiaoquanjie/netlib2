@@ -751,10 +751,9 @@ M_SOCKET_DECL void EpollService::Access::CtlEpoll(EpollService& service, Impl& i
 		service._implidx++;
 		s_int32_t size = service._implvector.size();
 		EpollService::IoServiceImpl& serviceimpl = *(service._implvector[service._implidx%size]);
-		service._mutex.unlock();
-
 		__sync_add_and_fetch(&serviceimpl._fdcnt, 1);
 		impl._epoll = serviceimpl._handler;
+		service._mutex.unlock();
 	}
 	if (impl._epoll == -1)
 	{
