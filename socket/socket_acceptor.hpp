@@ -31,6 +31,8 @@ public:
 	
 	M_SOCKET_DECL TcpAcceptor(IoServiceType& ioservice, const EndPoint& ep);
 
+	M_SOCKET_DECL TcpAcceptor(IoServiceType& ioservice, const EndPoint& ep, s_uint32_t flag);
+
 	template<typename Socket_Type>
 	M_SOCKET_DECL void Accept(Socket_Type& peer);
 
@@ -64,6 +66,27 @@ M_SOCKET_DECL TcpAcceptor<IoServiceType>::TcpAcceptor(IoServiceType& ioservice, 
 	M_THROW_DEFAULT_SOCKET_ERROR2(error);
 
 	this->GetObjectService().Listen(this->GetImpl(), 100, error);
+	M_THROW_DEFAULT_SOCKET_ERROR2(error);
+}
+
+template<typename IoServiceType>
+M_SOCKET_DECL TcpAcceptor<IoServiceType>::TcpAcceptor(IoServiceType& ioservice, const EndPoint& ep, s_uint32_t flag)
+	:SocketType(ioservice)
+{
+	this->GetObjectService().Construct(this->GetImpl(), E_ACCEPTOR_TYPE);
+	Tcp pt = ep.Protocol();
+	SocketError error;
+	this->GetObjectService().Open(this->GetImpl(), pt, error);
+	M_THROW_DEFAULT_SOCKET_ERROR2(error);
+
+	typename SocketType::ReuseAddress reuse(true);
+	this->SetOption(reuse, error);
+	M_THROW_DEFAULT_SOCKET_ERROR2(error);
+
+	this->GetObjectService().Bind(this->GetImpl(), ep, error);
+	M_THROW_DEFAULT_SOCKET_ERROR2(error);
+
+	this->GetObjectService().Listen(this->GetImpl(), flag, error);
 	M_THROW_DEFAULT_SOCKET_ERROR2(error);
 }
 

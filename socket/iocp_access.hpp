@@ -114,9 +114,11 @@ M_SOCKET_DECL void IocpService2::Access::Close(IocpService2& service, Impl& impl
 {
 	if (impl._fd != M_INVALID_SOCKET)
 	{
+		service._mutex.lock();
 		IocpService2::IoServiceImpl* serviceimpl = GetIoServiceImpl(service, impl);
 		if (serviceimpl)
 			::InterlockedDecrement(&serviceimpl->_fdcnt);
+		service._mutex.unlock();
 
 		if (impl._fd != M_INVALID_SOCKET)
 		{

@@ -118,9 +118,12 @@ M_SOCKET_DECL void EpollService::Access::Close(EpollService& service, EpollServi
 {
 	if (impl._fd != M_INVALID_SOCKET)
 	{
+		service._mutex.lock();
 		EpollService::IoServiceImpl* serviceimpl = GetIoServiceImpl(service, impl);
 		if (serviceimpl)
 			__sync_sub_and_fetch(&serviceimpl->_fdcnt, 1);
+		service._mutex.unlock();
+
 		if (impl._fd != M_INVALID_SOCKET)
 		{
 			if (M_IMPL_G_BIND(impl))
