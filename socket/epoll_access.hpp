@@ -274,7 +274,7 @@ M_SOCKET_DECL void EpollService::Access::Accept(EpollService& service, EpollServ
 }
 
 template<typename AcceptHandler>
-M_SOCKET_DECL void EpollService::Access::AsyncAccpet(EpollService& service, M_HANDLER_SOCKET_PTR(AcceptHandler) accept_ptr, AcceptHandler handler, SocketError& error)
+M_SOCKET_DECL void EpollService::Access::AsyncAccept(EpollService& service, M_HANDLER_SOCKET_PTR(AcceptHandler) accept_ptr, AcceptHandler handler, SocketError& error)
 {
 	EpollService::Impl& impl = accept_ptr->GetImpl();
 	if (impl._fd == M_INVALID_SOCKET)
@@ -321,6 +321,12 @@ M_SOCKET_DECL void EpollService::Access::AsyncAccpet(EpollService& service, M_HA
 		accept_op->Clear();
 		return;
 	}
+}
+
+template<typename AcceptHandler>
+M_SOCKET_DECL void EpollService::Access::AsyncAccept(EpollService& service, Impl& accept_impl, Impl& sock_impl, AcceptHandler handler, SocketError& error)
+{
+
 }
 
 M_SOCKET_DECL s_int32_t EpollService::Access::RecvSome(EpollService& service, EpollService::Impl& impl, s_byte_t* data, s_uint32_t size, SocketError& error)

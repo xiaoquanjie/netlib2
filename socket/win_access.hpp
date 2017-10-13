@@ -258,7 +258,7 @@ M_SOCKET_DECL void IocpService::Access::Accept(IocpService& service, Impl& impl,
 }
 
 template<typename AcceptHandler>
-M_SOCKET_DECL void IocpService::Access::AsyncAccpet(IocpService& service, M_HANDLER_SOCKET_PTR(AcceptHandler) accept_ptr, AcceptHandler handler, SocketError& error)
+M_SOCKET_DECL void IocpService::Access::AsyncAccept(IocpService& service, M_HANDLER_SOCKET_PTR(AcceptHandler) accept_ptr, AcceptHandler handler, SocketError& error)
 {
 	IocpService::Impl& impl = accept_ptr->GetImpl();
 	if (impl._fd == M_INVALID_SOCKET)

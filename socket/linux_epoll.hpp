@@ -193,7 +193,10 @@ public:
 	M_SOCKET_DECL static void Accept(EpollService& service, EpollService::Impl& impl, Impl& peer, SocketError& error);
 
 	template<typename AcceptHandler>
-	M_SOCKET_DECL static void AsyncAccpet(EpollService& service, M_HANDLER_SOCKET_PTR(AcceptHandler) accept_ptr, AcceptHandler handler, SocketError& error);
+	M_SOCKET_DECL static void AsyncAccept(EpollService& service, M_HANDLER_SOCKET_PTR(AcceptHandler) accept_ptr, AcceptHandler handler, SocketError& error);
+
+	template<typename AcceptHandler>
+	M_SOCKET_DECL static void AsyncAccept(EpollService& service, Impl& accept_impl, Impl& sock_impl, AcceptHandler handler, SocketError& error);
 
 	M_SOCKET_DECL static s_int32_t RecvSome(EpollService& service, EpollService::Impl& impl, s_byte_t* data, s_uint32_t size, SocketError& error);
 

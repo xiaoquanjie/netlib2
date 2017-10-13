@@ -260,7 +260,7 @@ M_SOCKET_DECL void IocpService2::Access::Accept(IocpService2& service, Impl& imp
 }
 
 template<typename AcceptHandler>
-M_SOCKET_DECL void IocpService2::Access::AsyncAccpet(IocpService2& service, M_HANDLER_SOCKET_PTR(AcceptHandler) accept_ptr, AcceptHandler handler, SocketError& error)
+M_SOCKET_DECL void IocpService2::Access::AsyncAccept(IocpService2& service, M_HANDLER_SOCKET_PTR(AcceptHandler) accept_ptr, AcceptHandler handler, SocketError& error)
 {
 	IocpService2::Impl& impl = accept_ptr->GetImpl();
 	if (impl._fd == M_INVALID_SOCKET)
@@ -330,6 +330,77 @@ M_SOCKET_DECL void IocpService2::Access::AsyncAccpet(IocpService2& service, M_HA
 			SocketError error2;
 			Close(service, op->_impl, error2);
 			Destroy(service, op->_impl);
+		}
+		break;
+	}
+}
+
+template<typename AcceptHandler>
+M_SOCKET_DECL void IocpService2::Access::AsyncAccept(IocpService2& service, Impl& accept_impl, Impl& client_impl, AcceptHandler handler, SocketError& error)
+{
+	if (accept_impl._fd == M_INVALID_SOCKET)
+	{
+		error = SocketError(M_ERR_BAD_DESCRIPTOR);
+		return;
+	}
+	if (M_IMPL2_G_ACCEPT_FLAG(accept_impl))
+	{
+		error = SocketError(M_ERR_POSTED_ACCEPT);
+		return;
+	}
+	if (!M_IMPL2_G_NONBLOCK(accept_impl))
+	{
+		if (!detail::Util::SetNonBlock(accept_impl._fd))
+		{
+			M_DEFAULT_SOCKET_ERROR2(error);
+			return;
+		}
+		M_IMPL2_S_NONBLOCK(accept_impl)
+	}
+
+	if (!M_IMPL2_G_BIND(accept_impl))
+	{
+		BindIocp(service, accept_impl, error);
+		if (error)
+			return;
+		M_IMPL2_S_BIND(accept_impl);
+	}
+
+	Construct(service, client_impl, E_SOCKET_TYPE);
+	Open(service, client_impl, M_IMPL2_G_V(accept_impl) ? Tcp::V6() : Tcp::V4(), error);
+	if (error)
+	{
+		return;
+	}
+
+	typedef IocpService2::AcceptOperation2<AcceptHandler> OperationType;
+	IocpService2::OperationAlloc<OperationType>::Alloc(&accept_impl._operation, E_ACCEPT_OP);
+	OperationType* op = dynamic_cast<OperationType*>(accept_impl._operation._accept_op->_oper);
+	g_bzero(op->_buf, sizeof(op->_buf));
+	op->_handler = handler;
+	op->_bytes = 0;
+	op->_impl = client_impl;
+
+	for (;;)
+	{
+		M_IMPL2_S_ACCEPT_FLAG(accept_impl);
+		// If no error occurs, the AcceptEx function completed successfully and a value of TRUE is returned.
+		s_int32_t ret = gAcceptEx(accept_impl._fd, op->_impl._fd, op->_buf,
+			0, sizeof(sockaddr_storage_t), sizeof(sockaddr_storage_t), (LPDWORD)&op->_bytes, accept_impl._operation._accept_op);
+
+		if (!ret && M_ERR_LAST == M_ECONNRESET)
+		{
+			M_DEBUG_PRINT("peer connect reset");
+			continue;
+		}
+		if (!ret && M_ERR_LAST != M_ERROR_IO_PENDING)
+		{
+			M_DEBUG_PRINT("acceptex fail");
+			M_DEFAULT_SOCKET_ERROR2(error);
+			M_IMPL2_C_ACCEPT_FLAG(accept_impl);
+
+			SocketError error2;
+			Close(service, client_impl, error2);
 		}
 		break;
 	}
@@ -775,6 +846,26 @@ M_SOCKET_DECL bool IocpService2::AcceptOperation<Handler>::Complete(IocpService2
 	M_HANDLER_SOCKET_PTR(Handler) acceptor_ptr = this->_socket_ptr;
 	this->_socket_ptr.reset();
 	handler(acceptor_ptr, SocketPtr, error);
+	return true;
+}
+
+template<typename Handler>
+M_SOCKET_DECL bool IocpService2::AcceptOperation2<Handler>::Complete(IocpService2& service, s_uint32_t transbyte, SocketError& error)
+{
+	if (error)
+	{
+		SocketError error2;
+		Access::Close(service, _impl, error2);
+	}
+
+	/*M_IMPL2_C_ACCEPT_FLAG(this->_socket_ptr->GetImpl());
+	shard_ptr_t<TcpSocket<IocpService2> > SocketPtr(new TcpSocket<IocpService2>(service));
+	IocpService2::Impl& impl = SocketPtr->GetImpl();
+	impl = _impl;
+	Handler handler = this->_handler;
+	M_HANDLER_SOCKET_PTR(Handler) acceptor_ptr = this->_socket_ptr;
+	this->_socket_ptr.reset();
+	handler(acceptor_ptr, SocketPtr, error);*/
 	return true;
 }
 

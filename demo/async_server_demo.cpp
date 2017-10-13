@@ -39,6 +39,11 @@ static void print_func(const s_byte_t* ptr, SocketError& error)
 
 AsyncServer::AsyncServer(IoService& ioservice):m_ioservice(ioservice)
 {
+	init2();
+}
+
+void AsyncServer::init()
+{
 	m_write_handler = bind_t(&AsyncServer::WriteHandler, this, placeholder_1, placeholder_2, placeholder_3, placeholder_4,
 		placeholder_5);
 	m_read_handler = bind_t(&AsyncServer::ReadHandler, this, placeholder_1, placeholder_2, placeholder_3, placeholder_4,
@@ -50,10 +55,31 @@ AsyncServer::AsyncServer(IoService& ioservice):m_ioservice(ioservice)
 	{
 		SocketError error;
 		Tcp::EndPoint ep(AddressV4(""), 2001);
-		TcpAcceptorPtr AcceptorPtr(new TcpAcceptor<IoService>(m_ioservice, ep));
+		TcpAcceptorPtr AcceptorPtr(new TcpAcceptor<IoService>(m_ioservice, ep, 20));
 
 		AcceptorPtr->DestroyHandler(m_destroy_handler);
 		AcceptorPtr->AsyncAccept(m_accept_handler);
+	}
+	catch (SocketError& error)
+	{
+		print_error(error);
+	}
+}
+
+void AsyncServer::init2()
+{
+	try
+	{
+		SocketError error;
+		Tcp::EndPoint ep(AddressV4(""), 2001);
+
+		TcpAcceptor<IoService> acceptor(m_ioservice,ep);
+		acceptor.DestroyHandler(m_destroy_handler);
+
+		TcpSocket<IoService> sock(m_ioservice);
+		TcpSocketPtr socket_ptr(new TcpSocket<IoService>(m_ioservice));
+		function_t<void(SocketError)> func = bind_t(&AsyncServer::AcceptHandler2, this, placeholder_1, socket_ptr);
+		acceptor.AsyncAccept(func, *socket_ptr);
 	}
 	catch (SocketError& error)
 	{
@@ -160,6 +186,28 @@ void AsyncServer::AcceptHandler(TcpAcceptorPtr acceptor, TcpSocketPtr sock, Sock
 		}
 	}
 	acceptor->AsyncAccept(m_accept_handler);
+}
+
+void AsyncServer::AcceptHandler2(SocketError error, TcpSocketPtr sock)
+{
+	if (error)
+	{
+		print_func("accept handler happen error :", error);
+	}
+	else
+	{
+		print_func("accept one....");
+		init_data* data = CreateInitData(100, 100);
+		sock->SetData(data);
+		sock->DestroyHandler(bind_t(&AsyncServer::DestroyHandler, this, (s_byte_t*)data->read_ptr, (s_byte_t*)data->write_ptr, data));
+
+		SocketError error2;
+		sock->AsyncRecvSome((s_byte_t*)data->read_ptr, (s_uint32_t)strlen(gContent), m_read_handler, error2);
+		if (error2)
+		{
+			print_func("recv error", error2);
+		}
+	}
 }
 
 void AsyncServer::DestroyHandler(s_byte_t* read_ptr, s_byte_t* write_ptr,init_data* pdata)

@@ -75,6 +75,8 @@ enum EShutdownType
 	E_Ehutdown_BOTH = M_SHUT_RDWR
 };
 
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 #define M_TCP_SOCKET_PTR(Service)    shard_ptr_t<TcpSocket<Service> >
 #define M_TCP_ACCEPTOR_PTR(Service)  shard_ptr_t<TcpAcceptor<Service> >
 #define M_TCP_CONNECTOR_PTR(Service) shard_ptr_t<TcpConnector<Service> >
@@ -116,6 +118,22 @@ enum EShutdownType
 #define M_CHECK_C_WRITE_HANDLER(handler,service) {\
 	M_C_WRITE_HANDLER_TYPE(service) _h_##LINE_ = handler;\
 }
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+#define M_TCP_SOCKET(Service)    TcpSocket<Service>
+#define M_TCP_ACCEPTOR(Service)  TcpAcceptor<Service>
+#define M_TCP_CONNECTOR(Service) TcpConnector<Service>
+
+#define M_ACCEPT_HANDLER_TYPE2(Service) function_t<\
+		void(SocketError)\
+>
+
+#define M_CHECK_ACCEPT_HANDLER2(handler,service) {\
+	M_ACCEPT_HANDLER_TYPE2(service) _h_##LINE_ = handler; \
+}
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 template<typename T>
 struct HandlerTraits
@@ -242,7 +260,7 @@ struct HandlerTraits<function_t<ReturnType(Arg1, Arg2, Arg3, Arg4, Arg5)> >
 #define M_HANDLER_SOCKET_PTR(HANDLER)\
 	typename HandlerTraits<HANDLER>::arg1_type 
 #define M_HANDLER_SOCKET_PTR2(HANDLER)\
-typename HandlerTraits<HANDLER>::arg2_type
+	typename HandlerTraits<HANDLER>::arg2_type
 
 M_SOCKET_NAMESPACE_END
 #endif

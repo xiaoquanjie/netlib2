@@ -34,7 +34,7 @@ public:
 		friend class Access;
 		M_SOCKET_DECL IoServiceImpl(IocpService2& service);
 		M_SOCKET_DECL IocpService2& GetService();
-	
+
 	private:
 		IocpService2&	_service;
 		HANDLE			_handler;
@@ -65,6 +65,16 @@ public:
 		Handler    _handler;
 
 		M_HANDLER_SOCKET_PTR(Handler) _socket_ptr;
+		M_SOCKET_DECL virtual bool Complete(IocpService2& service, s_uint32_t transbyte, SocketError& error);
+	};
+
+	template<typename Handler>
+	struct AcceptOperation2 : public Oper {
+		s_byte_t   _buf[sizeof(sockaddr_storage_t) * 2];
+		s_uint32_t _bytes;
+		Impl	   _impl;
+		Handler    _handler;
+
 		M_SOCKET_DECL virtual bool Complete(IocpService2& service, s_uint32_t transbyte, SocketError& error);
 	};
 
@@ -193,7 +203,10 @@ public:
 	M_SOCKET_DECL static void Accept(IocpService2& service, Impl& impl, Impl& peer, SocketError& error);
 
 	template<typename AcceptHandler>
-	M_SOCKET_DECL static void AsyncAccpet(IocpService2& service, M_HANDLER_SOCKET_PTR(AcceptHandler) accept_ptr, AcceptHandler handler, SocketError& error);
+	M_SOCKET_DECL static void AsyncAccept(IocpService2& service, M_HANDLER_SOCKET_PTR(AcceptHandler) accept_ptr, AcceptHandler handler, SocketError& error);
+
+	template<typename AcceptHandler>
+	M_SOCKET_DECL static void AsyncAccept(IocpService2& service, Impl& accept_impl, Impl& client_impl,AcceptHandler handler, SocketError& error);
 
 	M_SOCKET_DECL static s_int32_t RecvSome(IocpService2& service, Impl& impl, s_byte_t* data, s_uint32_t size, SocketError& error);
 
