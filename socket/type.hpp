@@ -125,12 +125,15 @@ enum EShutdownType
 #define M_TCP_ACCEPTOR(Service)  TcpAcceptor<Service>
 #define M_TCP_CONNECTOR(Service) TcpConnector<Service>
 
-#define M_ACCEPT_HANDLER_TYPE2(Service) function_t<\
+#define M_COMMON_HANDLER_TYPE(Service) function_t<\
 		void(SocketError)\
 >
+#define M_RW_HANDLER_TYPE(Service) function_t<\
+		void(s_uint32_t,SocketError)\
+>
 
-#define M_CHECK_ACCEPT_HANDLER2(handler,service) {\
-	M_ACCEPT_HANDLER_TYPE2(service) _h_##LINE_ = handler; \
+#define M_CHECK_COMMON_HANDLER(handler,service) {\
+	M_COMMON_HANDLER_TYPE(service) _h_##LINE_ = handler; \
 }
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////

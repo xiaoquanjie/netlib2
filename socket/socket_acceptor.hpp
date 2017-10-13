@@ -137,7 +137,7 @@ template<typename IoServiceType>
 template<typename AcceptHandler>
 M_SOCKET_DECL void TcpAcceptor<IoServiceType>::AsyncAccept(AcceptHandler handler,StreamSocketType& sock)
 {
-	M_CHECK_ACCEPT_HANDLER2(handler, IoServiceType);
+	M_CHECK_COMMON_HANDLER(handler, IoServiceType);
 	SocketError error;
 	this->AsyncAccept(handler, sock, error);
 	M_THROW_DEFAULT_SOCKET_ERROR2(error);
@@ -147,7 +147,7 @@ template<typename IoServiceType>
 template<typename AcceptHandler>
 M_SOCKET_DECL void TcpAcceptor<IoServiceType>::AsyncAccept(AcceptHandler handler, StreamSocketType& sock, SocketError& error)
 {
-	M_CHECK_ACCEPT_HANDLER2(handler, IoServiceType);
+	M_CHECK_COMMON_HANDLER(handler, IoServiceType);
 	this->GetObjectService().AsyncAccept(this->GetImpl(), sock.GetImpl(), handler, error);
 }
 

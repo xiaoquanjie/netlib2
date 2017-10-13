@@ -39,7 +39,11 @@ public:
 
 	void WriteHandler(TcpSocketPtr sock, const s_byte_t* data, s_uint32_t max, s_uint32_t trans, SocketError error);
 
+	void WriteHandler2(s_uint32_t trans, SocketError error, TcpSocketPtr sock);
+
 	void ReadHandler(TcpSocketPtr sock, s_byte_t* data, s_uint32_t max, s_uint32_t trans, SocketError error);
+
+	void ReadHandler2(s_uint32_t trans, SocketError error, TcpSocketPtr sock);
 
 	void AcceptHandler(TcpAcceptorPtr acceptor, TcpSocketPtr sock, SocketError error);
 
@@ -62,6 +66,8 @@ private:
 	M_READ_HANDLER_TYPE(IoService)		m_read_handler;
 	M_ACCEPT_HANDLER_TYPE(IoService)	m_accept_handler;
 	function_t<void()> m_destroy_handler;
+
+	TcpAcceptor<IoService> m_acceptor;
 };
 
 

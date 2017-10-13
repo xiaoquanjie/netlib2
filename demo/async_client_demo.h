@@ -27,13 +27,23 @@ public:
 
 	AsyncClient(IoService& ioservice);
 
+	void Init();
+
+	void Init2();
+
 	void Run();
 
 	void ConnectHandler(TcpConnectorPtr connector, SocketError error);
 
+	void ConnectHandler2(SocketError error, TcpConnectorPtr connector);
+
 	void WriteHandler(TcpConnectorPtr connector, const s_byte_t* data, s_uint32_t max, s_uint32_t trans, SocketError error);
 
+	void WriteHandler2(s_uint32_t trans, SocketError error,TcpConnectorPtr connector);
+
 	void ReadHandler(TcpConnectorPtr connector, s_byte_t* data, s_uint32_t max, s_uint32_t trans, SocketError error);
+
+	void ReadHandler2(s_uint32_t trans, SocketError error, TcpConnectorPtr connector);
 
 	void DestroyHandler(s_byte_t* read_ptr, s_byte_t* write_ptr, init_data*);
 
