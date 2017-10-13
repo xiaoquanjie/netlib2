@@ -71,12 +71,12 @@ AsyncClient::AsyncClient(IoService& ioservice):m_ioservice(ioservice)
 	m_write_handler = bind_t(&AsyncClient::WriteHandler, this, placeholder_1, placeholder_2, placeholder_3, placeholder_4, placeholder_5);
 	m_read_handler = bind_t(&AsyncClient::ReadHandler, this, placeholder_1, placeholder_2, placeholder_3, placeholder_4, placeholder_5);
 
-	Init();
+	Init2();
 }
 
 void AsyncClient::Init()
 {
-	for (int i = 0; i < 1000; ++i)
+	//for (int i = 0; i < 1000; ++i)
 	{
 		try
 		{
@@ -100,7 +100,7 @@ void AsyncClient::Init2()
 		Tcp::EndPoint ep(AddressV4("127.0.0.1"), 2001);
 		TcpConnectorPtr ConnectorPtr(new TcpConnector<IoService>(m_ioservice));
 
-		auto func = bind_t(&AsyncClient::ConnectHandler2, this, placeholder_1, ConnectorPtr);
+		M_COMMON_HANDLER_TYPE(IoService) func = bind_t(&AsyncClient::ConnectHandler2, this, placeholder_1, ConnectorPtr);
 		ConnectorPtr->AsyncConnect(func, ep);
 	}
 	catch (SocketError& error)
@@ -163,7 +163,7 @@ void AsyncClient::ConnectHandler2(SocketError error, TcpConnectorPtr connector)
 		connector->SetData(pdata);
 		connector->DestroyHandler(bind_t(&AsyncClient::DestroyHandler, this, pdata->read_ptr, pdata->write_ptr, pdata));
 
-		auto read_func = bind_t(&AsyncClient::ReadHandler2, this, placeholder_1, placeholder_2, connector);
+		M_RW_HANDLER_TYPE(IoService) read_func = bind_t(&AsyncClient::ReadHandler2, this, placeholder_1, placeholder_2, connector);
 		SocketError error;
 		connector->AsyncRecvSome(read_func, pdata->read_ptr, (s_uint32_t)strlen(gContent), error);
 		if (error)
@@ -171,7 +171,7 @@ void AsyncClient::ConnectHandler2(SocketError error, TcpConnectorPtr connector)
 			print_func("async recv some error :", error);
 		}
 
-		auto write_func = bind_t(&AsyncClient::WriteHandler2, this, placeholder_1, placeholder_2, connector);
+		M_RW_HANDLER_TYPE(IoService) write_func = bind_t(&AsyncClient::WriteHandler2, this, placeholder_1, placeholder_2, connector);
 		std::pair<const char*, int> p = GetRandWord();
 		memcpy(pdata->write_ptr, p.first, p.second);
 		connector->AsyncSendSome(write_func, pdata->write_ptr, p.second, error);
@@ -242,7 +242,7 @@ void AsyncClient::WriteHandler2(s_uint32_t trans, SocketError error, TcpConnecto
 			std::pair<const char*, int> p = GetRandWord();
 			memcpy(pdata->write_ptr, p.first, p.second);
 
-			auto write_func = bind_t(&AsyncClient::WriteHandler2, this, placeholder_1, placeholder_2, connector);
+			M_RW_HANDLER_TYPE(IoService) write_func = bind_t(&AsyncClient::WriteHandler2, this, placeholder_1, placeholder_2, connector);
 			connector->AsyncSendSome(write_func,pdata->write_ptr, p.second);
 		}
 	}
@@ -291,7 +291,7 @@ void AsyncClient::ReadHandler2(s_uint32_t trans, SocketError error, TcpConnector
 		M_PRINT_WITH_LOCK("cli ReadHandler trans :" << trans << "  data :" << pdata->read_ptr << endl);
 		pdata->read_ptr[0] = 0;
 
-		auto read_func = bind_t(&AsyncClient::ReadHandler2, this, placeholder_1, placeholder_2, connector);
+		M_RW_HANDLER_TYPE(IoService) read_func = bind_t(&AsyncClient::ReadHandler2, this, placeholder_1, placeholder_2, connector);
 		connector->AsyncRecvSome(read_func, pdata->read_ptr, (s_uint32_t)strlen(gContent), error);
 		if (error)
 		{

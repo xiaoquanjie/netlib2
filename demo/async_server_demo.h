@@ -47,7 +47,7 @@ public:
 
 	void AcceptHandler(TcpAcceptorPtr acceptor, TcpSocketPtr sock, SocketError error);
 
-	void AcceptHandler2(SocketError error, TcpSocketPtr sock);
+	void AcceptHandler2(SocketError error, TcpSocketPtr sock, TcpAcceptorPtr acceptor);
 
 	void DestroyHandler(s_byte_t* read_ptr, s_byte_t* write_ptr,init_data*);
 
@@ -66,8 +66,6 @@ private:
 	M_READ_HANDLER_TYPE(IoService)		m_read_handler;
 	M_ACCEPT_HANDLER_TYPE(IoService)	m_accept_handler;
 	function_t<void()> m_destroy_handler;
-
-	TcpAcceptor<IoService> m_acceptor;
 };
 
 

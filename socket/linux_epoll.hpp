@@ -148,11 +148,19 @@ struct EpollService::Impl
 	template<typename T>
 	friend struct ReadOperation;
 
+	struct core{
+		s_int32_t	 _epoll;
+		socket_t	 _fd;
+		s_uint16_t   _state;
+		OperationSet _operation;
+	};
+
+	Impl(){
+		_core = shard_ptr_t<core>(new core);
+	}
+
 private:
-	s_int32_t	 _epoll;
-	socket_t	 _fd;
-	s_uint16_t   _state;
-	OperationSet _operation;
+	shard_ptr_t<core> _core;
 };
 
 class EpollService::Access
@@ -205,14 +213,21 @@ public:
 	template<typename ReadHandler>
 	M_SOCKET_DECL static void AsyncRecvSome(EpollService& service, M_HANDLER_SOCKET_PTR(ReadHandler) socket_ptr, s_byte_t* data, s_uint32_t size, ReadHandler hander, SocketError& error);
 
+	M_SOCKET_DECL static void AsyncRecvSome(EpollService& service, Impl& impl, s_byte_t* data, s_uint32_t size, M_RW_HANDLER_TYPE(EpollService) hander, SocketError& error);
+
 	template<typename WriteHandler>
 	M_SOCKET_DECL static void AsyncSendSome(EpollService& service, M_HANDLER_SOCKET_PTR(WriteHandler) socket_ptr, const s_byte_t* data, s_uint32_t size, WriteHandler hander, SocketError& error);
+
+	M_SOCKET_DECL static void AsyncSendSome(EpollService& service, Impl& impl, const s_byte_t* data, s_uint32_t size, M_RW_HANDLER_TYPE(EpollService) hander, SocketError& error);
 
 	template<typename EndPoint>
 	M_SOCKET_DECL static void Connect(EpollService& service, EpollService::Impl& impl, const EndPoint& ep, SocketError& error);
 
 	template<typename ConnectHandler, typename EndPoint>
 	M_SOCKET_DECL static void AsyncConnect(EpollService& service, M_HANDLER_SOCKET_PTR(ConnectHandler) connect_ptr, const EndPoint& ep, ConnectHandler handler, SocketError& error);
+
+	template<typename EndPoint>
+	M_SOCKET_DECL static void AsyncConnect(EpollService& service, Impl& impl, const EndPoint& ep, M_COMMON_HANDLER_TYPE(EpollService) handler, SocketError& error);
 
 	M_SOCKET_DECL static void ExecOp(EpollService::IoServiceImpl& serviceimpl, EpollService::OperationSet* op, epoll_event_t* event);
 
