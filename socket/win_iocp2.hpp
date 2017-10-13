@@ -354,7 +354,7 @@ M_SOCKET_DECL bool IocpService2::Stopped()const
 
 M_SOCKET_DECL s_int32_t IocpService2::ServiceCount()const
 {
-	return 1;
+	return Access::GetServiceCount(*this);
 }
 
 #include "winsock_init.hpp"

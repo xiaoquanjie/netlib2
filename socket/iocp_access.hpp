@@ -1006,6 +1006,7 @@ M_SOCKET_DECL bool IocpService2::AcceptOperation<Handler>::Complete(IocpService2
 	IocpService2::Impl& impl = SocketPtr->GetImpl();
 	impl = this->_impl;
 	Handler handler = this->_handler;
+	this->_handler = 0;
 	M_HANDLER_SOCKET_PTR(Handler) acceptor_ptr = this->_socket_ptr;
 	this->_socket_ptr.reset();
 	handler(acceptor_ptr, SocketPtr, error);
@@ -1023,6 +1024,7 @@ M_SOCKET_DECL bool IocpService2::AcceptOperation2<Handler>::Complete(IocpService
 
 	M_IMPL2_C_ACCEPT_FLAG(this->_accept_impl);
 	Handler handler = this->_handler;
+	this->_handler = 0;
 	handler(error);
 	return true;
 }
@@ -1033,6 +1035,7 @@ M_SOCKET_DECL bool IocpService2::ConnectOperation<Handler>::Complete(IocpService
 	M_IMPL2_C_CONNECT_FLAG(this->_socket_ptr->GetImpl());
 	M_HANDLER_SOCKET_PTR(Handler) connect_ptr = this->_socket_ptr;
 	Handler handler = this->_handler;
+	this->_handler = 0;
 	this->_socket_ptr.reset();
 	if (!error)
 	{
@@ -1048,6 +1051,7 @@ M_SOCKET_DECL bool IocpService2::ConnectOperation2<Handler>::Complete(IocpServic
 {
 	M_IMPL2_C_CONNECT_FLAG(this->_impl);
 	Handler handler = this->_handler;
+	this->_handler = 0;
 	if (!error)
 	{
 		g_setsockopt(M_IMPL2_FD(this->_impl), M_SOL_SOCKET, SO_UPDATE_CONNECT_CONTEXT, NULL, 0);
@@ -1062,6 +1066,7 @@ M_SOCKET_DECL bool IocpService2::WriteOperation<Handler>::Complete(IocpService2&
 	M_IMPL2_C_WRITE_FLAG(this->_socket_ptr->GetImpl());
 	M_HANDLER_SOCKET_PTR(Handler) write_ptr = this->_socket_ptr;
 	Handler handler = this->_handler;
+	this->_handler = 0;
 	this->_socket_ptr.reset();
 	s_byte_t* data = this->_wsabuf.buf;
 	s_uint32_t size = (s_uint32_t)this->_wsabuf.len;
@@ -1074,6 +1079,7 @@ M_SOCKET_DECL bool IocpService2::WriteOperation2<Handler>::Complete(IocpService2
 {
 	M_IMPL2_C_WRITE_FLAG(this->_impl);
 	Handler handler = this->_handler;
+	this->_handler = 0;
 	handler(transbyte, error);
 	return true;
 }
@@ -1084,6 +1090,7 @@ M_SOCKET_DECL bool IocpService2::ReadOperation<Handler>::Complete(IocpService2& 
 	M_IMPL2_C_READ_FLAG(this->_socket_ptr->GetImpl());
 	M_HANDLER_SOCKET_PTR(Handler) read_ptr = this->_socket_ptr;
 	Handler handler = this->_handler;
+	this->_handler = 0;
 	this->_socket_ptr.reset();
 	s_byte_t* data = this->_wsabuf.buf;
 	s_uint32_t size = (s_uint32_t)this->_wsabuf.len;
@@ -1096,6 +1103,7 @@ M_SOCKET_DECL bool IocpService2::ReadOperation2<Handler>::Complete(IocpService2&
 {
 	M_IMPL2_C_READ_FLAG(this->_impl);
 	Handler handler = this->_handler;
+	this->_handler = 0;
 	handler(transbyte, error);
 	return true;
 }
