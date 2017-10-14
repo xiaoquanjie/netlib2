@@ -46,7 +46,7 @@ AsyncServer::AsyncServer(IoService& ioservice):m_ioservice(ioservice)
 	m_accept_handler = bind_t(&AsyncServer::AcceptHandler, this, placeholder_1, placeholder_2, placeholder_3);
 	m_destroy_handler = bind_t(&AsyncServer::DestroyHandler, this, (s_byte_t*)0, (s_byte_t*)0, (init_data*)0);
 
-	init2();
+	init();
 }
 
 void AsyncServer::init()
@@ -59,6 +59,7 @@ void AsyncServer::init()
 
 		AcceptorPtr->DestroyHandler(m_destroy_handler);
 		AcceptorPtr->AsyncAccept(m_accept_handler);
+		AcceptorPtr->Close();
 	}
 	catch (SocketError& error)
 	{
@@ -76,6 +77,7 @@ void AsyncServer::init2()
 		TcpSocketPtr socket_ptr(new TcpSocket<IoService>(m_ioservice));
 		function_t<void(SocketError)> func = bind_t(&AsyncServer::AcceptHandler2, this, placeholder_1, socket_ptr, AcceptorPtr);
 		AcceptorPtr->AsyncAccept(func, *socket_ptr);
+		
 	}
 	catch (SocketError& error)
 	{
@@ -278,6 +280,7 @@ void AsyncServer::AcceptHandler2(SocketError error, TcpSocketPtr sock, TcpAccept
 		M_RW_HANDLER_TYPE(IoService) read_func = bind_t(&AsyncServer::ReadHandler2, this, placeholder_1, placeholder_2, sock);
 		SocketError error2;
 		sock->AsyncRecvSome(read_func,(s_byte_t*)data->read_ptr, (s_uint32_t)strlen(gContent), error2);
+		
 		if (error2)
 		{
 			print_func("recv error", error2);

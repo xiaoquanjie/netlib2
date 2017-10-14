@@ -46,6 +46,7 @@ public:
 	struct Oper
 	{
 		virtual bool Complete(IocpService2& service, s_uint32_t transbyte, SocketError& error) = 0;
+		virtual void Clear(){}
 		virtual ~Oper() {}
 	};
 
@@ -66,6 +67,7 @@ public:
 
 		M_HANDLER_SOCKET_PTR(Handler) _socket_ptr;
 		M_SOCKET_DECL virtual bool Complete(IocpService2& service, s_uint32_t transbyte, SocketError& error);
+		M_SOCKET_DECL virtual void Clear();
 	};
 
 	template<typename Handler>
@@ -77,6 +79,7 @@ public:
 		Handler    _handler;
 
 		M_SOCKET_DECL virtual bool Complete(IocpService2& service, s_uint32_t transbyte, SocketError& error);
+		M_SOCKET_DECL virtual void Clear();
 	};
 
 	template<typename Handler>
@@ -85,22 +88,26 @@ public:
 		M_HANDLER_SOCKET_PTR(Handler) _socket_ptr;
 
 		M_SOCKET_DECL virtual bool Complete(IocpService2& service, s_uint32_t transbyte, SocketError& error);
+		M_SOCKET_DECL virtual void Clear();
 	};
 
 	template<typename Handler>
 	struct ConnectOperation2 : public Oper {
 		Handler _handler;
 		Impl	_impl;
+
 		M_SOCKET_DECL virtual bool Complete(IocpService2& service, s_uint32_t transbyte, SocketError& error);
+		M_SOCKET_DECL virtual void Clear();
 	};
 
 	template<typename Handler>
 	struct WriteOperation : public Oper {
 		wsabuf_t _wsabuf;
 		Handler _handler;
-		M_HANDLER_SOCKET_PTR(Handler) _socket_ptr;
 
+		M_HANDLER_SOCKET_PTR(Handler) _socket_ptr;
 		M_SOCKET_DECL virtual bool Complete(IocpService2& service, s_uint32_t transbyte, SocketError& error);
+		M_SOCKET_DECL virtual void Clear();
 	};
 
 	template<typename Handler>
@@ -110,15 +117,17 @@ public:
 		Impl	 _impl;
 
 		M_SOCKET_DECL virtual bool Complete(IocpService2& service, s_uint32_t transbyte, SocketError& error);
+		M_SOCKET_DECL virtual void Clear();
 	};
 
 	template<typename Handler>
 	struct ReadOperation : public Oper {
 		wsabuf_t _wsabuf;
 		Handler _handler;
-		M_HANDLER_SOCKET_PTR(Handler) _socket_ptr;
 
+		M_HANDLER_SOCKET_PTR(Handler) _socket_ptr;
 		M_SOCKET_DECL virtual bool Complete(IocpService2& service, s_uint32_t transbyte, SocketError& error);
+		M_SOCKET_DECL virtual void Clear();
 	};
 
 	template<typename Handler>
@@ -128,6 +137,7 @@ public:
 		Impl	 _impl;
 
 		M_SOCKET_DECL virtual bool Complete(IocpService2& service, s_uint32_t transbyte, SocketError& error);
+		M_SOCKET_DECL virtual void Clear();
 	};
 
 	struct OperationSet
@@ -141,7 +151,8 @@ public:
 	template<typename T>
 	struct OperationAlloc
 	{
-		M_SOCKET_DECL static void Alloc(OperationSet* ptr, s_int32_t type);
+		M_SOCKET_DECL static void Alloc(OperationSet* opset, s_int32_t type);
+		M_SOCKET_DECL static void Free(OperationSet* opset, s_int32_t type);
 	};
 
 	M_SOCKET_DECL IocpService2();
@@ -203,6 +214,13 @@ struct IocpService2::Impl
 	Impl()
 	{
 		_core = shard_ptr_t<core>(new core);
+		_core->_fd = M_INVALID_SOCKET;
+		_core->_iocp = 0;
+		_core->_state = 0;
+		_core->_operation._accept_op = 0;
+		_core->_operation._connect_op = 0;
+		_core->_operation._read_op = 0;
+		_core->_operation._write_op = 0;
 	}
 
 private:

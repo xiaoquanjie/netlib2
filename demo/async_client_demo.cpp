@@ -71,7 +71,7 @@ AsyncClient::AsyncClient(IoService& ioservice):m_ioservice(ioservice)
 	m_write_handler = bind_t(&AsyncClient::WriteHandler, this, placeholder_1, placeholder_2, placeholder_3, placeholder_4, placeholder_5);
 	m_read_handler = bind_t(&AsyncClient::ReadHandler, this, placeholder_1, placeholder_2, placeholder_3, placeholder_4, placeholder_5);
 
-	Init2();
+	Init();
 }
 
 void AsyncClient::Init()

@@ -336,10 +336,10 @@ M_SOCKET_DECL void IocpService2::Access::AsyncAccept(IocpService2& service, M_HA
 			M_DEFAULT_SOCKET_ERROR2(error);
 			M_IMPL2_C_ACCEPT_FLAG(impl);
 
-			op->_socket_ptr.reset();
 			SocketError error2;
 			Close(service, op->_impl, error2);
 			Destroy(service, op->_impl);
+			op->Clear();
 		}
 		break;
 	}
@@ -412,6 +412,7 @@ M_SOCKET_DECL void IocpService2::Access::AsyncAccept(IocpService2& service, Impl
 
 			SocketError error2;
 			Close(service, client_impl, error2);
+			op->Clear();
 		}
 		break;
 	}
@@ -530,9 +531,9 @@ M_SOCKET_DECL void IocpService2::Access::AsyncRecvSome(IocpService2& service, M_
 	s_int32_t ret = g_wsarecv(M_IMPL2_FD(impl), &op->_wsabuf, 1, 0, &flag, M_IMPL2_OP(impl)._read_op, 0);
 	if (ret == M_SOCKET_ERROR  && M_ERR_LAST != M_ERROR_IO_PENDING)
 	{
-		op->_socket_ptr.reset();
 		M_IMPL2_C_READ_FLAG(impl);
 		M_DEFAULT_SOCKET_ERROR2(error);
+		op->Clear();
 	}
 }
 
@@ -581,6 +582,7 @@ M_SOCKET_DECL void IocpService2::Access::AsyncRecvSome(IocpService2& service, Im
 	{
 		M_IMPL2_C_READ_FLAG(impl);
 		M_DEFAULT_SOCKET_ERROR2(error);
+		op->Clear();
 	}
 }
 
@@ -630,9 +632,9 @@ M_SOCKET_DECL void IocpService2::Access::AsyncSendSome(IocpService2& service, M_
 	s_int32_t ret = g_wsasend(M_IMPL2_FD(impl), &op->_wsabuf, 1, 0, 0, M_IMPL2_OP(impl)._write_op, 0);
 	if (ret == M_SOCKET_ERROR && M_ERR_LAST != M_ERROR_IO_PENDING)
 	{
-		op->_socket_ptr.reset();
 		M_IMPL2_C_WRITE_FLAG(impl);
 		M_DEFAULT_SOCKET_ERROR2(error);
+		op->Clear();
 	}
 }
 
@@ -683,6 +685,7 @@ M_SOCKET_DECL void IocpService2::Access::AsyncSendSome(IocpService2& service, Im
 	{
 		M_IMPL2_C_WRITE_FLAG(impl);
 		M_DEFAULT_SOCKET_ERROR2(error);
+		op->Clear();
 	}
 }
 
@@ -771,9 +774,9 @@ M_SOCKET_DECL void IocpService2::Access::AsyncConnect(IocpService2& service, M_H
 	s_int32_t ret = gConnectEx(M_IMPL2_FD(impl), ep_access::SockAddr(ep), ep_access::SockAddrLen(ep), 0, 0, &send_bytes, M_IMPL2_OP(impl)._connect_op);
 	if (!ret && M_ERR_LAST != M_ERROR_IO_PENDING)
 	{
-		op->_socket_ptr.reset();
 		M_IMPL2_C_CONNECT_FLAG(impl);
 		M_DEFAULT_SOCKET_ERROR2(error);
+		op->Clear();
 	}
 }
 
@@ -829,6 +832,7 @@ M_SOCKET_DECL void IocpService2::Access::AsyncConnect(IocpService2& service, Imp
 	{
 		M_IMPL2_C_CONNECT_FLAG(impl);
 		M_DEFAULT_SOCKET_ERROR2(error);
+		op->Clear();
 	}
 }
 
@@ -1008,10 +1012,18 @@ M_SOCKET_DECL bool IocpService2::AcceptOperation<Handler>::Complete(IocpService2
 	SocketPtr->GetImpl() = this->_impl;
 	Handler handler = this->_handler;
 	M_HANDLER_SOCKET_PTR(Handler) acceptor_ptr = this->_socket_ptr;
-	this->_socket_ptr.reset();
-	this->_handler = 0;
+	
+	this->Clear();
 	handler(acceptor_ptr, SocketPtr, error);
 	return true;
+}
+
+template<typename Handler>
+M_SOCKET_DECL void IocpService2::AcceptOperation<Handler>::Clear()
+{
+	this->_socket_ptr.reset();
+	this->_handler = 0;
+	this->_impl = Impl();
 }
 
 template<typename Handler>
@@ -1026,9 +1038,17 @@ M_SOCKET_DECL bool IocpService2::AcceptOperation2<Handler>::Complete(IocpService
 		M_IMPL2_C_ACCEPT_FLAG(this->_accept_impl);
 
 	Handler handler = this->_handler;
-	this->_handler = 0;
+
+	this->Clear();
 	handler(error);
 	return true;
+}
+
+template<typename Handler>
+M_SOCKET_DECL void IocpService2::AcceptOperation2<Handler>::Clear()
+{
+	this->_handler = 0;
+	this->_accept_impl = this->_impl = Impl();
 }
 
 template<typename Handler>
@@ -1039,15 +1059,22 @@ M_SOCKET_DECL bool IocpService2::ConnectOperation<Handler>::Complete(IocpService
 
 	M_HANDLER_SOCKET_PTR(Handler) connect_ptr = this->_socket_ptr;
 	Handler handler = this->_handler;
-	this->_handler = 0;
-	this->_socket_ptr.reset();
 	if (!error)
 	{
 		IocpService2::Impl& impl = connect_ptr->GetImpl();
 		g_setsockopt(M_IMPL2_FD(impl), M_SOL_SOCKET, SO_UPDATE_CONNECT_CONTEXT, NULL, 0);
 	}
+
+	this->Clear();
 	handler(connect_ptr, error);
 	return true;
+}
+
+template<typename Handler>
+M_SOCKET_DECL void IocpService2::ConnectOperation<Handler>::Clear()
+{
+	this->_socket_ptr.reset();
+	this->_handler = 0;
 }
 
 template<typename Handler>
@@ -1057,13 +1084,21 @@ M_SOCKET_DECL bool IocpService2::ConnectOperation2<Handler>::Complete(IocpServic
 		M_IMPL2_C_CONNECT_FLAG(this->_impl);
 
 	Handler handler = this->_handler;
-	this->_handler = 0;
 	if (!error)
 	{
 		g_setsockopt(M_IMPL2_FD(this->_impl), M_SOL_SOCKET, SO_UPDATE_CONNECT_CONTEXT, NULL, 0);
 	}
+
+	this->Clear();
 	handler(error);
 	return true;
+}
+
+template<typename Handler>
+M_SOCKET_DECL void IocpService2::ConnectOperation2<Handler>::Clear()
+{
+	this->_handler = 0;
+	this->_impl = Impl();
 }
 
 template<typename Handler>
@@ -1074,12 +1109,21 @@ M_SOCKET_DECL bool IocpService2::WriteOperation<Handler>::Complete(IocpService2&
 
 	M_HANDLER_SOCKET_PTR(Handler) write_ptr = this->_socket_ptr;
 	Handler handler = this->_handler;
-	this->_handler = 0;
-	this->_socket_ptr.reset();
 	s_byte_t* data = this->_wsabuf.buf;
 	s_uint32_t size = (s_uint32_t)this->_wsabuf.len;
+
+	this->Clear();
 	handler(write_ptr, data, size, transbyte, error);
 	return true;
+}
+
+template<typename Handler>
+M_SOCKET_DECL void IocpService2::WriteOperation<Handler>::Clear()
+{
+	this->_socket_ptr.reset();
+	this->_handler = 0;
+	this->_wsabuf.buf = 0;
+	this->_wsabuf.len = 0;
 }
 
 template<typename Handler>
@@ -1089,9 +1133,19 @@ M_SOCKET_DECL bool IocpService2::WriteOperation2<Handler>::Complete(IocpService2
 		M_IMPL2_C_WRITE_FLAG(this->_impl);
 
 	Handler handler = this->_handler;
-	this->_handler = 0;
+
+	this->Clear();
 	handler(transbyte, error);
 	return true;
+}
+
+template<typename Handler>
+M_SOCKET_DECL void IocpService2::WriteOperation2<Handler>::Clear()
+{
+	this->_impl = Impl();
+	this->_handler = 0;
+	this->_wsabuf.buf = 0;
+	this->_wsabuf.len = 0;
 }
 
 template<typename Handler>
@@ -1102,12 +1156,21 @@ M_SOCKET_DECL bool IocpService2::ReadOperation<Handler>::Complete(IocpService2& 
 
 	M_HANDLER_SOCKET_PTR(Handler) read_ptr = this->_socket_ptr;
 	Handler handler = this->_handler;
-	this->_handler = 0;
-	this->_socket_ptr.reset();
 	s_byte_t* data = this->_wsabuf.buf;
 	s_uint32_t size = (s_uint32_t)this->_wsabuf.len;
+
+	this->Clear();
 	handler(read_ptr, data, size, transbyte, error);
 	return true;
+}
+
+template<typename Handler>
+M_SOCKET_DECL void IocpService2::ReadOperation<Handler>::Clear()
+{
+	this->_socket_ptr.reset();
+	this->_handler = 0;
+	this->_wsabuf.buf = 0;
+	this->_wsabuf.len = 0;
 }
 
 template<typename Handler>
@@ -1117,9 +1180,19 @@ M_SOCKET_DECL bool IocpService2::ReadOperation2<Handler>::Complete(IocpService2&
 		M_IMPL2_C_READ_FLAG(this->_impl);
 
 	Handler handler = this->_handler;
-	this->_handler = 0;
+	
+	this->Clear();
 	handler(transbyte, error);
 	return true;
+}
+
+template<typename Handler>
+M_SOCKET_DECL void IocpService2::ReadOperation2<Handler>::Clear()
+{
+	this->_impl = Impl();
+	this->_handler = 0;
+	this->_wsabuf.buf = 0;
+	this->_wsabuf.len = 0;
 }
 
 template<typename T>
@@ -1177,6 +1250,29 @@ M_SOCKET_DECL void IocpService2::OperationAlloc<T>::Alloc(OperationSet* opset, s
 	{
 		assert(0);
 	}
+}
+
+template<typename T>
+M_SOCKET_DECL void IocpService2::OperationAlloc<T>::Free(OperationSet* opset, s_int32_t type)
+{
+	if (type == E_ACCEPT_OP){
+		delete opset->_accept_op;
+		opset->_accept_op = 0;
+	}
+	else if (type == E_CONNECT_OP) {
+		delete opset->_connect_op;
+		opset->_connect_op = 0;
+	}
+	else if (type == E_READ_OP) {
+		delete opset->_read_op;
+		opset->_read_op = 0;
+	}
+	else if (type == E_WRITE_OP) {
+		delete opset->_write_op;
+		opset->_write_op = 0;
+	}
+	else
+		assert(0);
 }
 
 #endif

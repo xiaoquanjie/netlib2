@@ -125,14 +125,14 @@ public:
 		Impl	   _cli_impl;
 
 		M_SOCKET_DECL virtual bool Complete(EpollService::IoServiceImpl& serviceimpl, epoll_event_t* event);
-		M_SOCKET_DECL virtual void Clear(){}
+		M_SOCKET_DECL virtual void Clear();
 	};
 
 	template<typename Handler>
 	struct ConnectOperation : public Operation {
 		Handler _handler;
-		M_HANDLER_SOCKET_PTR(Handler) _socket_ptr;
 
+		M_HANDLER_SOCKET_PTR(Handler) _socket_ptr;
 		M_SOCKET_DECL virtual bool Complete(EpollService::IoServiceImpl& serviceimpl, epoll_event_t* event);
 		M_SOCKET_DECL virtual void Clear();
 	};
@@ -141,16 +141,17 @@ public:
 	struct ConnectOperation2 : public Operation {
 		Handler _handler;
 		Impl    _impl;
+
 		M_SOCKET_DECL virtual bool Complete(EpollService::IoServiceImpl& serviceimpl, epoll_event_t* event);
-		M_SOCKET_DECL virtual void Clear(){}
+		M_SOCKET_DECL virtual void Clear();
 	};
 
 	template<typename Handler>
 	struct WriteOperation : public Operation {
 		wsabuf_t _wsabuf;
 		Handler _handler;
-		M_HANDLER_SOCKET_PTR(Handler) _socket_ptr;
 
+		M_HANDLER_SOCKET_PTR(Handler) _socket_ptr;
 		M_SOCKET_DECL virtual bool Complete(EpollService::IoServiceImpl& serviceimpl, epoll_event_t* event);
 		M_SOCKET_DECL virtual void Clear();
 	};
@@ -160,8 +161,9 @@ public:
 		wsabuf_t _wsabuf;
 		Handler _handler;
 		Impl    _impl;
+
 		M_SOCKET_DECL virtual bool Complete(EpollService::IoServiceImpl& serviceimpl, epoll_event_t* event);
-		M_SOCKET_DECL virtual void Clear(){}
+		M_SOCKET_DECL virtual void Clear();
 	};
 
 	template<typename Handler>
@@ -181,7 +183,7 @@ public:
 		Impl    _impl;
 
 		M_SOCKET_DECL virtual bool Complete(EpollService::IoServiceImpl& serviceimpl, epoll_event_t* event);
-		M_SOCKET_DECL virtual void Clear(){}
+		M_SOCKET_DECL virtual void Clear();
 	};
 
 	struct FinishOperation : public Operation {
