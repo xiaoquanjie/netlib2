@@ -134,6 +134,7 @@ M_SOCKET_DECL void IocpService2::Access::Close(IocpService2& service, Impl& impl
 			if (g_closesocket(M_IMPL2_FD(impl)) == M_SOCKET_ERROR)
 				M_DEFAULT_SOCKET_ERROR2(error);
 			M_IMPL2_FD(impl) = M_INVALID_SOCKET;
+			M_IMPL2_STATE(impl) = 0;
 		}
 	}
 }
@@ -1000,15 +1001,15 @@ M_SOCKET_DECL bool IocpService2::AcceptOperation<Handler>::Complete(IocpService2
 		SocketError error2;
 		Access::Close(service, this->_impl, error2);
 	}
-
-	M_IMPL2_C_ACCEPT_FLAG(this->_socket_ptr->GetImpl());
+	if (M_IMPL2_FD(this->_socket_ptr->GetImpl())!=M_INVALID_SOCKET)
+		M_IMPL2_C_ACCEPT_FLAG(this->_socket_ptr->GetImpl());
+	
 	shard_ptr_t<TcpSocket<IocpService2> > SocketPtr(new TcpSocket<IocpService2>(service));
-	IocpService2::Impl& impl = SocketPtr->GetImpl();
-	impl = this->_impl;
+	SocketPtr->GetImpl() = this->_impl;
 	Handler handler = this->_handler;
-	this->_handler = 0;
 	M_HANDLER_SOCKET_PTR(Handler) acceptor_ptr = this->_socket_ptr;
 	this->_socket_ptr.reset();
+	this->_handler = 0;
 	handler(acceptor_ptr, SocketPtr, error);
 	return true;
 }
@@ -1021,8 +1022,9 @@ M_SOCKET_DECL bool IocpService2::AcceptOperation2<Handler>::Complete(IocpService
 		SocketError error2;
 		Access::Close(service, this->_impl, error2);
 	}
+	if (M_IMPL2_FD(this->_accept_impl) != M_INVALID_SOCKET)
+		M_IMPL2_C_ACCEPT_FLAG(this->_accept_impl);
 
-	M_IMPL2_C_ACCEPT_FLAG(this->_accept_impl);
 	Handler handler = this->_handler;
 	this->_handler = 0;
 	handler(error);
@@ -1032,7 +1034,9 @@ M_SOCKET_DECL bool IocpService2::AcceptOperation2<Handler>::Complete(IocpService
 template<typename Handler>
 M_SOCKET_DECL bool IocpService2::ConnectOperation<Handler>::Complete(IocpService2& service, s_uint32_t transbyte, SocketError& error)
 {
-	M_IMPL2_C_CONNECT_FLAG(this->_socket_ptr->GetImpl());
+	if (M_IMPL2_FD(this->_socket_ptr->GetImpl()) != M_INVALID_SOCKET)
+		M_IMPL2_C_CONNECT_FLAG(this->_socket_ptr->GetImpl());
+
 	M_HANDLER_SOCKET_PTR(Handler) connect_ptr = this->_socket_ptr;
 	Handler handler = this->_handler;
 	this->_handler = 0;
@@ -1049,7 +1053,9 @@ M_SOCKET_DECL bool IocpService2::ConnectOperation<Handler>::Complete(IocpService
 template<typename Handler>
 M_SOCKET_DECL bool IocpService2::ConnectOperation2<Handler>::Complete(IocpService2& service, s_uint32_t transbyte, SocketError& error)
 {
-	M_IMPL2_C_CONNECT_FLAG(this->_impl);
+	if (M_IMPL2_FD(this->_impl) != M_INVALID_SOCKET)
+		M_IMPL2_C_CONNECT_FLAG(this->_impl);
+
 	Handler handler = this->_handler;
 	this->_handler = 0;
 	if (!error)
@@ -1063,7 +1069,9 @@ M_SOCKET_DECL bool IocpService2::ConnectOperation2<Handler>::Complete(IocpServic
 template<typename Handler>
 M_SOCKET_DECL bool IocpService2::WriteOperation<Handler>::Complete(IocpService2& service, s_uint32_t transbyte, SocketError& error)
 {
-	M_IMPL2_C_WRITE_FLAG(this->_socket_ptr->GetImpl());
+	if (M_IMPL2_FD(this->_socket_ptr->GetImpl()) != M_INVALID_SOCKET)
+		M_IMPL2_C_WRITE_FLAG(this->_socket_ptr->GetImpl());
+
 	M_HANDLER_SOCKET_PTR(Handler) write_ptr = this->_socket_ptr;
 	Handler handler = this->_handler;
 	this->_handler = 0;
@@ -1077,7 +1085,9 @@ M_SOCKET_DECL bool IocpService2::WriteOperation<Handler>::Complete(IocpService2&
 template<typename Handler>
 M_SOCKET_DECL bool IocpService2::WriteOperation2<Handler>::Complete(IocpService2& service, s_uint32_t transbyte, SocketError& error)
 {
-	M_IMPL2_C_WRITE_FLAG(this->_impl);
+	if (M_IMPL2_FD(this->_impl) != M_INVALID_SOCKET)
+		M_IMPL2_C_WRITE_FLAG(this->_impl);
+
 	Handler handler = this->_handler;
 	this->_handler = 0;
 	handler(transbyte, error);
@@ -1087,7 +1097,9 @@ M_SOCKET_DECL bool IocpService2::WriteOperation2<Handler>::Complete(IocpService2
 template<typename Handler>
 M_SOCKET_DECL bool IocpService2::ReadOperation<Handler>::Complete(IocpService2& service, s_uint32_t transbyte, SocketError& error)
 {
-	M_IMPL2_C_READ_FLAG(this->_socket_ptr->GetImpl());
+	if (M_IMPL2_FD(this->_socket_ptr->GetImpl()) != M_INVALID_SOCKET)
+		M_IMPL2_C_READ_FLAG(this->_socket_ptr->GetImpl());
+
 	M_HANDLER_SOCKET_PTR(Handler) read_ptr = this->_socket_ptr;
 	Handler handler = this->_handler;
 	this->_handler = 0;
@@ -1101,7 +1113,9 @@ M_SOCKET_DECL bool IocpService2::ReadOperation<Handler>::Complete(IocpService2& 
 template<typename Handler>
 M_SOCKET_DECL bool IocpService2::ReadOperation2<Handler>::Complete(IocpService2& service, s_uint32_t transbyte, SocketError& error)
 {
-	M_IMPL2_C_READ_FLAG(this->_impl);
+	if (M_IMPL2_FD(this->_impl) != M_INVALID_SOCKET)
+		M_IMPL2_C_READ_FLAG(this->_impl);
+
 	Handler handler = this->_handler;
 	this->_handler = 0;
 	handler(transbyte, error);
