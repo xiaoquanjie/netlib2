@@ -335,7 +335,51 @@ M_SOCKET_DECL void EpollService::Access::AsyncAccept(EpollService& service, M_HA
 template<typename AcceptHandler>
 M_SOCKET_DECL void EpollService::Access::AsyncAccept(EpollService& service, Impl& accept_impl, Impl& sock_impl, AcceptHandler handler, SocketError& error)
 {
+	if (M_IMPL_FD(accept_impl) == M_INVALID_SOCKET)
+	{
+		error = SocketError(M_ERR_BAD_DESCRIPTOR);
+		return;
+	}
+	if (M_IMPL_G_ACCEPT_FLAG(accept_impl))
+	{
+		error = SocketError(M_ERR_POSTED_ACCEPT);
+		return;
+	}
+	if (!M_IMPL_G_NONBLOCK(accept_impl))
+	{
+		if (!detail::Util::SetNonBlock(M_IMPL_FD(accept_impl)))
+		{
+			M_DEFAULT_SOCKET_ERROR2(error);
+			return;
+		}
+		M_IMPL_S_NONBLOCK(accept_impl)
+	}
 
+	typedef EpollService::AcceptOperation2<AcceptHandler> OperationType;
+	OperationType* accept_op = dynamic_cast<OperationType*>(M_IMPL_OP(accept_impl)._accept_op);
+	if (!accept_op)
+	{
+		EpollService::OperationAlloc<OperationType>::Alloc(&M_IMPL_OP(accept_impl), E_ACCEPT_OP);
+		accept_op = dynamic_cast<OperationType*>(M_IMPL_OP(accept_impl)._accept_op);
+		M_IMPL_OP(accept_impl)._type = E_ACCEPT_OP;
+	}
+	accept_op->_handler = handler;
+	accept_op->_acpt_impl = accept_impl;
+	accept_op->_cli_impl = sock_impl;
+
+	M_IMPL_S_ACCEPT_FLAG(accept_impl);
+	if (!M_IMPL_G_BIND(accept_impl))
+	{
+		M_IMPL_S_BIND(accept_impl);
+		CtlEpoll(service, accept_impl, &M_IMPL_OP(accept_impl), M_EPOLL_CTL_ADD, M_EPOLLIN, error);
+	}
+	if (error)
+	{
+		M_IMPL_C_ACCEPT_FLAG(accept_impl);
+		M_IMPL_S_UNBIND(accept_impl);
+		accept_op->Clear();
+		return;
+	}
 }
 
 M_SOCKET_DECL s_int32_t EpollService::Access::RecvSome(EpollService& service, EpollService::Impl& impl, s_byte_t* data, s_uint32_t size, SocketError& error)
@@ -458,7 +502,61 @@ M_SOCKET_DECL void EpollService::Access::AsyncRecvSome(EpollService& service, M_
 
 M_SOCKET_DECL void EpollService::Access::AsyncRecvSome(EpollService& service, Impl& impl, s_byte_t* data, s_uint32_t size, M_RW_HANDLER_TYPE(EpollService) hander, SocketError& error)
 {
+	if (!M_IMPL_G_NONBLOCK(impl))
+	{
+		if (!detail::Util::SetNonBlock(M_IMPL_FD(impl)))
+		{
+			M_DEFAULT_SOCKET_ERROR2(error);
+			return;
+		}
+		M_IMPL_S_NONBLOCK(impl)
+	}
+	if (M_IMPL_FD(impl) == M_INVALID_SOCKET)
+	{
+		error = SocketError(M_ERR_BAD_DESCRIPTOR);
+		return;
+	}
+	if (M_IMPL_G_READ_FLAG(impl))
+	{
+		error = SocketError(M_ERR_POSTED_READ);
+		return;
+	}
 
+	typedef M_RW_HANDLER_TYPE(EpollService) ReadHandler;
+	typedef EpollService::ReadOperation2<ReadHandler> OperationType;
+	OperationType* read_op = dynamic_cast<OperationType*>(M_IMPL_OP(impl)._read_op);
+	if (!read_op)
+	{
+		EpollService::OperationAlloc<OperationType>::Alloc(&M_IMPL_OP(impl), E_READ_OP);
+		read_op = dynamic_cast<OperationType*>(M_IMPL_OP(impl)._read_op);
+	}
+	read_op->_wsabuf.buf = data;
+	read_op->_wsabuf.len = size;
+	read_op->_handler = hander;
+	read_op->_impl = impl;
+
+	M_IMPL_OP(impl)._type = E_READ_OP;
+	int flag = M_EPOLLIN;
+	int ctl = M_EPOLL_CTL_MOD;
+	if (!M_IMPL_G_BIND(impl))
+	{
+		M_IMPL_S_BIND(impl);
+		ctl = M_EPOLL_CTL_ADD;
+	}
+	if (M_IMPL_G_WRITE_FLAG(impl))
+	{
+		flag |= M_EPOLLOUT;
+		M_IMPL_OP(impl)._type |= E_WRITE_OP;
+	}
+
+	M_IMPL_S_READ_FLAG(impl);
+	CtlEpoll(service, impl, &M_IMPL_OP(impl), ctl, flag, error);
+	if (error)
+	{
+		read_op->Clear();
+		M_IMPL_C_READ_FLAG(impl);
+		M_IMPL_S_UNBIND(impl);
+	}
 }
 
 template<typename WriteHandler>
@@ -523,7 +621,61 @@ M_SOCKET_DECL void EpollService::Access::AsyncSendSome(EpollService& service, M_
 
 M_SOCKET_DECL void EpollService::Access::AsyncSendSome(EpollService& service, Impl& impl, const s_byte_t* data, s_uint32_t size, M_RW_HANDLER_TYPE(EpollService) hander, SocketError& error)
 {
+	if (!M_IMPL_G_NONBLOCK(impl))
+	{
+		if (!detail::Util::SetNonBlock(M_IMPL_FD(impl)))
+		{
+			M_DEFAULT_SOCKET_ERROR2(error);
+			return;
+		}
+		M_IMPL_S_NONBLOCK(impl)
+	}
+	if (M_IMPL_FD(impl) == M_INVALID_SOCKET)
+	{
+		error = SocketError(M_ERR_BAD_DESCRIPTOR);
+		return;
+	}
+	if (M_IMPL_G_WRITE_FLAG(impl))
+	{
+		error = SocketError(M_ERR_POSTED_WRITE);
+		return;
+	}
 
+	typedef M_RW_HANDLER_TYPE(EpollService) WriteHandler;
+	typedef EpollService::WriteOperation2<WriteHandler> OperationType;
+	OperationType* write_op = dynamic_cast<OperationType*>(M_IMPL_OP(impl)._write_op);
+	if (!write_op)
+	{
+		EpollService::OperationAlloc<OperationType>::Alloc(&M_IMPL_OP(impl), E_WRITE_OP);
+		write_op = dynamic_cast<OperationType*>(M_IMPL_OP(impl)._write_op);
+	}
+	write_op->_wsabuf.buf = const_cast<s_byte_t*>(data);
+	write_op->_wsabuf.len = size;
+	write_op->_handler = hander;
+	write_op->_impl = impl;
+
+	M_IMPL_OP(impl)._type = E_WRITE_OP;
+	int flag = M_EPOLLOUT;
+	int ctl = M_EPOLL_CTL_MOD;
+	if (!M_IMPL_G_BIND(impl))
+	{
+		M_IMPL_S_BIND(impl);
+		ctl = M_EPOLL_CTL_ADD;
+	}
+	if (M_IMPL_G_READ_FLAG(impl))
+	{
+		flag |= M_EPOLLIN;
+		M_IMPL_OP(impl)._type |= E_READ_OP;
+	}
+
+	M_IMPL_S_WRITE_FLAG(impl);
+	CtlEpoll(service, impl, &M_IMPL_OP(impl), ctl, flag, error);
+	if (error)
+	{
+		write_op->Clear();
+		M_IMPL_C_WRITE_FLAG(impl);
+		M_IMPL_S_UNBIND(impl);
+	}
 }
 
 template<typename EndPoint>
@@ -622,7 +774,59 @@ M_SOCKET_DECL void EpollService::Access::AsyncConnect(EpollService& service, M_H
 template<typename EndPoint>
 M_SOCKET_DECL void EpollService::Access::AsyncConnect(EpollService& service, Impl& impl, const EndPoint& ep, M_COMMON_HANDLER_TYPE(EpollService) handler, SocketError& error)
 {
+	if (M_IMPL_FD(impl) == M_INVALID_SOCKET)
+	{
+		error = SocketError(M_ERR_BAD_DESCRIPTOR);
+		return;
+	}
+	if (M_IMPL_G_CONNECT_FLAG(impl))
+	{
+		error = SocketError(M_ERR_POSTED_CONNECT);
+		return;
+	}
+	if (!M_IMPL_G_NONBLOCK(impl))
+	{
+		if (!detail::Util::SetNonBlock(M_IMPL_FD(impl)))
+		{
+			M_DEFAULT_SOCKET_ERROR2(error);
+			return;
+		}
+		M_IMPL_S_NONBLOCK(impl)
+	}
 
+	typedef typename EndPoint::Impl::endpoint_impl_access ep_access;
+	s_int32_t ret = g_connect(M_IMPL_FD(impl), ep_access::SockAddr(ep), ep_access::SockAddrLen(ep));
+	if (ret == -1 && M_ERR_LAST != M_EINPROGRESS)
+	{
+		M_DEFAULT_SOCKET_ERROR2(error);
+		return;
+	}
+
+	typedef M_COMMON_HANDLER_TYPE(EpollService) ConnectHandler;
+	typedef EpollService::ConnectOperation2<ConnectHandler> OperationType;
+	OperationType* connect_op = dynamic_cast<OperationType*>(M_IMPL_OP(impl)._connect_op);
+	if (!connect_op)
+	{
+		EpollService::OperationAlloc<OperationType>::Alloc(&M_IMPL_OP(impl), E_CONNECT_OP);
+		connect_op = dynamic_cast<OperationType*>(M_IMPL_OP(impl)._connect_op);
+		M_IMPL_OP(impl)._type = E_CONNECT_OP;
+	}
+	connect_op->_handler = handler;
+	connect_op->_impl = impl;
+
+	M_IMPL_S_CONNECT_FLAG(impl);
+	if (!M_IMPL_G_BIND(impl))
+	{
+		M_IMPL_S_BIND(impl);
+		CtlEpoll(service, impl, &M_IMPL_OP(impl), M_EPOLL_CTL_ADD, M_EPOLLOUT | M_EPOLLONESHOT, error);
+	}
+	if (error)
+	{
+		M_IMPL_C_CONNECT_FLAG(impl);
+		M_IMPL_S_UNBIND(impl);
+		connect_op->Clear();
+		return;
+	}
 }
 
 M_SOCKET_DECL void EpollService::Access::ExecOp(EpollService::IoServiceImpl& serviceimpl, EpollService::OperationSet* opset, epoll_event_t* event)
@@ -823,9 +1027,10 @@ template<typename Handler>
 M_SOCKET_DECL bool EpollService::AcceptOperation<Handler>::Complete(EpollService::IoServiceImpl& serviceimpl, epoll_event_t* event)
 {
 	Handler handler = this->_handler;
+	this->_handler = 0;
 	M_HANDLER_SOCKET_PTR(Handler) socket_ptr = this->_socket_ptr;
 	this->_socket_ptr.reset();
-	if (!socket_ptr)
+	if (!socket_ptr) // 这里之所以可能为空的原因是：this->_socket_ptr可能由于close函数的调用而被释放.close时之所以要释放this->_socket_ptr，原因是epoll无通知
 		return false;
 
 	EpollService::Impl& impl = socket_ptr->GetImpl();
@@ -861,14 +1066,52 @@ M_SOCKET_DECL bool EpollService::AcceptOperation<Handler>::Complete(EpollService
 template<typename Handler>
 M_SOCKET_DECL void EpollService::AcceptOperation<Handler>::Clear()
 {
+	this->_handler = 0;
 	this->_socket_ptr.reset();
 }
+
+template<typename Handler>
+M_SOCKET_DECL bool EpollService::AcceptOperation2<Handler>::Complete(EpollService::IoServiceImpl& serviceimpl, epoll_event_t* event)
+{
+	Handler handler = this->_handler;
+	this->_handler = 0;
+
+	EpollService::Impl& impl = this->_acpt_impl;
+	if (!M_IMPL_G_ACCEPT_FLAG(impl))
+		return false;
+
+	SocketError error;
+	socket_t fd = g_accept(M_IMPL_FD(impl), 0, 0);
+	if (fd < 0)
+	{
+		Opts::SoError error_opt;
+		EpollService::Access::GetOption(serviceimpl.GetService(), impl, error_opt, error);
+		error = error ? SocketError(M_ERR_ASYNC_ACCEPT_FAIL) : SocketError(error_opt.Value());
+	}
+	else
+	{
+		EpollService::Impl& cli_impl = this->_cli_impl;
+		M_IMPL_FD(cli_impl) = fd;
+		if (M_IMPL_G_V(impl)) {
+			M_IMPL_S_V4(cli_impl);
+		}
+		else {
+			M_IMPL_S_V6(cli_impl);
+		}
+	}
+
+	M_IMPL_C_ACCEPT_FLAG(impl);
+	handler(error);
+	return true;
+}
+
 
 template<typename Handler>
 M_SOCKET_DECL bool EpollService::ConnectOperation<Handler>::Complete(EpollService::IoServiceImpl& serviceimpl, epoll_event_t* event)
 {
 	M_HANDLER_SOCKET_PTR(Handler) socket_ptr = this->_socket_ptr;
 	Handler handler = this->_handler;
+	this->_handler = 0;
 	this->_socket_ptr.reset();
 	if (!socket_ptr)
 		return false;
@@ -896,7 +1139,34 @@ M_SOCKET_DECL bool EpollService::ConnectOperation<Handler>::Complete(EpollServic
 template<typename Handler>
 M_SOCKET_DECL void EpollService::ConnectOperation<Handler>::Clear()
 {
+	this->_handler = 0;
 	this->_socket_ptr.reset();
+}
+
+template<typename Handler>
+M_SOCKET_DECL bool EpollService::ConnectOperation2<Handler>::Complete(EpollService::IoServiceImpl& serviceimpl, epoll_event_t* event)
+{
+	Handler handler = this->_handler;
+	this->_handler = 0;
+	
+	EpollService::Impl& impl = this->_impl;
+	if (!M_IMPL_G_CONNECT_FLAG(impl))
+		return false;
+
+	SocketError error;
+	if (event->events & M_EPOLLERR)
+	{
+		Opts::SoError error_opt;
+		EpollService::Access::GetOption(serviceimpl.GetService(), impl, error_opt, error);
+		error = error ? SocketError(M_ERR_ASYNC_CONNECT_FAIL) : SocketError(error_opt.Value());
+	}
+
+	EpollService::OperationSet* opset = (EpollService::OperationSet*)event->data.ptr;
+	opset->_type &= ~(E_CONNECT_OP);
+
+	M_IMPL_C_CONNECT_FLAG(impl);
+	handler(error);
+	return true;
 }
 
 template<typename Handler>
@@ -908,6 +1178,7 @@ M_SOCKET_DECL bool EpollService::WriteOperation<Handler>::Complete(EpollService:
 	this->_wsabuf.len = 0;
 	M_HANDLER_SOCKET_PTR(Handler) socket_ptr = this->_socket_ptr;
 	Handler handler = this->_handler;
+	this->_handler = 0;
 	this->_socket_ptr.reset();
 	if (!socket_ptr)
 		return false;
@@ -940,7 +1211,43 @@ M_SOCKET_DECL bool EpollService::WriteOperation<Handler>::Complete(EpollService:
 template<typename Handler>
 M_SOCKET_DECL void EpollService::WriteOperation<Handler>::Clear()
 {
+	this->_handler = 0;
 	this->_socket_ptr.reset();
+}
+
+template<typename Handler>
+M_SOCKET_DECL bool EpollService::WriteOperation2<Handler>::Complete(EpollService::IoServiceImpl& serviceimpl, epoll_event_t* event)
+{
+	s_byte_t* data = this->_wsabuf.buf;
+	s_uint32_t size = (s_uint32_t)this->_wsabuf.len;
+	this->_wsabuf.buf = 0;
+	this->_wsabuf.len = 0;
+	Handler handler = this->_handler;
+	this->_handler = 0;
+	
+	EpollService::Impl& impl = this->_impl;
+	if (!M_IMPL_G_WRITE_FLAG(impl))
+		return false;
+
+	SocketError error;
+	s_int32_t ret = g_send(M_IMPL_FD(impl), data, size, MSG_NOSIGNAL);
+	if (ret <= 0)
+	{
+		Opts::SoError error_opt;
+		Access::GetOption(serviceimpl.GetService(), impl, error_opt, error);
+		error = error ? SocketError(M_ERR_ASYNC_WRITE_FAIL) : SocketError(error_opt.Value());
+	}
+
+	EpollService::OperationSet* opset = (EpollService::OperationSet*)event->data.ptr;
+	s_int32_t flag = 0;
+	if (opset->_type & E_READ_OP)
+		flag = M_EPOLLIN;
+	opset->_type &= ~(E_WRITE_OP);
+	Access::CtlEpoll(serviceimpl.GetService(), impl, opset, M_EPOLL_CTL_MOD, flag, error);
+
+	M_IMPL_C_WRITE_FLAG(impl);
+	handler(ret < 0 ? 0 : ret, error);
+	return true;
 }
 
 template<typename Handler>
@@ -952,6 +1259,7 @@ M_SOCKET_DECL bool EpollService::ReadOperation<Handler>::Complete(EpollService::
 	this->_wsabuf.len = 0;
 	M_HANDLER_SOCKET_PTR(Handler) socket_ptr = this->_socket_ptr;
 	Handler handler = this->_handler;
+	this->_handler = 0;
 	this->_socket_ptr.reset();
 	if (!socket_ptr)
 		return false;
@@ -984,8 +1292,45 @@ M_SOCKET_DECL bool EpollService::ReadOperation<Handler>::Complete(EpollService::
 template<typename Handler>
 M_SOCKET_DECL void EpollService::ReadOperation<Handler>::Clear()
 {
+	this->_handler = 0;
 	this->_socket_ptr.reset();
 }
+
+template<typename Handler>
+M_SOCKET_DECL bool EpollService::ReadOperation2<Handler>::Complete(EpollService::IoServiceImpl& serviceimpl, epoll_event_t* event)
+{
+	s_byte_t* data = this->_wsabuf.buf;
+	s_uint32_t size = (s_uint32_t)this->_wsabuf.len;
+	this->_wsabuf.buf = 0;
+	this->_wsabuf.len = 0;
+	Handler handler = this->_handler;
+	this->_handler = 0;
+	
+	EpollService::Impl& impl = this->_impl;
+	if (!M_IMPL_G_READ_FLAG(impl))
+		return false;
+
+	SocketError error;
+	s_int32_t ret = g_recv(M_IMPL_FD(impl), data, size, 0);
+	if (ret <= 0)
+	{
+		Opts::SoError error_opt;
+		Access::GetOption(serviceimpl.GetService(), impl, error_opt, error);
+		error = (error) ? SocketError(M_ERR_ASYNC_READ_FAIL) : SocketError(error_opt.Value());
+	}
+
+	EpollService::OperationSet* opset = (EpollService::OperationSet*)event->data.ptr;
+	s_int32_t flag = 0;
+	if (opset->_type & E_WRITE_OP)
+		flag = M_EPOLLOUT;
+	opset->_type &= ~(E_READ_OP);
+	Access::CtlEpoll(serviceimpl.GetService(), impl, opset, M_EPOLL_CTL_MOD, flag, error);
+
+	M_IMPL_C_READ_FLAG(impl);
+	handler(ret < 0 ? 0 : ret, error);
+	return true;
+}
+
 
 M_SOCKET_DECL bool EpollService::FinishOperation::Complete(EpollService::IoServiceImpl& serviceimpl, epoll_event_t* event)
 {

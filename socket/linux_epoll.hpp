@@ -25,7 +25,6 @@ class EpollService
 {
 public:
 	class  Access;
-	struct Impl;
 	friend class Access;
 
 	struct IoServiceImpl
@@ -49,6 +48,67 @@ public:
 		virtual ~Operation() {}
 	};
 
+	struct OperationSet
+	{
+		s_uint8_t  _type;
+		Operation* _accept_op;
+		Operation* _connect_op;
+		Operation* _write_op;
+		Operation* _read_op;
+	};
+
+	template<typename T>
+	struct AcceptOperation;
+	template<typename T>
+	struct AcceptOperation2;
+	template<typename T>
+	struct ConnectOperation;
+	template<typename T>
+	struct ConnectOperation2;
+	template<typename T>
+	struct WriteOperation;
+	template<typename T>
+	struct WriteOperation2;
+	template<typename T>
+	struct ReadOperation;
+	template<typename T>
+	struct ReadOperation2;
+
+	struct Impl
+	{
+		friend class Access;
+		template<typename T>
+		friend struct AcceptOperation;
+		template<typename T>
+		friend struct AcceptOperation2;
+		template<typename T>
+		friend struct ConnectOperation;
+		template<typename T>
+		friend struct ConnectOperation2;
+		template<typename T>
+		friend struct WriteOperation;
+		template<typename T>
+		friend struct WriteOperation2;
+		template<typename T>
+		friend struct ReadOperation;
+		template<typename T>
+		friend struct ReadOperation2;
+
+		struct core {
+			s_int32_t	 _epoll;
+			socket_t	 _fd;
+			s_uint16_t   _state;
+			OperationSet _operation;
+		};
+
+		Impl() {
+			_core = shard_ptr_t<core>(new core);
+		}
+
+	private:
+		shard_ptr_t<core> _core;
+	};
+
 	template<typename Handler>
 	struct AcceptOperation : public Operation {
 		Handler    _handler;
@@ -59,12 +119,30 @@ public:
 	};
 
 	template<typename Handler>
+	struct AcceptOperation2 : public Operation {
+		Handler    _handler;
+		Impl	   _acpt_impl;
+		Impl	   _cli_impl;
+
+		M_SOCKET_DECL virtual bool Complete(EpollService::IoServiceImpl& serviceimpl, epoll_event_t* event);
+		M_SOCKET_DECL virtual void Clear(){}
+	};
+
+	template<typename Handler>
 	struct ConnectOperation : public Operation {
 		Handler _handler;
 		M_HANDLER_SOCKET_PTR(Handler) _socket_ptr;
 
 		M_SOCKET_DECL virtual bool Complete(EpollService::IoServiceImpl& serviceimpl, epoll_event_t* event);
 		M_SOCKET_DECL virtual void Clear();
+	};
+
+	template<typename Handler>
+	struct ConnectOperation2 : public Operation {
+		Handler _handler;
+		Impl    _impl;
+		M_SOCKET_DECL virtual bool Complete(EpollService::IoServiceImpl& serviceimpl, epoll_event_t* event);
+		M_SOCKET_DECL virtual void Clear(){}
 	};
 
 	template<typename Handler>
@@ -78,6 +156,15 @@ public:
 	};
 
 	template<typename Handler>
+	struct WriteOperation2 : public Operation {
+		wsabuf_t _wsabuf;
+		Handler _handler;
+		Impl    _impl;
+		M_SOCKET_DECL virtual bool Complete(EpollService::IoServiceImpl& serviceimpl, epoll_event_t* event);
+		M_SOCKET_DECL virtual void Clear(){}
+	};
+
+	template<typename Handler>
 	struct ReadOperation : public Operation {
 		wsabuf_t _wsabuf;
 		Handler _handler;
@@ -87,19 +174,20 @@ public:
 		M_SOCKET_DECL virtual void Clear();
 	};
 
+	template<typename Handler>
+	struct ReadOperation2 : public Operation {
+		wsabuf_t _wsabuf;
+		Handler _handler;
+		Impl    _impl;
+
+		M_SOCKET_DECL virtual bool Complete(EpollService::IoServiceImpl& serviceimpl, epoll_event_t* event);
+		M_SOCKET_DECL virtual void Clear(){}
+	};
+
 	struct FinishOperation : public Operation {
 		s_int32_t _fd;
 		M_SOCKET_DECL virtual bool Complete(EpollService::IoServiceImpl& serviceimpl, epoll_event_t* event);
 		M_SOCKET_DECL virtual void Clear();
-	};
-
-	struct OperationSet
-	{
-		s_uint8_t  _type;
-		Operation* _accept_op;
-		Operation* _connect_op;
-		Operation* _write_op;
-		Operation* _read_op;
 	};
 
 	template<typename T>
@@ -134,33 +222,6 @@ private:
 	s_int32_t			_implcnt;
 	s_int32_t			_implidx;
 	mutable MutexLock	_mutex;
-};
-
-struct EpollService::Impl
-{
-	friend class Access;
-	template<typename T>
-	friend struct AcceptOperation;
-	template<typename T>
-	friend struct ConnectOperation;
-	template<typename T>
-	friend struct WriteOperation;
-	template<typename T>
-	friend struct ReadOperation;
-
-	struct core{
-		s_int32_t	 _epoll;
-		socket_t	 _fd;
-		s_uint16_t   _state;
-		OperationSet _operation;
-	};
-
-	Impl(){
-		_core = shard_ptr_t<core>(new core);
-	}
-
-private:
-	shard_ptr_t<core> _core;
 };
 
 class EpollService::Access
