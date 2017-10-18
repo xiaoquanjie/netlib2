@@ -59,7 +59,6 @@ void AsyncServer::init()
 
 		AcceptorPtr->DestroyHandler(m_destroy_handler);
 		AcceptorPtr->AsyncAccept(m_accept_handler);
-		AcceptorPtr->Close();
 	}
 	catch (SocketError& error)
 	{

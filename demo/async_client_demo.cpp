@@ -71,7 +71,7 @@ AsyncClient::AsyncClient(IoService& ioservice):m_ioservice(ioservice)
 	m_write_handler = bind_t(&AsyncClient::WriteHandler, this, placeholder_1, placeholder_2, placeholder_3, placeholder_4, placeholder_5);
 	m_read_handler = bind_t(&AsyncClient::ReadHandler, this, placeholder_1, placeholder_2, placeholder_3, placeholder_4, placeholder_5);
 
-	Init();
+	Init2();
 }
 
 void AsyncClient::Init()
@@ -94,18 +94,21 @@ void AsyncClient::Init()
 
 void AsyncClient::Init2()
 {
-	try
+	//for (int i = 0; i < 100; ++i)
 	{
-		SocketError error;
-		Tcp::EndPoint ep(AddressV4("127.0.0.1"), 2001);
-		TcpConnectorPtr ConnectorPtr(new TcpConnector<IoService>(m_ioservice));
+		try
+		{
+			SocketError error;
+			Tcp::EndPoint ep(AddressV4("127.0.0.1"), 2001);
+			TcpConnectorPtr ConnectorPtr(new TcpConnector<IoService>(m_ioservice));
 
-		M_COMMON_HANDLER_TYPE(IoService) func = bind_t(&AsyncClient::ConnectHandler2, this, placeholder_1, ConnectorPtr);
-		ConnectorPtr->AsyncConnect(func, ep);
-	}
-	catch (SocketError& error)
-	{
-		print_error(error);
+			M_COMMON_HANDLER_TYPE(IoService) func = bind_t(&AsyncClient::ConnectHandler2, this, placeholder_1, ConnectorPtr);
+			ConnectorPtr->AsyncConnect(func, ep);
+		}
+		catch (SocketError& error)
+		{
+			print_error(error);
+		}
 	}
 }
 

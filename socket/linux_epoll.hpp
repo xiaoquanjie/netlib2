@@ -26,36 +26,7 @@ class EpollService
 public:
 	class  Access;
 	friend class Access;
-
-	struct IoServiceImpl
-	{
-		friend class Access;
-		M_SOCKET_DECL IoServiceImpl(EpollService& service);
-		M_SOCKET_DECL EpollService& GetService();
-
-	private:
-		EpollService&		_service;
-		s_int32_t			_handler;
-		s_uint32_t			_fdcnt;
-	};
-	typedef std::vector<IoServiceImpl*> IoServiceImplVector;
-	typedef std::map<s_int32_t, IoServiceImpl*> IoServiceImplMap;
-
-	struct Operation
-	{
-		virtual bool Complete(EpollService::IoServiceImpl& serviceimpl, epoll_event_t* event) = 0;
-		virtual void Clear() = 0;
-		virtual ~Operation() {}
-	};
-
-	struct OperationSet
-	{
-		s_uint8_t  _type;
-		Operation* _accept_op;
-		Operation* _connect_op;
-		Operation* _write_op;
-		Operation* _read_op;
-	};
+	struct IoServiceImpl;
 
 	template<typename T>
 	struct AcceptOperation;
@@ -73,6 +44,22 @@ public:
 	struct ReadOperation;
 	template<typename T>
 	struct ReadOperation2;
+
+	struct Operation
+	{
+		virtual bool Complete(EpollService::IoServiceImpl& serviceimpl, epoll_event_t* event) = 0;
+		virtual void Clear() = 0;
+		virtual ~Operation() {}
+	};
+
+	struct OperationSet
+	{
+		s_uint8_t  _type;
+		Operation* _accept_op;
+		Operation* _connect_op;
+		Operation* _write_op;
+		Operation* _read_op;
+	};
 
 	struct Impl
 	{
@@ -108,6 +95,22 @@ public:
 	private:
 		shard_ptr_t<core> _core;
 	};
+	typedef std::vector<Impl> ImplVector;
+
+	struct IoServiceImpl
+	{
+		friend class Access;
+		M_SOCKET_DECL IoServiceImpl(EpollService& service);
+		M_SOCKET_DECL EpollService& GetService();
+
+	private:
+		EpollService&		_service;
+		s_int32_t			_handler;
+		s_uint32_t			_fdcnt;
+		ImplVector		    _closeimplvector;
+	};
+	typedef std::vector<IoServiceImpl*> IoServiceImplVector;
+	typedef std::map<s_int32_t, IoServiceImpl*> IoServiceImplMap;
 
 	template<typename Handler>
 	struct AcceptOperation : public Operation {
