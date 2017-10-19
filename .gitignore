@@ -3,3 +3,10 @@
 ################################################################################
 
 /Debug
+/x64/Debug
+/socket.VC.VC.opendb
+/socket.VC.db
+/test.h
+/cachefile.h
+/output
+/.vs/socket/v14/.suo
