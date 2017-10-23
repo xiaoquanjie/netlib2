@@ -20,7 +20,7 @@
 M_SOCKET_NAMESPACE_BEGIN
 
 #ifdef M_PLATFORM_WIN
-typedef IocpService		IoService2;
+typedef IocpService		IoService2; // 不建议使用这个
 typedef IocpService2	IoService;
 #else
 typedef EpollService	IoService;

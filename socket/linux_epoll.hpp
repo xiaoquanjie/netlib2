@@ -25,8 +25,77 @@ class EpollService
 {
 public:
 	class  Access;
-	struct Impl;
 	friend class Access;
+	struct IoServiceImpl;
+
+	template<typename T>
+	struct AcceptOperation;
+	template<typename T>
+	struct AcceptOperation2;
+	template<typename T>
+	struct ConnectOperation;
+	template<typename T>
+	struct ConnectOperation2;
+	template<typename T>
+	struct WriteOperation;
+	template<typename T>
+	struct WriteOperation2;
+	template<typename T>
+	struct ReadOperation;
+	template<typename T>
+	struct ReadOperation2;
+
+	struct Operation
+	{
+		virtual bool Complete(EpollService::IoServiceImpl& serviceimpl, epoll_event_t* event) = 0;
+		virtual void Clear() = 0;
+		virtual ~Operation() {}
+	};
+
+	struct OperationSet
+	{
+		s_uint8_t  _type;
+		Operation* _accept_op;
+		Operation* _connect_op;
+		Operation* _write_op;
+		Operation* _read_op;
+	};
+
+	struct Impl
+	{
+		friend class Access;
+		template<typename T>
+		friend struct AcceptOperation;
+		template<typename T>
+		friend struct AcceptOperation2;
+		template<typename T>
+		friend struct ConnectOperation;
+		template<typename T>
+		friend struct ConnectOperation2;
+		template<typename T>
+		friend struct WriteOperation;
+		template<typename T>
+		friend struct WriteOperation2;
+		template<typename T>
+		friend struct ReadOperation;
+		template<typename T>
+		friend struct ReadOperation2;
+
+		struct core {
+			s_int32_t	 _epoll;
+			socket_t	 _fd;
+			s_uint16_t   _state;
+			OperationSet _operation;
+		};
+
+		Impl() {
+			_core = shard_ptr_t<core>(new core);
+		}
+
+	private:
+		shard_ptr_t<core> _core;
+	};
+	typedef std::vector<Impl> ImplVector;
 
 	struct IoServiceImpl
 	{
@@ -38,16 +107,10 @@ public:
 		EpollService&		_service;
 		s_int32_t			_handler;
 		s_uint32_t			_fdcnt;
+		ImplVector		    _closeimplvector;
 	};
 	typedef std::vector<IoServiceImpl*> IoServiceImplVector;
 	typedef std::map<s_int32_t, IoServiceImpl*> IoServiceImplMap;
-
-	struct Operation
-	{
-		virtual bool Complete(EpollService::IoServiceImpl& serviceimpl, epoll_event_t* event) = 0;
-		virtual void Clear() = 0;
-		virtual ~Operation() {}
-	};
 
 	template<typename Handler>
 	struct AcceptOperation : public Operation {
@@ -59,9 +122,28 @@ public:
 	};
 
 	template<typename Handler>
+	struct AcceptOperation2 : public Operation {
+		Handler    _handler;
+		Impl	   _acpt_impl;
+		Impl	   _cli_impl;
+
+		M_SOCKET_DECL virtual bool Complete(EpollService::IoServiceImpl& serviceimpl, epoll_event_t* event);
+		M_SOCKET_DECL virtual void Clear();
+	};
+
+	template<typename Handler>
 	struct ConnectOperation : public Operation {
 		Handler _handler;
+
 		M_HANDLER_SOCKET_PTR(Handler) _socket_ptr;
+		M_SOCKET_DECL virtual bool Complete(EpollService::IoServiceImpl& serviceimpl, epoll_event_t* event);
+		M_SOCKET_DECL virtual void Clear();
+	};
+
+	template<typename Handler>
+	struct ConnectOperation2 : public Operation {
+		Handler _handler;
+		Impl    _impl;
 
 		M_SOCKET_DECL virtual bool Complete(EpollService::IoServiceImpl& serviceimpl, epoll_event_t* event);
 		M_SOCKET_DECL virtual void Clear();
@@ -71,7 +153,17 @@ public:
 	struct WriteOperation : public Operation {
 		wsabuf_t _wsabuf;
 		Handler _handler;
+
 		M_HANDLER_SOCKET_PTR(Handler) _socket_ptr;
+		M_SOCKET_DECL virtual bool Complete(EpollService::IoServiceImpl& serviceimpl, epoll_event_t* event);
+		M_SOCKET_DECL virtual void Clear();
+	};
+
+	template<typename Handler>
+	struct WriteOperation2 : public Operation {
+		wsabuf_t _wsabuf;
+		Handler _handler;
+		Impl    _impl;
 
 		M_SOCKET_DECL virtual bool Complete(EpollService::IoServiceImpl& serviceimpl, epoll_event_t* event);
 		M_SOCKET_DECL virtual void Clear();
@@ -87,19 +179,20 @@ public:
 		M_SOCKET_DECL virtual void Clear();
 	};
 
-	struct FinishOperation : public Operation {
-		s_int32_t _fd;
+	template<typename Handler>
+	struct ReadOperation2 : public Operation {
+		wsabuf_t _wsabuf;
+		Handler _handler;
+		Impl    _impl;
+
 		M_SOCKET_DECL virtual bool Complete(EpollService::IoServiceImpl& serviceimpl, epoll_event_t* event);
 		M_SOCKET_DECL virtual void Clear();
 	};
 
-	struct OperationSet
-	{
-		s_uint8_t  _type;
-		Operation* _accept_op;
-		Operation* _connect_op;
-		Operation* _write_op;
-		Operation* _read_op;
+	struct FinishOperation : public Operation {
+		s_int32_t _fd;
+		M_SOCKET_DECL virtual bool Complete(EpollService::IoServiceImpl& serviceimpl, epoll_event_t* event);
+		M_SOCKET_DECL virtual void Clear();
 	};
 
 	template<typename T>
@@ -134,25 +227,6 @@ private:
 	s_int32_t			_implcnt;
 	s_int32_t			_implidx;
 	mutable MutexLock	_mutex;
-};
-
-struct EpollService::Impl
-{
-	friend class Access;
-	template<typename T>
-	friend struct AcceptOperation;
-	template<typename T>
-	friend struct ConnectOperation;
-	template<typename T>
-	friend struct WriteOperation;
-	template<typename T>
-	friend struct ReadOperation;
-
-private:
-	s_int32_t	 _epoll;
-	socket_t	 _fd;
-	s_uint16_t   _state;
-	OperationSet _operation;
 };
 
 class EpollService::Access
@@ -205,14 +279,21 @@ public:
 	template<typename ReadHandler>
 	M_SOCKET_DECL static void AsyncRecvSome(EpollService& service, M_HANDLER_SOCKET_PTR(ReadHandler) socket_ptr, s_byte_t* data, s_uint32_t size, ReadHandler hander, SocketError& error);
 
+	M_SOCKET_DECL static void AsyncRecvSome(EpollService& service, Impl& impl, s_byte_t* data, s_uint32_t size, M_RW_HANDLER_TYPE(EpollService) hander, SocketError& error);
+
 	template<typename WriteHandler>
 	M_SOCKET_DECL static void AsyncSendSome(EpollService& service, M_HANDLER_SOCKET_PTR(WriteHandler) socket_ptr, const s_byte_t* data, s_uint32_t size, WriteHandler hander, SocketError& error);
+
+	M_SOCKET_DECL static void AsyncSendSome(EpollService& service, Impl& impl, const s_byte_t* data, s_uint32_t size, M_RW_HANDLER_TYPE(EpollService) hander, SocketError& error);
 
 	template<typename EndPoint>
 	M_SOCKET_DECL static void Connect(EpollService& service, EpollService::Impl& impl, const EndPoint& ep, SocketError& error);
 
 	template<typename ConnectHandler, typename EndPoint>
 	M_SOCKET_DECL static void AsyncConnect(EpollService& service, M_HANDLER_SOCKET_PTR(ConnectHandler) connect_ptr, const EndPoint& ep, ConnectHandler handler, SocketError& error);
+
+	template<typename EndPoint>
+	M_SOCKET_DECL static void AsyncConnect(EpollService& service, Impl& impl, const EndPoint& ep, M_COMMON_HANDLER_TYPE(EpollService) handler, SocketError& error);
 
 	M_SOCKET_DECL static void ExecOp(EpollService::IoServiceImpl& serviceimpl, EpollService::OperationSet* op, epoll_event_t* event);
 

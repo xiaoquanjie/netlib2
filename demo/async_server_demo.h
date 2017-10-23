@@ -39,11 +39,15 @@ public:
 
 	void WriteHandler(TcpSocketPtr sock, const s_byte_t* data, s_uint32_t max, s_uint32_t trans, SocketError error);
 
+	void WriteHandler2(s_uint32_t trans, SocketError error, TcpSocketPtr sock);
+
 	void ReadHandler(TcpSocketPtr sock, s_byte_t* data, s_uint32_t max, s_uint32_t trans, SocketError error);
+
+	void ReadHandler2(s_uint32_t trans, SocketError error, TcpSocketPtr sock);
 
 	void AcceptHandler(TcpAcceptorPtr acceptor, TcpSocketPtr sock, SocketError error);
 
-	void AcceptHandler2(SocketError error, TcpSocketPtr sock);
+	void AcceptHandler2(SocketError error, TcpSocketPtr sock, TcpAcceptorPtr acceptor);
 
 	void DestroyHandler(s_byte_t* read_ptr, s_byte_t* write_ptr,init_data*);
 

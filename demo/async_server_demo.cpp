@@ -39,11 +39,6 @@ static void print_func(const s_byte_t* ptr, SocketError& error)
 
 AsyncServer::AsyncServer(IoService& ioservice):m_ioservice(ioservice)
 {
-	init2();
-}
-
-void AsyncServer::init()
-{
 	m_write_handler = bind_t(&AsyncServer::WriteHandler, this, placeholder_1, placeholder_2, placeholder_3, placeholder_4,
 		placeholder_5);
 	m_read_handler = bind_t(&AsyncServer::ReadHandler, this, placeholder_1, placeholder_2, placeholder_3, placeholder_4,
@@ -51,6 +46,11 @@ void AsyncServer::init()
 	m_accept_handler = bind_t(&AsyncServer::AcceptHandler, this, placeholder_1, placeholder_2, placeholder_3);
 	m_destroy_handler = bind_t(&AsyncServer::DestroyHandler, this, (s_byte_t*)0, (s_byte_t*)0, (init_data*)0);
 
+	init();
+}
+
+void AsyncServer::init()
+{
 	try
 	{
 		SocketError error;
@@ -70,16 +70,13 @@ void AsyncServer::init2()
 {
 	try
 	{
-		SocketError error;
 		Tcp::EndPoint ep(AddressV4(""), 2001);
-
-		TcpAcceptor<IoService> acceptor(m_ioservice,ep);
-		acceptor.DestroyHandler(m_destroy_handler);
-
-		TcpSocket<IoService> sock(m_ioservice);
+		TcpAcceptorPtr AcceptorPtr(new TcpAcceptor<IoService>(m_ioservice, ep, 20));
+		AcceptorPtr->DestroyHandler(m_destroy_handler);
 		TcpSocketPtr socket_ptr(new TcpSocket<IoService>(m_ioservice));
-		function_t<void(SocketError)> func = bind_t(&AsyncServer::AcceptHandler2, this, placeholder_1, socket_ptr);
-		acceptor.AsyncAccept(func, *socket_ptr);
+		function_t<void(SocketError)> func = bind_t(&AsyncServer::AcceptHandler2, this, placeholder_1, socket_ptr, AcceptorPtr);
+		AcceptorPtr->AsyncAccept(func, *socket_ptr);
+		
 	}
 	catch (SocketError& error)
 	{
@@ -127,6 +124,42 @@ void AsyncServer::WriteHandler(TcpSocketPtr sock, const s_byte_t* data, s_uint32
 	}
 }
 
+void AsyncServer::WriteHandler2(s_uint32_t trans, SocketError error, TcpSocketPtr sock)
+{
+	init_data* pdata = (init_data*)sock->GetData();
+	if (error)
+	{
+		print_func("write handler error");
+		print_error(error);
+	}
+	else if (trans == 0)
+	{
+		print_func("write handler remote close connection");
+	}
+	{
+		++pdata->write_cnt;
+		string str;
+		pdata->lock.lock();
+		if (pdata->reply.size())
+		{
+			pdata->write_ptr[0] = 0;
+			str = pdata->reply.front();
+			pdata->reply.pop_front();
+		}
+		else
+			pdata->is_writing = false;
+		pdata->lock.unlock();
+		if (str.size())
+		{
+			memcpy(pdata->write_ptr, str.c_str(), str.length());
+			M_RW_HANDLER_TYPE(IoService) func = bind_t(&AsyncServer::WriteHandler2, this, placeholder_1, placeholder_2, sock);
+			sock->AsyncSendSome(func, pdata->write_ptr, (s_uint32_t)str.length(), error);
+			if (error)
+				print_error(error);
+		}
+	}
+}
+
 void AsyncServer::ReadHandler(TcpSocketPtr sock, s_byte_t* data, s_uint32_t max, s_uint32_t trans, SocketError error)
 {
 	if (error)
@@ -165,6 +198,48 @@ void AsyncServer::ReadHandler(TcpSocketPtr sock, s_byte_t* data, s_uint32_t max,
 	}
 }
 
+void AsyncServer::ReadHandler2(s_uint32_t trans, SocketError error, TcpSocketPtr sock)
+{
+	if (error)
+	{
+		print_func("read handler error", error);
+	}
+	else if (trans == 0)
+	{
+		print_func("read handler remote close connection");
+	}
+	else
+	{
+		init_data* pdata = (init_data*)sock->GetData();
+		pdata->read_ptr[trans] = '\0';
+		std::string reply = std::string("reply:") + std::string(pdata->read_ptr);
+
+		++pdata->read_cnt;
+		M_PRINT_WITH_LOCK("server receive trans : " << trans << " data : " << pdata->read_ptr << endl);
+		pdata->read_ptr[0] = 0;
+
+		M_RW_HANDLER_TYPE(IoService) read_func = bind_t(&AsyncServer::ReadHandler2, this, placeholder_1, placeholder_2, sock);
+		sock->AsyncRecvSome(read_func, pdata->read_ptr, (s_uint32_t)strlen(gContent), error);
+		if (error)
+		{
+			print_error(error);
+		}
+
+		pdata->lock.lock();
+		if (!pdata->is_writing)
+		{
+			pdata->is_writing = true;
+			memcpy(pdata->write_ptr, reply.c_str(), reply.length());
+
+			M_RW_HANDLER_TYPE(IoService) write_func = bind_t(&AsyncServer::WriteHandler2, this, placeholder_1, placeholder_2, sock);
+			sock->AsyncSendSome(write_func,pdata->write_ptr, (s_uint32_t)reply.length(), error);
+		}
+		else
+			pdata->reply.push_back(reply);
+		pdata->lock.unlock();
+	}
+}
+
 void AsyncServer::AcceptHandler(TcpAcceptorPtr acceptor, TcpSocketPtr sock, SocketError error)
 {
 	if (error)
@@ -188,7 +263,7 @@ void AsyncServer::AcceptHandler(TcpAcceptorPtr acceptor, TcpSocketPtr sock, Sock
 	acceptor->AsyncAccept(m_accept_handler);
 }
 
-void AsyncServer::AcceptHandler2(SocketError error, TcpSocketPtr sock)
+void AsyncServer::AcceptHandler2(SocketError error, TcpSocketPtr sock, TcpAcceptorPtr acceptor)
 {
 	if (error)
 	{
@@ -201,13 +276,18 @@ void AsyncServer::AcceptHandler2(SocketError error, TcpSocketPtr sock)
 		sock->SetData(data);
 		sock->DestroyHandler(bind_t(&AsyncServer::DestroyHandler, this, (s_byte_t*)data->read_ptr, (s_byte_t*)data->write_ptr, data));
 
+		M_RW_HANDLER_TYPE(IoService) read_func = bind_t(&AsyncServer::ReadHandler2, this, placeholder_1, placeholder_2, sock);
 		SocketError error2;
-		sock->AsyncRecvSome((s_byte_t*)data->read_ptr, (s_uint32_t)strlen(gContent), m_read_handler, error2);
+		sock->AsyncRecvSome(read_func,(s_byte_t*)data->read_ptr, (s_uint32_t)strlen(gContent), error2);
+		
 		if (error2)
 		{
 			print_func("recv error", error2);
 		}
 	}
+	TcpSocketPtr socket_ptr(new TcpSocket<IoService>(m_ioservice));
+	function_t<void(SocketError)> accept_func = bind_t(&AsyncServer::AcceptHandler2, this, placeholder_1, socket_ptr, acceptor);
+	acceptor->AsyncAccept(accept_func, *socket_ptr);
 }
 
 void AsyncServer::DestroyHandler(s_byte_t* read_ptr, s_byte_t* write_ptr,init_data* pdata)
