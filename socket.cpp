@@ -8,6 +8,7 @@
 #include <map>
 #include "demo/async_server_demo.h"
 #include "demo/async_client_demo.h"
+#include "netio/netio.hpp"
 
 #define _CRT_SECURE_NO_WARNINGS
 

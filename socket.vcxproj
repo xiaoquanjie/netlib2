@@ -154,6 +154,9 @@
   <ItemGroup>
     <ClInclude Include="demo\async_client_demo.h" />
     <ClInclude Include="demo\async_server_demo.h" />
+    <ClInclude Include="netio\config.hpp" />
+    <ClInclude Include="netio\netio.hpp" />
+    <ClInclude Include="netio\tcp_socket.hpp" />
     <ClInclude Include="socket\acceptor_service.hpp" />
     <ClInclude Include="socket\address.hpp" />
     <ClInclude Include="socket\basic_socket.hpp" />

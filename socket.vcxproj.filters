@@ -22,6 +22,9 @@
     <Filter Include="sync_call">
       <UniqueIdentifier>{8b3bb306-3e89-45b6-b47c-f52d6f87c5d9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="netio">
+      <UniqueIdentifier>{622dc570-efad-4f2f-b957-cdea83f54c82}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -167,6 +170,15 @@
     </ClInclude>
     <ClInclude Include="sync_call\sync_call.hpp">
       <Filter>sync_call</Filter>
+    </ClInclude>
+    <ClInclude Include="netio\config.hpp">
+      <Filter>netio</Filter>
+    </ClInclude>
+    <ClInclude Include="netio\netio.hpp">
+      <Filter>netio</Filter>
+    </ClInclude>
+    <ClInclude Include="netio\tcp_socket.hpp">
+      <Filter>netio</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
