@@ -72,6 +72,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
     <OutDir>output\</OutDir>
+    <IncludePath>E:\socket\netlib2;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
@@ -156,7 +157,9 @@
     <ClInclude Include="demo\async_server_demo.h" />
     <ClInclude Include="netio\config.hpp" />
     <ClInclude Include="netio\netio.hpp" />
-    <ClInclude Include="netio\tcp_socket.hpp" />
+    <ClInclude Include="netio\netio_impl.hpp" />
+    <ClInclude Include="netio\tls.hpp" />
+    <ClInclude Include="netio\tsocket_impl.hpp" />
     <ClInclude Include="socket\acceptor_service.hpp" />
     <ClInclude Include="socket\address.hpp" />
     <ClInclude Include="socket\basic_socket.hpp" />
@@ -206,6 +209,7 @@
   <ItemGroup>
     <ClCompile Include="demo\async_client_demo.cpp" />
     <ClCompile Include="demo\async_server_demo.cpp" />
+    <ClCompile Include="main.cpp" />
     <ClCompile Include="socket.cpp" />
     <ClCompile Include="thread.cpp" />
   </ItemGroup>

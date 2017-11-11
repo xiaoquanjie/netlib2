@@ -15,12 +15,37 @@
 #define M_NETIO_NETIO_INCLUDE
 
 #include "config.hpp"
-#include "tcp_socket.hpp"
-
 M_NETIO_NAMESPACE_BEGIN
 
-typedef shard_ptr_t<SocketLib::TcpAcceptor<IoService> > NetIoTcpAcceptorPtr;
+#ifdef M_PLATFORM_WIN
+#pragma pack(1)
+struct MessageHeader {
+	unsigned short checksum;
+	unsigned short size;
+	int			   timestamp;
+	unsigned char  endian; // 0 == little endian, 1 == big endian
+};
+#pragma pack()
+#else
+struct __attribute__((__packed__)) MessageHeader {
+	unsigned short checksum;
+	unsigned short size;
+	int			   timestamp;
+	unsigned char  endian; // 0 == little endian, 1 == big endian
+};
+#endif
 
+class NetIo;
+class TcpSocket;
+
+typedef shard_ptr_t<SocketLib::Buffer> BufferPtr;
+typedef shard_ptr_t<TcpSocket>		   TcpSocketPtr;
+typedef shard_ptr_t<SocketLib::TcpAcceptor<SocketLib::IoService> > NetIoTcpAcceptorPtr;
+
+typedef function_t<void(TcpSocketPtr, BufferPtr)> MessageReceiver;
+typedef function_t<bool(TcpSocketPtr, const MessageHeader&)> MessageHeaderChecker;
+
+// class netio
 class NetIo 
 {
 public:
@@ -49,57 +74,44 @@ protected:
 	NetIo& operator=(const NetIo&);
 
 private:
-	SocketLib::IoService  _ioservice;
-	SocketLib::s_uint32_t _backlog;
+	SocketLib::IoService   _ioservice;
+	SocketLib::s_uint32_t  _backlog;
 	SocketLib::SocketError _lasterror;
 };
 
-/////////////////////////////////////////////////////////////////////////////////////
+// class tcpsocket
+class TcpSocket : public enable_shared_from_this_t<TcpSocket>
+{
+public:
+	TcpSocket(NetIo& netio, MessageReceiver receiver, MessageHeaderChecker checker);
 
-NetIo::NetIo():_backlog(20){
-}
+	SocketLib::TcpSocket<SocketLib::IoService>& GetSocket();
 
-NetIo::NetIo(SocketLib::s_uint32_t backlog) : _backlog(backlog) {
-}
+protected:
+	void WriteHandler(SocketLib::s_uint32_t tran_byte, const SocketLib::SocketError& error);
 
-NetIo::~NetIo(){}
+	void ReadHandler(SocketLib::s_uint32_t tran_byte, const SocketLib::SocketError& error);
 
-bool NetIo::ListenOne(const SocketLib::Tcp::EndPoint& ep) {
-	try {
-		TcpAcceptorPtr acceptor(new SocketLib::TcpAcceptor<SocketLib::IoService>(_ioservice, ep, _backlog));
-		//TcpSocketPtr clisock(new TcpSocket<SocketLib::IoService>(_ioservice));
-		//function_t<void(SocketLib::SocketError)> handler = bind_t(&NetIo::AcceptHandler, this, placeholder_1, clisock, acceptor);
-	}
-	catch (SocketLib::SocketError& error) {
-		return false;
-	}
-	return true;
-}
+private:
+	NetIo& _netio;
+	SocketLib::TcpSocket<SocketLib::IoService>* _socket;
 
-void NetIo::Run(){
+	MessageReceiver		 _message_receiver;
+	MessageHeaderChecker _header_checker;
 
-}
+	// lock
+	SocketLib::MutexLock _write_mutex;
+	SocketLib::MutexLock _read_mutex;
 
-void NetIo::Stop() {
-	try {
-		_ioservice.Run();
-	}
-	catch (SocketLib::SocketError& error) {
+	// writer buffer
+	std::list<BufferPtr> _wait_write;
+	BufferPtr			 _writing_buffer;
 
-	}
-}
-
-inline SocketLib::SocketError NetIo::GetLastError()const {
-	return _lasterror;
-}
-
-inline SocketLib::IoService& NetIo::GetIoService() {
-	return _ioservice;
-}
-
-void NetIo::AcceptHandler(SocketLib::SocketError error, TcpSocketPtr clisock, NetIoTcpAcceptorPtr acceptor) {
-
-}
+	// reader buffer
+	BufferPtr			 _reading_buffer;
+};
 
 M_NETIO_NAMESPACE_END
+#include "netio_impl.hpp"
+#include "tsocket_impl.hpp"
 #endif
