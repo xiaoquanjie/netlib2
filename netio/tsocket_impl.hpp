@@ -53,7 +53,7 @@ void TcpSocket::Init() {
 		_netio.OnConnected(shared_from_this());
 
 		function_t<void(SocketLib::s_uint32_t, SocketLib::SocketError)> handler = 
-			bind_t(&TcpSocket::ReadHandler, shared_from_this(), placeholder_1, placeholder_2);
+			bind_t(&TcpSocket::_ReadHandler, shared_from_this(), placeholder_1, placeholder_2);
 		_socket->AsyncRecvSome(handler,_reader.readbuf,M_READ_SIZE);
 	}
 	catch (const SocketLib::SocketError& e) {
@@ -72,10 +72,10 @@ const SocketLib::Tcp::EndPoint& TcpSocket::RemoteEndpoint()const {
 void TcpSocket::PostClose() {
 	SocketLib::ScopedLock scoped_r(_reader.lock);
 	SocketLib::ScopedLock scoped_w(_writer.lock);
-	Close();
+	_Close();
 }
 
-void TcpSocket::Close() {
+void TcpSocket::_Close() {
 	if (!_stopped) {
 		_stopped = true;
 	}
@@ -85,15 +85,15 @@ void TcpSocket::Send(SocketLib::Buffer* buffer) {
 	SocketLib::ScopedLock scoped_r(_writer.lock);
 	if (!_stopped) {
 		_writer.buffer_pool.push_back(buffer);
-		TrySendData();
+		_TrySendData();
 	}
 }
 
-void TcpSocket::WriteHandler(SocketLib::s_uint32_t tran_byte, const SocketLib::SocketError& error) {
+void TcpSocket::_WriteHandler(SocketLib::s_uint32_t tran_byte, const SocketLib::SocketError& error) {
 
 }
 
-void TcpSocket::ReadHandler(SocketLib::s_uint32_t tran_byte, const SocketLib::SocketError& error) {
+void TcpSocket::_ReadHandler(SocketLib::s_uint32_t tran_byte, const SocketLib::SocketError& error) {
 	if (error) {
 		// 出错关闭连接
 		M_NETIO_LOGGER("read handler happend error:" << M_ERROR_DESC_STR(error));
@@ -106,12 +106,12 @@ void TcpSocket::ReadHandler(SocketLib::s_uint32_t tran_byte, const SocketLib::So
 	else {
 		_reader.msgbuffer.Write(_reader.readbuf, tran_byte);
 		_reader.readbuf[0] = 0;
-		if (CutMsgPack()) 
+		if (_CutMsgPack()) 
 		{
 			SocketLib::ScopedLock scoped_r(_reader.lock);
 			if (!_stopped) {
 				function_t<void(SocketLib::s_uint32_t, SocketLib::SocketError)> handler =
-					bind_t(&TcpSocket::ReadHandler, shared_from_this(), placeholder_1, placeholder_2);
+					bind_t(&TcpSocket::_ReadHandler, shared_from_this(), placeholder_1, placeholder_2);
 				_socket->AsyncRecvSome(handler, _reader.readbuf, M_READ_SIZE);
 			}
 		}
@@ -122,11 +122,22 @@ void TcpSocket::ReadHandler(SocketLib::s_uint32_t tran_byte, const SocketLib::So
 	}
 }
 
-bool TcpSocket::CutMsgPack() {
+bool TcpSocket::_CutMsgPack() {
 	return true;
 }
 
-bool TcpSocket::TrySendData() {
+bool TcpSocket::_TrySendData() {
+	if (!_writer.writing && _writer.buffer_pool.size()) 
+	{
+		_writer.writing = true;
+		SocketLib::Buffer* pbuffer = _writer.buffer_pool.front();
+		_writer.msgbuffer.reset(pbuffer);
+
+		function_t<void(SocketLib::s_uint32_t, SocketLib::SocketError)> handler =
+			bind_t(&TcpSocket::_WriteHandler, shared_from_this(), placeholder_1, placeholder_2);
+		_socket->AsyncSendSome(handler, _writer.msgbuffer->Data(), _writer.msgbuffer->Length());
+		return true;
+	}
 	return false;
 }
 

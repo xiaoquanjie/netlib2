@@ -113,6 +113,7 @@ public:
 	};
 	struct _writerinfo_ {
 		std::list<SocketLib::Buffer*> buffer_pool;
+		BufferPtr msgbuffer;
 		SocketLib::MutexLock lock;
 		bool writing;
 
@@ -138,16 +139,16 @@ public:
 	void Send(SocketLib::Buffer*);
 
 protected:
-	void WriteHandler(SocketLib::s_uint32_t tran_byte, const SocketLib::SocketError& error);
+	void _WriteHandler(SocketLib::s_uint32_t tran_byte, const SocketLib::SocketError& error);
 
-	void ReadHandler(SocketLib::s_uint32_t tran_byte, const SocketLib::SocketError& error);
+	void _ReadHandler(SocketLib::s_uint32_t tran_byte, const SocketLib::SocketError& error);
 
-	void Close();
+	void _Close();
 
 	// 裁减出数据包，返回false意味着数据包有错
-	bool CutMsgPack();
+	bool _CutMsgPack();
 
-	bool TrySendData();
+	bool _TrySendData();
 
 private:
 	NetIo& _netio;
