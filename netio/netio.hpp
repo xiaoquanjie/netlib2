@@ -45,6 +45,8 @@ typedef shard_ptr_t<SocketLib::TcpAcceptor<SocketLib::IoService> > NetIoTcpAccep
 typedef function_t<void(TcpSocketPtr, BufferPtr)> MessageReceiver;
 typedef function_t<bool(TcpSocketPtr, const MessageHeader&)> MessageHeaderChecker;
 
+#define lasterror tlsdata<SocketLib::SocketError,0>::data()
+
 // class netio
 class NetIo 
 {
@@ -62,12 +64,28 @@ public:
 
 	void Stop();
 
+	// 获取最后的异常
 	inline SocketLib::SocketError GetLastError()const;
 
 	inline SocketLib::IoService& GetIoService();
 
+	/*
+	 *以下三个函数定义为虚函数，以便根据实际业务的模式来做具体模式的消息包分发处理。
+	 *保证同一个socket，以下三个函数的调用遵循OnConnected -> OnReceiveData -> OnDisconnected的顺序。
+	 *保证同一个socket，以下后两个函数的调用都在同一个线程中
+	 */
+
+	// 连线通知,这个函数里不要处理业务，防止堵塞
+	virtual void OnConnected(TcpSocketPtr clisock);
+
+	// 掉线通知,这个函数里不要处理业务，防止堵塞
+	virtual void OnDisconnected(TcpSocketPtr clisock);
+
+	// 数据包通知,这个函数里不要处理业务，防止堵塞
+	virtual void OnReceiveData(TcpSocketPtr clisock, BufferPtr buffer);
+
 protected:
-	virtual void AcceptHandler(SocketLib::SocketError error, TcpSocketPtr clisock, NetIoTcpAcceptorPtr acceptor);
+	void AcceptHandler(SocketLib::SocketError error, TcpSocketPtr clisock, NetIoTcpAcceptorPtr acceptor);
 
 protected:
 	NetIo(const NetIo&);
@@ -76,21 +94,60 @@ protected:
 private:
 	SocketLib::IoService   _ioservice;
 	SocketLib::s_uint32_t  _backlog;
-	SocketLib::SocketError _lasterror;
+
+	std::list<TcpSocketPtr> _connected_list;
+	std::list<TcpSocketPtr> _disconnected_list; // 断线
 };
 
 // class tcpsocket
 class TcpSocket : public enable_shared_from_this_t<TcpSocket>
 {
 public:
+	struct _readerinfo_ {
+		SocketLib::s_byte_t* readbuf;
+		SocketLib::Buffer	 msgbuffer;
+		SocketLib::MutexLock lock;
+
+		_readerinfo_();
+		~_readerinfo_();
+	};
+	struct _writerinfo_ {
+		std::list<SocketLib::Buffer*> buffer_pool;
+		SocketLib::MutexLock lock;
+		bool writing;
+
+		_writerinfo_();
+	};
+
+public:
 	TcpSocket(NetIo& netio, MessageReceiver receiver, MessageHeaderChecker checker);
 
+	~TcpSocket();
+
 	SocketLib::TcpSocket<SocketLib::IoService>& GetSocket();
+
+	void Init();
+
+	const SocketLib::Tcp::EndPoint& LocalEndpoint()const;
+
+	const SocketLib::Tcp::EndPoint& RemoteEndpoint()const;
+
+	// 调用这个函数不意味着连接立即断开，会等所有的未处理的数据处理完就会断开
+	void PostClose();
+
+	void Send(SocketLib::Buffer*);
 
 protected:
 	void WriteHandler(SocketLib::s_uint32_t tran_byte, const SocketLib::SocketError& error);
 
 	void ReadHandler(SocketLib::s_uint32_t tran_byte, const SocketLib::SocketError& error);
+
+	void Close();
+
+	// 裁减出数据包，返回false意味着数据包有错
+	bool CutMsgPack();
+
+	bool TrySendData();
 
 private:
 	NetIo& _netio;
@@ -99,16 +156,14 @@ private:
 	MessageReceiver		 _message_receiver;
 	MessageHeaderChecker _header_checker;
 
-	// lock
-	SocketLib::MutexLock _write_mutex;
-	SocketLib::MutexLock _read_mutex;
+	_readerinfo_ _reader;
+	_writerinfo_ _writer;
 
-	// writer buffer
-	std::list<BufferPtr> _wait_write;
-	BufferPtr			 _writing_buffer;
+	// endpoint
+	SocketLib::Tcp::EndPoint _localep;
+	SocketLib::Tcp::EndPoint _remoteep;
 
-	// reader buffer
-	BufferPtr			 _reading_buffer;
+	bool _stopped; // stop flag
 };
 
 M_NETIO_NAMESPACE_END

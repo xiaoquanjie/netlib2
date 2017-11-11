@@ -186,6 +186,9 @@
     <ClInclude Include="netio\tls.hpp">
       <Filter>netio</Filter>
     </ClInclude>
+    <ClInclude Include="netio\log.hpp">
+      <Filter>netio</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="socket.cpp">

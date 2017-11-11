@@ -30,6 +30,7 @@ public:
 
 	M_SOCKET_DECL virtual ~BasicSocket();
 
+	// 此函数是非线程安全函数,调用要慎重。如果外部可以不调用，则最好不要调用，由析构函数自动调用
 	M_SOCKET_DECL void Close();
 	
 	M_SOCKET_DECL void Close(SocketError& error);

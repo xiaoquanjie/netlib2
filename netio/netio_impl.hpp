@@ -32,6 +32,7 @@ bool NetIo::ListenOne(const SocketLib::Tcp::EndPoint& ep) {
 		acceptor->AsyncAccept(handler, clisock->GetSocket());
 	}
 	catch (SocketLib::SocketError& error) {
+		lasterror = error;
 		return false;
 	}
 	return true;
@@ -51,7 +52,7 @@ void NetIo::Stop() {
 }
 
 inline SocketLib::SocketError NetIo::GetLastError()const {
-	return _lasterror;
+	return lasterror;
 }
 
 inline SocketLib::IoService& NetIo::GetIoService() {
@@ -59,6 +60,44 @@ inline SocketLib::IoService& NetIo::GetIoService() {
 }
 
 void NetIo::AcceptHandler(SocketLib::SocketError error, TcpSocketPtr clisock, NetIoTcpAcceptorPtr acceptor) {
+	if (error) {
+		M_NETIO_LOGGER("accept handler happend error:" << M_NETIO_LOGGER(error));
+	}
+	else {
+		clisock->Init();
+	}
+	if (!_ioservice.Stopped()) {
+		TcpSocketPtr clisock(new TcpSocket(*this, 0, 0));
+		function_t<void(SocketLib::SocketError)> handler = bind_t(&NetIo::AcceptHandler, this, placeholder_1, clisock, acceptor);
+		SocketLib::SocketError error2;
+		acceptor->AsyncAccept(handler, clisock->GetSocket(),error2);
+		if (error2)
+			lasterror = error2;
+	}
+}
+
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/*
+*以下三个函数定义为虚函数，以便根据实际业务的模式来做具体模式的消息包分发处理。
+*保证同一个socket，以下三个函数的调用遵循OnConnected -> OnReceiveData -> OnDisconnected的顺序。
+*保证同一个socket，以下后两个函数的调用都在同一个线程中
+*/
+
+// 连线通知,这个函数里不要处理业务，防止堵塞
+void NetIo::OnConnected(TcpSocketPtr clisock) {
+
+}
+
+// 掉线通知,这个函数里不要处理业务，防止堵塞
+void NetIo::OnDisconnected(TcpSocketPtr clisock) {
+
+}
+
+// 数据包通知,这个函数里不要处理业务，防止堵塞
+void NetIo::OnReceiveData(TcpSocketPtr clisock, BufferPtr buffer) {
 
 }
 
