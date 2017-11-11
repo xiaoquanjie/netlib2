@@ -221,6 +221,21 @@
 #define M_SET_MBIT(x,y,s,e) {M_CLR_MBIT(x,s,e); x |= (y<<s);}
 #define M_GET_MBIT(x,s,e) ((x>>s) & ((1<<(e-s+1))-1))
 
+#define shard_ptr_t std::tr1::shared_ptr 
+#define enable_shared_from_this_t std::tr1::enable_shared_from_this
+#define function_t	std::tr1::function
+#define bind_t std::tr1::bind
+#define placeholder_1 std::tr1::placeholders::_1
+#define placeholder_2 std::tr1::placeholders::_2
+#define placeholder_3 std::tr1::placeholders::_3
+#define placeholder_4 std::tr1::placeholders::_4
+#define placeholder_5 std::tr1::placeholders::_5
+#define placeholder_6 std::tr1::placeholders::_6
+#define placeholder_7 std::tr1::placeholders::_7
+#define placeholder_8 std::tr1::placeholders::_8
+#define placeholder_9 std::tr1::placeholders::_9
+#define placeholder_10 std::tr1::placeholders::_10
+#define dynamic_pointer_cast_t std::tr1::dynamic_pointer_cast
 
 #endif // M_CONFIG_INCLUDE
 

@@ -13,23 +13,8 @@
 
 #ifndef M_TYPE_INCLUDE
 #define M_TYPE_INCLUDE
-M_SOCKET_NAMESPACE_BEGIN
 
-#define shard_ptr_t std::tr1::shared_ptr 
-#define enable_shared_from_this_t std::tr1::enable_shared_from_this
-#define function_t	std::tr1::function
-#define bind_t std::tr1::bind
-#define placeholder_1 tr1::placeholders::_1
-#define placeholder_2 tr1::placeholders::_2
-#define placeholder_3 tr1::placeholders::_3
-#define placeholder_4 tr1::placeholders::_4
-#define placeholder_5 tr1::placeholders::_5
-#define placeholder_6 tr1::placeholders::_6
-#define placeholder_7 tr1::placeholders::_7
-#define placeholder_8 tr1::placeholders::_8
-#define placeholder_9 tr1::placeholders::_9
-#define placeholder_10 tr1::placeholders::_10
-#define dynamic_pointer_cast_t std::tr1::dynamic_pointer_cast
+M_SOCKET_NAMESPACE_BEGIN
 
 /*
 基本数据类型
