@@ -99,6 +99,13 @@ private:
 	std::list<TcpSocketPtr> _disconnected_list; // ¶ÏÏß
 };
 
+enum {
+	E_TCPSOCKET_STATE_STOP = 0,
+	E_TCPSOCKET_STATE_START = 1 << 0,
+	E_TCPSOCKET_STATE_READ = 1 << 1,
+	E_TCPSOCKET_STATE_WRITE = 1 << 2,
+};
+
 // class tcpsocket
 class TcpSocket : public enable_shared_from_this_t<TcpSocket>
 {
@@ -165,6 +172,7 @@ private:
 	SocketLib::Tcp::EndPoint _remoteep;
 
 	bool _stopped; // stop flag
+	unsigned int _flag;
 };
 
 M_NETIO_NAMESPACE_END

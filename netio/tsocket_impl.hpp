@@ -105,6 +105,9 @@ void TcpSocket::_WriteHandler(SocketLib::s_uint32_t tran_byte, const SocketLib::
 		if (_stopped) {
 			_writer.msgbuffer->RemoveData(tran_byte);
 			_TrySendData();
+		} 
+		else{
+			_socket->Shutdown(SocketLib::E_Shutdown_WR);
 		}
 	}
 }
@@ -133,6 +136,7 @@ void TcpSocket::_ReadHandler(SocketLib::s_uint32_t tran_byte, const SocketLib::S
 		}
 		else {
 			// 数据检查出错，主动断开连接
+			_socket->Shutdown(SocketLib::E_Shutdown_RD);
 			PostClose();
 		}
 	}
