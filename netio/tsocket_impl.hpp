@@ -82,7 +82,7 @@ void TcpSocket::_Close() {
 }
 
 void TcpSocket::Send(SocketLib::Buffer* buffer) {
-	SocketLib::ScopedLock scoped_r(_writer.lock);
+	SocketLib::ScopedLock scoped_w(_writer.lock);
 	if (!_stopped) {
 		_writer.buffer_pool.push_back(buffer);
 		_TrySendData();
@@ -90,7 +90,23 @@ void TcpSocket::Send(SocketLib::Buffer* buffer) {
 }
 
 void TcpSocket::_WriteHandler(SocketLib::s_uint32_t tran_byte, const SocketLib::SocketError& error) {
-
+	_writer.writing = false;
+	if (error) {
+		// 出错关闭连接
+		M_NETIO_LOGGER("write handler happend error:"M_ERROR_DESC_STR(error));
+		PostClose();
+	}
+	else if (tran_byte <= 0) {
+		// 连接已经关闭
+		PostClose();
+	}
+	else {
+		SocketLib::ScopedLock scoped_w(_writer.lock);
+		if (_stopped) {
+			_writer.msgbuffer->RemoveData(tran_byte);
+			_TrySendData();
+		}
+	}
 }
 
 void TcpSocket::_ReadHandler(SocketLib::s_uint32_t tran_byte, const SocketLib::SocketError& error) {
@@ -127,15 +143,21 @@ bool TcpSocket::_CutMsgPack() {
 }
 
 bool TcpSocket::_TrySendData() {
-	if (!_writer.writing && _writer.buffer_pool.size()) 
+	if (!_writer.writing) 
 	{
-		_writer.writing = true;
-		SocketLib::Buffer* pbuffer = _writer.buffer_pool.front();
-		_writer.msgbuffer.reset(pbuffer);
-
-		function_t<void(SocketLib::s_uint32_t, SocketLib::SocketError)> handler =
-			bind_t(&TcpSocket::_WriteHandler, shared_from_this(), placeholder_1, placeholder_2);
-		_socket->AsyncSendSome(handler, _writer.msgbuffer->Data(), _writer.msgbuffer->Length());
+		if (_writer.msgbuffer->Length() == 0 && _writer.buffer_pool.size() > 0) {
+			SocketLib::Buffer* pbuffer = _writer.buffer_pool.front();
+			_writer.msgbuffer.reset(pbuffer);
+		}
+		if (_writer.msgbuffer->Length() != 0) {
+			_writer.writing = true;
+			function_t<void(SocketLib::s_uint32_t, SocketLib::SocketError)> handler =
+				bind_t(&TcpSocket::_WriteHandler, shared_from_this(), placeholder_1, placeholder_2);
+			_socket->AsyncSendSome(handler, _writer.msgbuffer->Data(), _writer.msgbuffer->Length());
+		}
+		else {
+			_writer.writing = false;
+		}
 		return true;
 	}
 	return false;

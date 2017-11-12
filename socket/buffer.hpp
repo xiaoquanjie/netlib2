@@ -19,6 +19,8 @@ public:
 
 	M_SOCKET_DECL ~Buffer();
 
+	M_SOCKET_DECL void RemoveData(s_uint32_t len);
+
 	M_SOCKET_DECL s_byte_t* Data();
 
 	M_SOCKET_DECL const s_byte_t* Data()const;
@@ -74,6 +76,12 @@ M_SOCKET_DECL Buffer::~Buffer(){
 	g_free(_data._data);
 }
 
+M_SOCKET_DECL void Buffer::RemoveData(s_uint32_t len) {
+	if (_data._offset + len > _data._pos)
+		_data._offset = _data._pos;
+	_data._offset += len;
+}
+
 M_SOCKET_DECL s_byte_t* Buffer::Data(){
 	return _data._data;
 }
@@ -91,7 +99,7 @@ M_SOCKET_DECL s_uint32_t Buffer::Size()const{
 }
 
 M_SOCKET_DECL s_uint32_t Buffer::Length()const{
-	return _data._pos;
+	return (_data._pos - _data._offset);
 }
 
 M_SOCKET_DECL void Buffer::Write(void* data, s_uint32_t len)
