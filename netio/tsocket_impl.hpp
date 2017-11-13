@@ -19,6 +19,7 @@ M_NETIO_NAMESPACE_BEGIN
 #define M_READ_SIZE (4*1024)
 
 TcpSocket::_readerinfo_::_readerinfo_() {
+	g_memset(&curheader, 0, sizeof(curheader));
 	readbuf = new SocketLib::s_byte_t[M_READ_SIZE];
 	g_memset(readbuf, 0, M_READ_SIZE);
 }
@@ -31,8 +32,8 @@ TcpSocket::_writerinfo_::_writerinfo_() {
 	writing = false;
 }
 
-TcpSocket::TcpSocket(NetIo& netio, MessageReceiver receiver, MessageHeaderChecker checker)
-	:_netio(netio), _message_receiver(receiver), _header_checker(checker) {
+TcpSocket::TcpSocket(NetIo& netio, MessageChecker checker)
+	:_netio(netio), _msgchecker(checker){
 	_flag = E_TCPSOCKET_STATE_STOP;
 	_socket = new SocketLib::TcpSocket<SocketLib::IoService>(_netio.GetIoService());
 }
@@ -47,8 +48,8 @@ SocketLib::TcpSocket<SocketLib::IoService>& TcpSocket::GetSocket() {
 
 void TcpSocket::Init() {
 	try {
-		_localep = _socket->LocalEndPoint();
 		_remoteep = _socket->RemoteEndPoint();
+		_localep = _socket->LocalEndPoint();
 		_flag = E_TCPSOCKET_STATE_START;
 		_netio.OnConnected(shared_from_this());
 		_flag |= E_TCPSOCKET_STATE_READ;
@@ -98,6 +99,19 @@ void TcpSocket::Send(SocketLib::Buffer* buffer) {
 		_writer.buffer_pool.push_back(buffer);
 		_TrySendData();
 	}
+	delete buffer;
+}
+
+void TcpSocket::Send(SocketLib::s_byte_t* data, SocketLib::s_uint16_t len) {
+	MessageHeader hdr;
+	hdr.endian = _netio.LocalEndian();
+	hdr.size = len;
+	hdr.timestamp = (unsigned int)time(0);
+
+	SocketLib::Buffer* buffer = new SocketLib::Buffer();
+	buffer->Write(hdr);
+	buffer->Write(data, len);
+	Send(buffer);
 }
 
 void TcpSocket::_WriteHandler(SocketLib::s_uint32_t tran_byte, const SocketLib::SocketError& error) {
@@ -113,11 +127,9 @@ void TcpSocket::_WriteHandler(SocketLib::s_uint32_t tran_byte, const SocketLib::
 	}
 	else {
 		SocketLib::ScopedLock scoped_w(_writer.lock);
-		if (_flag & E_TCPSOCKET_STATE_START) {
-			_writer.msgbuffer->RemoveData(tran_byte);
-			_TrySendData();
-		}
-		else {
+		_writer.msgbuffer->RemoveData(tran_byte);
+		if (!_TrySendData() && !(_flag & E_TCPSOCKET_STATE_START)){
+			// 数据发送完后，如果状态不是E_TCPSOCKET_STATE_START，则需要关闭写
 			_socket->Shutdown(SocketLib::E_Shutdown_WR);
 			_Close(E_TCPSOCKET_STATE_WRITE);
 		}
@@ -135,9 +147,7 @@ void TcpSocket::_ReadHandler(SocketLib::s_uint32_t tran_byte, const SocketLib::S
 		_PostClose(E_TCPSOCKET_STATE_START | E_TCPSOCKET_STATE_READ);
 	}
 	else {
-		_reader.msgbuffer.Write(_reader.readbuf, tran_byte);
-		_reader.readbuf[0] = 0;
-		if (_CutMsgPack()) 
+		if (_CutMsgPack(_reader.readbuf, tran_byte))
 		{
 			SocketLib::ScopedLock scoped_r(_reader.lock);
 			if (_flag & E_TCPSOCKET_STATE_START){
@@ -157,11 +167,58 @@ void TcpSocket::_ReadHandler(SocketLib::s_uint32_t tran_byte, const SocketLib::S
 	}
 }
 
-bool TcpSocket::_CutMsgPack() {
+bool TcpSocket::_CutMsgPack(SocketLib::s_byte_t* buf, SocketLib::s_uint32_t tran_byte) {
+	// 减少内存拷贝是此函数的设计关键
+	SocketLib::s_uint32_t hdrlen = (SocketLib::s_uint32_t)sizeof(MessageHeader);
+	SocketLib::s_uint32_t datalen = _reader.msgbuffer.Length();
+
+	// 算出头部长度
+	if (_reader.curheader.size == 0) {
+		if (tran_byte + datalen < hdrlen) {
+			_reader.msgbuffer.Write(buf, tran_byte);
+			return true;
+		}
+		else {
+			_reader.msgbuffer.Write(buf, hdrlen - datalen);
+			buf += (hdrlen - datalen);
+			tran_byte -= (hdrlen - datalen);
+
+			_reader.msgbuffer.Read(_reader.curheader);
+			if (_reader.curheader.endian != _netio.LocalEndian()) {
+				_reader.curheader.size = g_htons(_reader.curheader.size);
+				_reader.curheader.timestamp = g_htonl(_reader.curheader.timestamp);
+			}
+
+			// 校验
+			if (_reader.curheader.size > (0xFFFF - hdrlen))
+				return false;
+		}
+	}
+
+	// 拷贝body
+	datalen = _reader.msgbuffer.Length();
+	if (tran_byte + datalen < _reader.curheader.size) {
+		_reader.msgbuffer.Write(buf, tran_byte);
+	}
+	else {
+		_reader.msgbuffer.Write(buf, _reader.curheader.size - datalen);
+		buf += (_reader.curheader.size - datalen);
+		tran_byte -= (_reader.curheader.size - datalen);
+
+		BufferPtr tmp_bufferptr(new SocketLib::Buffer());
+		tmp_bufferptr->Write(buf, tran_byte);
+		// swap
+		tmp_bufferptr->Swap(_reader.msgbuffer);
+		if (_msgchecker)
+			if (!_msgchecker(shared_from_this(), _reader.curheader, tmp_bufferptr))
+				return false;
+		// notify
+		_netio.OnReceiveData(shared_from_this(), tmp_bufferptr);
+	}
 	return true;
 }
 
-void TcpSocket::_TrySendData() {
+bool TcpSocket::_TrySendData() {
 	if (!_writer.writing) 
 	{
 		if (_writer.msgbuffer->Length() == 0 && _writer.buffer_pool.size() > 0) {
@@ -174,12 +231,13 @@ void TcpSocket::_TrySendData() {
 			function_t<void(SocketLib::s_uint32_t, SocketLib::SocketError)> handler =
 				bind_t(&TcpSocket::_WriteHandler, shared_from_this(), placeholder_1, placeholder_2);
 			_socket->AsyncSendSome(handler, _writer.msgbuffer->Data(), _writer.msgbuffer->Length());
+			return true;
 		}
 		else {
 			_writer.writing = false;
-			_Close(E_TCPSOCKET_STATE_WRITE);
 		}
 	}
+	return false;
 }
 
 M_NETIO_NAMESPACE_END

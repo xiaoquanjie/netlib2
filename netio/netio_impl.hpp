@@ -17,9 +17,11 @@
 M_NETIO_NAMESPACE_BEGIN
 
 NetIo::NetIo() :_backlog(20) {
+	_endian = SocketLib::detail::Util::LocalEndian();
 }
 
 NetIo::NetIo(SocketLib::s_uint32_t backlog) : _backlog(backlog) {
+	_endian = SocketLib::detail::Util::LocalEndian();
 }
 
 NetIo::~NetIo() {}
@@ -27,7 +29,7 @@ NetIo::~NetIo() {}
 bool NetIo::ListenOne(const SocketLib::Tcp::EndPoint& ep) {
 	try {
 		NetIoTcpAcceptorPtr acceptor(new SocketLib::TcpAcceptor<SocketLib::IoService>(_ioservice, ep, _backlog));
-		TcpSocketPtr clisock(new TcpSocket(*this, 0, 0));
+		TcpSocketPtr clisock(new TcpSocket(*this, 0));
 		function_t<void(SocketLib::SocketError)> handler = bind_t(&NetIo::AcceptHandler, this, placeholder_1, clisock, acceptor);
 		acceptor->AsyncAccept(handler, clisock->GetSocket());
 	}
@@ -38,16 +40,28 @@ bool NetIo::ListenOne(const SocketLib::Tcp::EndPoint& ep) {
 	return true;
 }
 
-void NetIo::Run() {
-
+bool NetIo::ListenOne(const std::string& addr, SocketLib::s_uint16_t port) {
+	SocketLib::Tcp::EndPoint ep(SocketLib::AddressV4(addr), port);
+	return ListenOne(ep);
 }
 
-void NetIo::Stop() {
+void NetIo::Run() {
 	try {
 		_ioservice.Run();
 	}
 	catch (SocketLib::SocketError& error) {
+		lasterror = error;
+		M_NETIO_LOGGER("run happend error:"M_ERROR_DESC_STR(error));
+	}
+}
 
+void NetIo::Stop() {
+	try{
+		_ioservice.Stop();
+	}
+	catch (SocketLib::SocketError& error){
+		lasterror = error;
+		M_NETIO_LOGGER("stop happend error:"M_ERROR_DESC_STR(error));
 	}
 }
 
@@ -59,6 +73,10 @@ inline SocketLib::IoService& NetIo::GetIoService() {
 	return _ioservice;
 }
 
+inline SocketLib::s_uint32_t NetIo::LocalEndian()const {
+	return _endian;
+}
+
 void NetIo::AcceptHandler(SocketLib::SocketError error, TcpSocketPtr clisock, NetIoTcpAcceptorPtr acceptor) {
 	if (error) {
 		M_NETIO_LOGGER("accept handler happend error:" << M_NETIO_LOGGER(error));
@@ -67,7 +85,7 @@ void NetIo::AcceptHandler(SocketLib::SocketError error, TcpSocketPtr clisock, Ne
 		clisock->Init();
 	}
 	if (!_ioservice.Stopped()) {
-		TcpSocketPtr clisock(new TcpSocket(*this, 0, 0));
+		TcpSocketPtr clisock(new TcpSocket(*this, 0));
 		function_t<void(SocketLib::SocketError)> handler = bind_t(&NetIo::AcceptHandler, this, placeholder_1, clisock, acceptor);
 		SocketLib::SocketError error2;
 		acceptor->AsyncAccept(handler, clisock->GetSocket(),error2);
@@ -75,8 +93,6 @@ void NetIo::AcceptHandler(SocketLib::SocketError error, TcpSocketPtr clisock, Ne
 			lasterror = error2;
 	}
 }
-
-
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 

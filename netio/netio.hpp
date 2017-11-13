@@ -20,17 +20,15 @@ M_NETIO_NAMESPACE_BEGIN
 #ifdef M_PLATFORM_WIN
 #pragma pack(1)
 struct MessageHeader {
-	unsigned short checksum;
-	unsigned short size;
 	int			   timestamp;
+	unsigned short size;
 	unsigned char  endian; // 0 == little endian, 1 == big endian
 };
 #pragma pack()
 #else
 struct __attribute__((__packed__)) MessageHeader {
-	unsigned short checksum;
-	unsigned short size;
 	int			   timestamp;
+	unsigned short size;
 	unsigned char  endian; // 0 == little endian, 1 == big endian
 };
 #endif
@@ -42,8 +40,7 @@ typedef shard_ptr_t<SocketLib::Buffer> BufferPtr;
 typedef shard_ptr_t<TcpSocket>		   TcpSocketPtr;
 typedef shard_ptr_t<SocketLib::TcpAcceptor<SocketLib::IoService> > NetIoTcpAcceptorPtr;
 
-typedef function_t<void(TcpSocketPtr, BufferPtr)> MessageReceiver;
-typedef function_t<bool(TcpSocketPtr, const MessageHeader&)> MessageHeaderChecker;
+typedef function_t<bool(TcpSocketPtr, MessageHeader&, BufferPtr)> MessageChecker;
 
 #define lasterror tlsdata<SocketLib::SocketError,0>::data()
 
@@ -60,14 +57,18 @@ public:
 	// 建立一个监听
 	bool ListenOne(const SocketLib::Tcp::EndPoint& ep);
 
-	void Run();
+	bool ListenOne(const std::string& addr, SocketLib::s_uint16_t port);
 
-	void Stop();
+	virtual void Run();
+
+	virtual void Stop();
 
 	// 获取最后的异常
 	inline SocketLib::SocketError GetLastError()const;
 
 	inline SocketLib::IoService& GetIoService();
+
+	inline SocketLib::s_uint32_t LocalEndian()const;
 
 	/*
 	 *以下三个函数定义为虚函数，以便根据实际业务的模式来做具体模式的消息包分发处理。
@@ -94,9 +95,7 @@ protected:
 private:
 	SocketLib::IoService   _ioservice;
 	SocketLib::s_uint32_t  _backlog;
-
-	std::list<TcpSocketPtr> _connected_list;
-	std::list<TcpSocketPtr> _disconnected_list; // 断线
+	SocketLib::s_uint32_t  _endian;
 };
 
 enum {
@@ -111,9 +110,10 @@ class TcpSocket : public enable_shared_from_this_t<TcpSocket>
 {
 public:
 	struct _readerinfo_ {
-		SocketLib::s_byte_t* readbuf;
-		SocketLib::Buffer	 msgbuffer;
-		SocketLib::MutexLock lock;
+		SocketLib::s_byte_t*  readbuf;
+		SocketLib::Buffer	  msgbuffer;
+		MessageHeader		  curheader;
+		SocketLib::MutexLock  lock;
 
 		_readerinfo_();
 		~_readerinfo_();
@@ -128,7 +128,7 @@ public:
 	};
 
 public:
-	TcpSocket(NetIo& netio, MessageReceiver receiver, MessageHeaderChecker checker);
+	TcpSocket(NetIo& netio, MessageChecker checker);
 
 	~TcpSocket();
 
@@ -145,6 +145,8 @@ public:
 
 	void Send(SocketLib::Buffer*);
 
+	void Send(SocketLib::s_byte_t* data, SocketLib::s_uint16_t len);
+
 protected:
 	void _WriteHandler(SocketLib::s_uint32_t tran_byte, const SocketLib::SocketError& error);
 
@@ -155,16 +157,13 @@ protected:
 	void _Close(unsigned int state);
 
 	// 裁减出数据包，返回false意味着数据包有错
-	bool _CutMsgPack();
+	bool _CutMsgPack(SocketLib::s_byte_t* buf, SocketLib::s_uint32_t tran_byte);
 
-	void _TrySendData();
+	bool _TrySendData();
 
 private:
 	NetIo& _netio;
 	SocketLib::TcpSocket<SocketLib::IoService>* _socket;
-
-	MessageReceiver		 _message_receiver;
-	MessageHeaderChecker _header_checker;
 
 	_readerinfo_ _reader;
 	_writerinfo_ _writer;
@@ -175,6 +174,8 @@ private:
 
 	// 状态标志
 	unsigned short _flag;
+	MessageChecker _msgchecker;
+
 };
 
 M_NETIO_NAMESPACE_END
