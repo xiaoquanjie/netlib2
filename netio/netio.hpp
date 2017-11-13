@@ -141,7 +141,7 @@ public:
 	const SocketLib::Tcp::EndPoint& RemoteEndpoint()const;
 
 	// 调用这个函数不意味着连接立即断开，会等所有的未处理的数据处理完就会断开
-	void PostClose();
+	void Close();
 
 	void Send(SocketLib::Buffer*);
 
@@ -150,12 +150,14 @@ protected:
 
 	void _ReadHandler(SocketLib::s_uint32_t tran_byte, const SocketLib::SocketError& error);
 
-	void _Close();
+	void _PostClose(unsigned int state);
+
+	void _Close(unsigned int state);
 
 	// 裁减出数据包，返回false意味着数据包有错
 	bool _CutMsgPack();
 
-	bool _TrySendData();
+	void _TrySendData();
 
 private:
 	NetIo& _netio;
@@ -171,8 +173,8 @@ private:
 	SocketLib::Tcp::EndPoint _localep;
 	SocketLib::Tcp::EndPoint _remoteep;
 
-	bool _stopped; // stop flag
-	unsigned int _flag;
+	// 状态标志
+	unsigned short _flag;
 };
 
 M_NETIO_NAMESPACE_END

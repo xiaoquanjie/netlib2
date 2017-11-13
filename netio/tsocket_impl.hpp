@@ -33,7 +33,7 @@ TcpSocket::_writerinfo_::_writerinfo_() {
 
 TcpSocket::TcpSocket(NetIo& netio, MessageReceiver receiver, MessageHeaderChecker checker)
 	:_netio(netio), _message_receiver(receiver), _header_checker(checker) {
-	_stopped = true;
+	_flag = E_TCPSOCKET_STATE_STOP;
 	_socket = new SocketLib::TcpSocket<SocketLib::IoService>(_netio.GetIoService());
 }
 
@@ -49,9 +49,9 @@ void TcpSocket::Init() {
 	try {
 		_localep = _socket->LocalEndPoint();
 		_remoteep = _socket->RemoteEndPoint();
-		_stopped = false;
+		_flag = E_TCPSOCKET_STATE_START;
 		_netio.OnConnected(shared_from_this());
-
+		_flag |= E_TCPSOCKET_STATE_READ;
 		function_t<void(SocketLib::s_uint32_t, SocketLib::SocketError)> handler = 
 			bind_t(&TcpSocket::_ReadHandler, shared_from_this(), placeholder_1, placeholder_2);
 		_socket->AsyncRecvSome(handler,_reader.readbuf,M_READ_SIZE);
@@ -69,21 +69,32 @@ const SocketLib::Tcp::EndPoint& TcpSocket::RemoteEndpoint()const {
 	return _remoteep;
 }
 
-void TcpSocket::PostClose() {
-	SocketLib::ScopedLock scoped_r(_reader.lock);
-	SocketLib::ScopedLock scoped_w(_writer.lock);
-	_Close();
+void TcpSocket::Close() {
+	_PostClose(E_TCPSOCKET_STATE_START);
 }
 
-void TcpSocket::_Close() {
-	if (!_stopped) {
-		_stopped = true;
+void TcpSocket::_PostClose(unsigned int state) {
+	// 这里一定要写双锁，可以思考下重要性
+	SocketLib::ScopedLock scoped_r(_reader.lock);
+	SocketLib::ScopedLock scoped_w(_writer.lock);
+	_Close(state);
+}
+
+void TcpSocket::_Close(unsigned int state) {
+	if (_flag & state) {
+		unsigned int tmp_flag = _flag;
+		_flag &= ~state;
+		if (_flag == E_TCPSOCKET_STATE_STOP
+			&& tmp_flag != E_TCPSOCKET_STATE_STOP) {
+			// 通知连接断开
+			_netio.OnDisconnected(shared_from_this());
+		}
 	}
 }
 
 void TcpSocket::Send(SocketLib::Buffer* buffer) {
 	SocketLib::ScopedLock scoped_w(_writer.lock);
-	if (!_stopped) {
+	if (_flag & E_TCPSOCKET_STATE_START) {
 		_writer.buffer_pool.push_back(buffer);
 		_TrySendData();
 	}
@@ -94,20 +105,21 @@ void TcpSocket::_WriteHandler(SocketLib::s_uint32_t tran_byte, const SocketLib::
 	if (error) {
 		// 出错关闭连接
 		M_NETIO_LOGGER("write handler happend error:"M_ERROR_DESC_STR(error));
-		PostClose();
+		_PostClose(E_TCPSOCKET_STATE_START | E_TCPSOCKET_STATE_WRITE);
 	}
 	else if (tran_byte <= 0) {
 		// 连接已经关闭
-		PostClose();
+		_PostClose(E_TCPSOCKET_STATE_START | E_TCPSOCKET_STATE_WRITE);
 	}
 	else {
 		SocketLib::ScopedLock scoped_w(_writer.lock);
-		if (_stopped) {
+		if (_flag & E_TCPSOCKET_STATE_START) {
 			_writer.msgbuffer->RemoveData(tran_byte);
 			_TrySendData();
-		} 
-		else{
+		}
+		else {
 			_socket->Shutdown(SocketLib::E_Shutdown_WR);
+			_Close(E_TCPSOCKET_STATE_WRITE);
 		}
 	}
 }
@@ -116,11 +128,11 @@ void TcpSocket::_ReadHandler(SocketLib::s_uint32_t tran_byte, const SocketLib::S
 	if (error) {
 		// 出错关闭连接
 		M_NETIO_LOGGER("read handler happend error:" << M_ERROR_DESC_STR(error));
-		PostClose();
+		_PostClose(E_TCPSOCKET_STATE_START | E_TCPSOCKET_STATE_READ);
 	}
 	else if (tran_byte<=0){
 		// 对方关闭写
-		PostClose();
+		_PostClose(E_TCPSOCKET_STATE_START | E_TCPSOCKET_STATE_READ);
 	}
 	else {
 		_reader.msgbuffer.Write(_reader.readbuf, tran_byte);
@@ -128,16 +140,19 @@ void TcpSocket::_ReadHandler(SocketLib::s_uint32_t tran_byte, const SocketLib::S
 		if (_CutMsgPack()) 
 		{
 			SocketLib::ScopedLock scoped_r(_reader.lock);
-			if (!_stopped) {
+			if (_flag & E_TCPSOCKET_STATE_START){
 				function_t<void(SocketLib::s_uint32_t, SocketLib::SocketError)> handler =
 					bind_t(&TcpSocket::_ReadHandler, shared_from_this(), placeholder_1, placeholder_2);
 				_socket->AsyncRecvSome(handler, _reader.readbuf, M_READ_SIZE);
+			}
+			else {
+				_Close(E_TCPSOCKET_STATE_READ);
 			}
 		}
 		else {
 			// 数据检查出错，主动断开连接
 			_socket->Shutdown(SocketLib::E_Shutdown_RD);
-			PostClose();
+			_PostClose(E_TCPSOCKET_STATE_START | E_TCPSOCKET_STATE_READ);
 		}
 	}
 }
@@ -146,7 +161,7 @@ bool TcpSocket::_CutMsgPack() {
 	return true;
 }
 
-bool TcpSocket::_TrySendData() {
+void TcpSocket::_TrySendData() {
 	if (!_writer.writing) 
 	{
 		if (_writer.msgbuffer->Length() == 0 && _writer.buffer_pool.size() > 0) {
@@ -155,16 +170,16 @@ bool TcpSocket::_TrySendData() {
 		}
 		if (_writer.msgbuffer->Length() != 0) {
 			_writer.writing = true;
+			_flag |= E_TCPSOCKET_STATE_WRITE;
 			function_t<void(SocketLib::s_uint32_t, SocketLib::SocketError)> handler =
 				bind_t(&TcpSocket::_WriteHandler, shared_from_this(), placeholder_1, placeholder_2);
 			_socket->AsyncSendSome(handler, _writer.msgbuffer->Data(), _writer.msgbuffer->Length());
 		}
 		else {
 			_writer.writing = false;
+			_Close(E_TCPSOCKET_STATE_WRITE);
 		}
-		return true;
 	}
-	return false;
 }
 
 M_NETIO_NAMESPACE_END
