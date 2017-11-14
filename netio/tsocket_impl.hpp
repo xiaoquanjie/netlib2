@@ -36,6 +36,14 @@ TcpBaseSocket<T, SocketType, CheckerType>::_writerinfo_::_writerinfo_() {
 }
 
 template<typename T, typename SocketType, typename CheckerType>
+TcpBaseSocket<T, SocketType, CheckerType>::_writerinfo_::~_writerinfo_() {
+	for (std::list<SocketLib::Buffer*>::iterator iter = buffer_pool.begin();
+		iter != buffer_pool.end(); ++iter)
+		delete (*iter);
+	buffer_pool.clear();
+}
+
+template<typename T, typename SocketType, typename CheckerType>
 TcpBaseSocket<T, SocketType, CheckerType>::TcpBaseSocket(NetIo& netio, CheckerType checker)
 	:_netio(netio) ,_msgchecker(checker){
 	_flag = E_TCPSOCKET_STATE_STOP;
@@ -91,11 +99,12 @@ void TcpBaseSocket<T, SocketType, CheckerType>::Send(SocketLib::Buffer* buffer) 
 		_writer.buffer_pool.push_back(buffer);
 		_TrySendData();
 	}
-	delete buffer;
+	else
+		delete buffer;
 }
 
 template<typename T, typename SocketType, typename CheckerType>
-void TcpBaseSocket<T, SocketType, CheckerType>::Send(SocketLib::s_byte_t* data, SocketLib::s_uint16_t len) {
+void TcpBaseSocket<T, SocketType, CheckerType>::Send(const SocketLib::s_byte_t* data, SocketLib::s_uint32_t len) {
 	MessageHeader hdr;
 	hdr.endian = _netio.LocalEndian();
 	hdr.size = len;
@@ -103,7 +112,7 @@ void TcpBaseSocket<T, SocketType, CheckerType>::Send(SocketLib::s_byte_t* data, 
 
 	SocketLib::Buffer* buffer = new SocketLib::Buffer();
 	buffer->Write(hdr);
-	buffer->Write(data, len);
+	buffer->Write((void*)data, len);
 	Send(buffer);
 }
 

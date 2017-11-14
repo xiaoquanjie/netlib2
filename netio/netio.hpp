@@ -130,6 +130,7 @@ protected:
 		bool writing;
 
 		_writerinfo_();
+		~_writerinfo_();
 	};
 
 public:
@@ -146,7 +147,7 @@ public:
 
 	void Send(SocketLib::Buffer*);
 
-	void Send(SocketLib::s_byte_t* data, SocketLib::s_uint16_t len);
+	void Send(const SocketLib::s_byte_t* data, SocketLib::s_uint32_t len);
 
 protected:
 	void _WriteHandler(SocketLib::s_uint32_t tran_byte, const SocketLib::SocketError& error);
