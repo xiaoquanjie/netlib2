@@ -227,11 +227,13 @@ template<typename T, typename SocketType, typename CheckerType>
 bool TcpBaseSocket<T, SocketType, CheckerType>::_TrySendData() {
 	if (!_writer.writing)
 	{
-		if (_writer.msgbuffer->Length() == 0 && _writer.buffer_pool.size() > 0) {
+		if ((!_writer.msgbuffer || _writer.msgbuffer->Length() == 0)
+			&& _writer.buffer_pool.size() > 0) {
 			SocketLib::Buffer* pbuffer = _writer.buffer_pool.front();
 			_writer.msgbuffer.reset(pbuffer);
+			_writer.buffer_pool.pop_front();
 		}
-		if (_writer.msgbuffer->Length() != 0) {
+		if (_writer.msgbuffer && _writer.msgbuffer->Length() != 0) {
 			_writer.writing = true;
 			_flag |= E_TCPSOCKET_STATE_WRITE;
 			function_t<void(SocketLib::s_uint32_t, SocketLib::SocketError)> handler =
