@@ -223,6 +223,7 @@
 
 #define shard_ptr_t std::tr1::shared_ptr 
 #define enable_shared_from_this_t std::tr1::enable_shared_from_this
+#define dynamic_pointer_cast_t std::tr1::dynamic_pointer_cast
 #define function_t	std::tr1::function
 #define bind_t std::tr1::bind
 #define placeholder_1 std::tr1::placeholders::_1

@@ -35,12 +35,15 @@ struct __attribute__((__packed__)) MessageHeader {
 
 class NetIo;
 class TcpSocket;
+class TcpConnector;
 
 typedef shard_ptr_t<SocketLib::Buffer> BufferPtr;
 typedef shard_ptr_t<TcpSocket>		   TcpSocketPtr;
+typedef shard_ptr_t<TcpConnector>	   TcpConnectorPtr;
 typedef shard_ptr_t<SocketLib::TcpAcceptor<SocketLib::IoService> > NetIoTcpAcceptorPtr;
 
 typedef function_t<bool(TcpSocketPtr, MessageHeader&, BufferPtr)> MessageChecker;
+typedef function_t<bool(TcpConnectorPtr, MessageHeader&, BufferPtr)> MessageChecker2;
 
 #define lasterror tlsdata<SocketLib::SocketError,0>::data()
 
@@ -56,7 +59,6 @@ public:
 
 	// 建立一个监听
 	bool ListenOne(const SocketLib::Tcp::EndPoint& ep);
-
 	bool ListenOne(const std::string& addr, SocketLib::s_uint16_t port);
 
 	virtual void Run();
@@ -78,12 +80,15 @@ public:
 
 	// 连线通知,这个函数里不要处理业务，防止堵塞
 	virtual void OnConnected(TcpSocketPtr clisock);
+	virtual void OnConnected(TcpConnectorPtr clisock,SocketLib::SocketError error);
 
 	// 掉线通知,这个函数里不要处理业务，防止堵塞
 	virtual void OnDisconnected(TcpSocketPtr clisock);
+	virtual void OnDisconnected(TcpConnectorPtr clisock);
 
 	// 数据包通知,这个函数里不要处理业务，防止堵塞
 	virtual void OnReceiveData(TcpSocketPtr clisock, BufferPtr buffer);
+	virtual void OnReceiveData(TcpConnectorPtr clisock, BufferPtr buffer);
 
 protected:
 	void AcceptHandler(SocketLib::SocketError error, TcpSocketPtr clisock, NetIoTcpAcceptorPtr acceptor);
@@ -105,10 +110,10 @@ enum {
 	E_TCPSOCKET_STATE_WRITE = 1 << 2,
 };
 
-// class tcpsocket
-class TcpSocket : public enable_shared_from_this_t<TcpSocket>
+template<typename T, typename SocketType,typename CheckerType>
+class TcpBaseSocket : public enable_shared_from_this_t<T>
 {
-public:
+protected:
 	struct _readerinfo_ {
 		SocketLib::s_byte_t*  readbuf;
 		SocketLib::Buffer	  msgbuffer;
@@ -128,13 +133,9 @@ public:
 	};
 
 public:
-	TcpSocket(NetIo& netio, MessageChecker checker);
+	TcpBaseSocket(NetIo& netio, CheckerType checker);
 
-	~TcpSocket();
-
-	SocketLib::TcpSocket<SocketLib::IoService>& GetSocket();
-
-	void Init();
+	virtual ~TcpBaseSocket();
 
 	const SocketLib::Tcp::EndPoint& LocalEndpoint()const;
 
@@ -161,9 +162,10 @@ protected:
 
 	bool _TrySendData();
 
-private:
+protected:
 	NetIo& _netio;
-	SocketLib::TcpSocket<SocketLib::IoService>* _socket;
+	SocketType* _socket;
+	CheckerType _msgchecker;
 
 	_readerinfo_ _reader;
 	_writerinfo_ _writer;
@@ -174,11 +176,47 @@ private:
 
 	// 状态标志
 	unsigned short _flag;
-	MessageChecker _msgchecker;
+};
 
+// class tcpsocket
+class TcpSocket : public TcpBaseSocket<TcpSocket, SocketLib::TcpSocket<SocketLib::IoService>,
+	MessageChecker>
+{
+public:
+	typedef TcpBaseSocket<TcpSocket, SocketLib::TcpSocket<SocketLib::IoService>,
+		MessageChecker> BaseSelf;
+public:
+	TcpSocket(NetIo& netio, MessageChecker checker);
+
+	SocketLib::TcpSocket<SocketLib::IoService>& GetSocket();
+
+	void Init();
+};
+
+class TcpConnector : public TcpBaseSocket<TcpConnector, SocketLib::TcpConnector<SocketLib::IoService>,
+	MessageChecker2>
+{
+	typedef TcpBaseSocket<TcpConnector, SocketLib::TcpConnector<SocketLib::IoService>,
+		MessageChecker2> BaseSelf;
+public:
+	TcpConnector(NetIo& netio, MessageChecker2 checker);
+
+	SocketLib::TcpConnector<SocketLib::IoService>& GetSocket();
+
+	bool Connect(const SocketLib::Tcp::EndPoint& ep);
+
+	bool Connect(const std::string& addr, SocketLib::s_uint16_t port);
+
+	void AsyncConnect(const SocketLib::Tcp::EndPoint& ep);
+
+	void AsyncConnect(const std::string& addr, SocketLib::s_uint16_t port);
+
+public:
+	void _ConnectHandler(const SocketLib::SocketError& error, TcpConnectorPtr conector);
 };
 
 M_NETIO_NAMESPACE_END
 #include "netio_impl.hpp"
 #include "tsocket_impl.hpp"
+#include "tconnector_impl.hpp"
 #endif

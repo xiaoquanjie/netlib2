@@ -159,6 +159,7 @@
     <ClInclude Include="netio\log.hpp" />
     <ClInclude Include="netio\netio.hpp" />
     <ClInclude Include="netio\netio_impl.hpp" />
+    <ClInclude Include="netio\tconnector_impl.hpp" />
     <ClInclude Include="netio\tls.hpp" />
     <ClInclude Include="netio\tsocket_impl.hpp" />
     <ClInclude Include="socket\acceptor_service.hpp" />
