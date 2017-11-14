@@ -764,6 +764,8 @@ M_SOCKET_DECL bool IocpService::AcceptOperation<Handler>::Complete(IocpService& 
 	impl = _impl;
 	Handler handler = this->_handler;
 	M_HANDLER_SOCKET_PTR(Handler) acceptor_ptr = this->_socket_ptr;
+	g_setsockopt(impl._fd, M_SOL_SOCKET, SO_UPDATE_ACCEPT_CONTEXT, (char*)&(acceptor_ptr->GetImpl()._fd),
+		sizeof(acceptor_ptr->GetImpl()._fd));
 	this->_socket_ptr.reset();
 	handler(acceptor_ptr, SocketPtr, error);
 	return true;

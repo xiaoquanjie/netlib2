@@ -1005,8 +1005,11 @@ M_SOCKET_DECL bool IocpService2::AcceptOperation<Handler>::Complete(IocpService2
 		SocketError error2;
 		Access::Close(service, this->_impl, error2);
 	}
-	if (M_IMPL2_FD(this->_socket_ptr->GetImpl())!=M_INVALID_SOCKET)
+	if (M_IMPL2_FD(this->_socket_ptr->GetImpl()) != M_INVALID_SOCKET) {
 		M_IMPL2_C_ACCEPT_FLAG(this->_socket_ptr->GetImpl());
+		g_setsockopt(M_IMPL2_FD(this->_impl), M_SOL_SOCKET, SO_UPDATE_ACCEPT_CONTEXT, (char*)&(M_IMPL2_FD(this->_socket_ptr->GetImpl())), 
+			sizeof(M_IMPL2_FD(this->_socket_ptr->GetImpl())));
+	}
 	
 	shard_ptr_t<TcpSocket<IocpService2> > SocketPtr(new TcpSocket<IocpService2>(service));
 	SocketPtr->GetImpl() = this->_impl;
@@ -1034,8 +1037,11 @@ M_SOCKET_DECL bool IocpService2::AcceptOperation2<Handler>::Complete(IocpService
 		SocketError error2;
 		Access::Close(service, this->_impl, error2);
 	}
-	if (M_IMPL2_FD(this->_accept_impl) != M_INVALID_SOCKET)
+	if (M_IMPL2_FD(this->_accept_impl) != M_INVALID_SOCKET) {
 		M_IMPL2_C_ACCEPT_FLAG(this->_accept_impl);
+		g_setsockopt(M_IMPL2_FD(this->_impl), M_SOL_SOCKET, SO_UPDATE_ACCEPT_CONTEXT, (char*)&(M_IMPL2_FD(this->_accept_impl)), 
+			sizeof(M_IMPL2_FD(this->_accept_impl)));
+	}
 
 	Handler handler = this->_handler;
 
