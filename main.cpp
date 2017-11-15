@@ -79,7 +79,7 @@ void client() {
 
 int main() {
 
-	//server();
-	client();
+	server();
+	//client();
 	return 0;
 }

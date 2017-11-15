@@ -105,6 +105,8 @@ void TcpBaseSocket<T, SocketType, CheckerType>::Send(SocketLib::Buffer* buffer) 
 
 template<typename T, typename SocketType, typename CheckerType>
 void TcpBaseSocket<T, SocketType, CheckerType>::Send(const SocketLib::s_byte_t* data, SocketLib::s_uint32_t len) {
+	if (len <= 0)
+		return;
 	MessageHeader hdr;
 	hdr.endian = _netio.LocalEndian();
 	hdr.size = len;
@@ -218,6 +220,7 @@ bool TcpBaseSocket<T, SocketType, CheckerType>::_CutMsgPack(SocketLib::s_byte_t*
 			if (!_msgchecker(this->shared_from_this(), _reader.curheader, tmp_bufferptr))
 				return false;
 		// notify
+		_reader.curheader.size = 0;
 		_netio.OnReceiveData(this->shared_from_this(), tmp_bufferptr);
 	}
 	return true;
