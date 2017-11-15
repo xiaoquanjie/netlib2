@@ -61,15 +61,16 @@ public:
 	bool ListenOne(const SocketLib::Tcp::EndPoint& ep);
 	bool ListenOne(const std::string& addr, SocketLib::s_uint16_t port);
 
-	virtual void Run();
+	// 异步建接
+	void AsyncConnect(const SocketLib::Tcp::EndPoint& ep);
+	void AsyncConnect(const std::string& addr, SocketLib::s_uint16_t port);
 
+	virtual void Run();
 	virtual void Stop();
 
 	// 获取最后的异常
 	inline SocketLib::SocketError GetLastError()const;
-
 	inline SocketLib::IoService& GetIoService();
-
 	inline SocketLib::s_uint32_t LocalEndian()const;
 
 	/*
@@ -183,6 +184,7 @@ protected:
 class TcpSocket : public TcpBaseSocket<TcpSocket, SocketLib::TcpSocket<SocketLib::IoService>,
 	MessageChecker>
 {
+	friend class NetIo;
 public:
 	typedef TcpBaseSocket<TcpSocket, SocketLib::TcpSocket<SocketLib::IoService>,
 		MessageChecker> BaseSelf;
@@ -191,6 +193,7 @@ public:
 
 	SocketLib::TcpSocket<SocketLib::IoService>& GetSocket();
 
+protected:
 	void Init();
 };
 
@@ -212,7 +215,7 @@ public:
 
 	void AsyncConnect(const std::string& addr, SocketLib::s_uint16_t port);
 
-public:
+protected:
 	void _ConnectHandler(const SocketLib::SocketError& error, TcpConnectorPtr conector);
 };
 

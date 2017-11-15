@@ -60,26 +60,26 @@ public:
 void server() {
 	TestNetIo test_io;
 	thread thr(&TestNetIo::Start, &test_io, 0);
+	thread thr2(&TestNetIo::Start, &test_io, 0);
 	thr.sleep(200);
 	if (!test_io.ListenOne("0.0.0.0", 3001)) {
 		cout << test_io.GetLastError().What() << endl;
 	}
 	thr.join();
+	thr2.join();
 }
 
 void client() {
 	TestNetIo test_io;
 	thread thr(&TestNetIo::Start, &test_io, 0);
 	thr.sleep(200);
-	netiolib::TcpConnectorPtr connector(new netiolib::TcpConnector(test_io, 0));
-	connector->AsyncConnect("127.0.0.1", 3001);
-	connector.reset();
+	test_io.AsyncConnect("127.0.0.1", 3001);
 	thr.join();
 }
 
 int main() {
 
-	server();
-	//client();
+	//server();
+	client();
 	return 0;
 }
