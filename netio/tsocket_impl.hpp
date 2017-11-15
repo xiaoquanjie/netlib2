@@ -245,6 +245,7 @@ bool TcpBaseSocket<T, SocketType, CheckerType>::_TrySendData() {
 			return true;
 		}
 		else {
+			_flag &= ~E_TCPSOCKET_STATE_WRITE;
 			_writer.writing = false;
 		}
 	}
