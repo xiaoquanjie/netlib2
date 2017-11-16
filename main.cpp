@@ -4,6 +4,19 @@
 
 using namespace std;
 
+void SendData(netiolib::TcpConnectorPtr clisock) {
+	unsigned int data = clisock->GetData();
+	--data;
+	clisock->SetData(data);
+	if (data > 0) {
+		std::string str = "hello world.........................................................................................";
+		clisock->Send(str.c_str(), str.length());
+	}
+	else {
+		cout << "send over" << endl;
+	}
+}
+
 class TestNetIo : public netiolib::NetIo {
 public:
 	// 连线通知,这个函数里不要处理业务，防止堵塞
@@ -16,9 +29,7 @@ public:
 		}
 		else {
 			cout << "connect success : " << clisock->RemoteEndpoint().Address() << " " << clisock->RemoteEndpoint().Port() << endl;
-			std::string str;
-			std::cin >> str;
-			clisock->Send(str.c_str(), str.length());
+			SendData(clisock);
 		}
 	}
 
@@ -32,9 +43,9 @@ public:
 
 	// 数据包通知,这个函数里不要处理业务，防止堵塞
 	virtual void OnReceiveData(netiolib::TcpSocketPtr clisock, netiolib::BufferPtr buffer) {
-		cout << "receive data from :" << clisock->RemoteEndpoint().Address() << " " << clisock->RemoteEndpoint().Port();
-		buffer->Write('\0');
-		cout << " : " << buffer->Data() << endl;
+		//cout << "receive data from :" << clisock->RemoteEndpoint().Address() << " " << clisock->RemoteEndpoint().Port();
+		//buffer->Write('\0');
+		//cout << " : " << buffer->Data() << endl;
 
 		// 回复
 		std::string str("svr reply:");
@@ -42,13 +53,11 @@ public:
 		clisock->Send(str.c_str(), str.length());
 	}
 	virtual void OnReceiveData(netiolib::TcpConnectorPtr clisock, netiolib::BufferPtr buffer) {
-		cout << "receive data from :" << clisock->RemoteEndpoint().Address() << " " << clisock->RemoteEndpoint().Port();
-		buffer->Write('\0');
-		cout << " : " << buffer->Data() << endl;
+		//cout << "receive data from :" << clisock->RemoteEndpoint().Address() << " " << clisock->RemoteEndpoint().Port();
+		//buffer->Write('\0');
+		//cout << " : " << buffer->Data() << endl;
 
-		std::string str;
-		std::cin >> str;
-		clisock->Send(str.c_str(), str.length());
+		SendData(clisock);
 	}
 
 	void Start(void*) {
@@ -71,10 +80,21 @@ void server() {
 
 void client() {
 	TestNetIo test_io;
-	thread thr(&TestNetIo::Start, &test_io, 0);
-	thr.sleep(200);
-	test_io.ConnectOne("127.0.0.1", 3001);
-	thr.join();
+	std::list<thread*> pthreads;
+	for (int i = 0; i<100; ++i)
+	{
+		pthreads.push_back(new thread(&TestNetIo::Start, &test_io, 0));
+	}
+	thread::sleep(2000);
+	for (int i = 0; i < 100; ++i) {
+		test_io.ConnectOne("192.168.10.128", 3001, 200);
+	}
+	
+	for (std::list<thread*>::iterator iter=pthreads.begin(); iter!=pthreads.end();
+		++iter)
+	{
+		(*iter)->join();
+	}
 }
 
 int main() {
