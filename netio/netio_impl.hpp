@@ -45,14 +45,15 @@ bool NetIo::ListenOne(const std::string& addr, SocketLib::s_uint16_t port) {
 	return ListenOne(ep);
 }
 
-void NetIo::AsyncConnect(const SocketLib::Tcp::EndPoint& ep) {
+void NetIo::ConnectOne(const SocketLib::Tcp::EndPoint& ep, unsigned int data) {
 	netiolib::TcpConnectorPtr connector(new netiolib::TcpConnector(*this, 0));
+	connector->SetData(data);
 	connector->AsyncConnect("127.0.0.1", 3001);
 	connector.reset();
 }
-void NetIo::AsyncConnect(const std::string& addr, SocketLib::s_uint16_t port) {
+void NetIo::ConnectOne(const std::string& addr, SocketLib::s_uint16_t port, unsigned int data) {
 	SocketLib::Tcp::EndPoint ep(SocketLib::AddressV4(addr), port);
-	return AsyncConnect(ep);
+	return ConnectOne(ep,data);
 }
 
 void NetIo::Run() {

@@ -73,7 +73,7 @@ void client() {
 	TestNetIo test_io;
 	thread thr(&TestNetIo::Start, &test_io, 0);
 	thr.sleep(200);
-	test_io.AsyncConnect("127.0.0.1", 3001);
+	test_io.ConnectOne("127.0.0.1", 3001);
 	thr.join();
 }
 

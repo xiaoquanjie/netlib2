@@ -62,8 +62,8 @@ public:
 	bool ListenOne(const std::string& addr, SocketLib::s_uint16_t port);
 
 	// “Ï≤ΩΩ®Ω”
-	void AsyncConnect(const SocketLib::Tcp::EndPoint& ep);
-	void AsyncConnect(const std::string& addr, SocketLib::s_uint16_t port);
+	void ConnectOne(const SocketLib::Tcp::EndPoint& ep, unsigned int data=0);
+	void ConnectOne(const std::string& addr, SocketLib::s_uint16_t port, unsigned int data=0);
 
 	virtual void Run();
 	virtual void Stop();
@@ -215,8 +215,15 @@ public:
 
 	void AsyncConnect(const std::string& addr, SocketLib::s_uint16_t port);
 
+	inline void SetData(unsigned int data);
+
+	inline unsigned int GetData()const;
+
 protected:
 	void _ConnectHandler(const SocketLib::SocketError& error, TcpConnectorPtr conector);
+
+protected:
+	unsigned int _data;
 };
 
 M_NETIO_NAMESPACE_END

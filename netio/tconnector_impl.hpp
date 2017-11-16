@@ -17,8 +17,7 @@
 M_NETIO_NAMESPACE_BEGIN
 
 TcpConnector::TcpConnector(NetIo& netio, MessageChecker2 checker)
-	:TcpBaseSocket(netio, checker) {
-
+	:TcpBaseSocket(netio, checker),_data(0) {
 }
 
 SocketLib::TcpConnector<SocketLib::IoService>& TcpConnector::GetSocket() {
@@ -55,6 +54,14 @@ void TcpConnector::AsyncConnect(const SocketLib::Tcp::EndPoint& ep) {
 void TcpConnector::AsyncConnect(const std::string& addr, SocketLib::s_uint16_t port) {
 	SocketLib::Tcp::EndPoint ep(SocketLib::AddressV4(addr), port);
 	return AsyncConnect(ep);
+}
+
+inline void TcpConnector::SetData(unsigned int data) {
+	_data = data;
+}
+
+inline unsigned int TcpConnector::GetData()const {
+	return _data;
 }
 
 void TcpConnector::_ConnectHandler(const SocketLib::SocketError& error, TcpConnectorPtr conector) {
