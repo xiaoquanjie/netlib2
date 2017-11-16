@@ -4,15 +4,37 @@
 
 using namespace std;
 
+clock_t gbeg_time = 0;
+clock_t gend_time = 0;
+std::string gstr = "";
+
+void init_gstr() {
+	for (int i = 0; i < 1 * 1024; ++i)
+		gstr.append(".");
+}
+
+void print_clock(bool beg) {
+	if (beg)
+		gbeg_time = clock();
+	else
+		gend_time = clock();
+	if (beg)
+		cout << "begin : " << ((double)gbeg_time / CLOCKS_PER_SEC) << endl;
+	else {
+		cout << "end : " << ((double)gend_time / CLOCKS_PER_SEC) << endl;
+		cout << "elapsed : " << ((double)(gend_time - gbeg_time) / CLOCKS_PER_SEC) << endl;
+	}
+}
+
 void SendData(netiolib::TcpConnectorPtr clisock) {
 	unsigned int data = clisock->GetData();
 	--data;
 	clisock->SetData(data);
 	if (data > 0) {
-		std::string str = "hello world.........................................................................................";
-		clisock->Send(str.c_str(), str.length());
+		clisock->Send(gstr.c_str(), gstr.length());
 	}
 	else {
+		print_clock(false);
 		cout << "send over" << endl;
 	}
 }
@@ -29,7 +51,7 @@ public:
 		}
 		else {
 			cout << "connect success : " << clisock->RemoteEndpoint().Address() << " " << clisock->RemoteEndpoint().Port() << endl;
-			SendData(clisock);
+			//SendData(clisock);
 		}
 	}
 
@@ -74,6 +96,8 @@ void server() {
 	if (!test_io.ListenOne("0.0.0.0", 3001)) {
 		cout << test_io.GetLastError().What() << endl;
 	}
+	else
+		cout << "listening....." << endl;
 	thr.join();
 	thr2.join();
 }
@@ -81,25 +105,31 @@ void server() {
 void client() {
 	TestNetIo test_io;
 	std::list<thread*> pthreads;
-	for (int i = 0; i<100; ++i)
-	{
-		pthreads.push_back(new thread(&TestNetIo::Start, &test_io, 0));
-	}
+	pthreads.push_back(new thread(&TestNetIo::Start, &test_io, 0));
+
 	thread::sleep(2000);
-	for (int i = 0; i < 100; ++i) {
-		test_io.ConnectOne("192.168.10.128", 3001, 200);
-	}
+	netiolib::TcpConnectorPtr connector(new netiolib::TcpConnector(test_io, 0));
+	connector->AsyncConnect("127.0.0.1",3001);
 	
-	for (std::list<thread*>::iterator iter=pthreads.begin(); iter!=pthreads.end();
-		++iter)
+	while (true)
 	{
-		(*iter)->join();
+		int i;
+		cin >> i;
+		print_clock(true);
+		connector->SetData(i);
+		SendData(connector);
 	}
 }
 
 int main() {
 
-	//server();
-	client();
+	init_gstr();
+	cout << "select 1 is server,or client :" << endl;
+	int i = 0;
+	cin >> i;
+	if (i == 1)
+		server();
+	else
+		client();
 	return 0;
 }
