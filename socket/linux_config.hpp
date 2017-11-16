@@ -32,11 +32,11 @@
 #define M_EPOLL_CTL_ADD		EPOLL_CTL_ADD		// 添加监听
 #define M_EPOLL_CTL_MOD		EPOLL_CTL_MOD		// 修改监听
 #define M_EPOLL_CTL_DEL		EPOLL_CTL_DEL		// 删除监听
-#define M_EPOLLIN			EPOLLIN				// 描述符可以读
-#define M_EPOLLOUT			EPOLLOUT			// 描述符可以写
-#define M_EPOLLPRI			EPOLLPRI			// 带外数据到来
-#define M_EPOLLERR			EPOLLERR			// 描述符发生错误
-#define M_EPOLLHUP			EPOLLHUP			// 描述符被挂断
+#define M_EPOLLIN			EPOLLIN				// 描述符可以读,值为1
+#define M_EPOLLOUT			EPOLLOUT			// 描述符可以写，值为4
+#define M_EPOLLPRI			EPOLLPRI			// 带外数据到来，值为2
+#define M_EPOLLERR			EPOLLERR			// 描述符发生错误，值为8
+#define M_EPOLLHUP			EPOLLHUP			// 描述符被挂断，值为16
 #define M_EPOLLET			EPOLLET				// 边缘触发
 #define M_EPOLLLT			EPOLLLT				// 水平触发(default)
 #define M_EPOLLONESHOT		EPOLLONESHOT		// 只监听一次
