@@ -177,52 +177,61 @@ template<typename T, typename SocketType, typename CheckerType>
 bool TcpBaseSocket<T, SocketType, CheckerType>::_CutMsgPack(SocketLib::s_byte_t* buf, SocketLib::s_uint32_t tran_byte) {
 	// 减少内存拷贝是此函数的设计关键
 	SocketLib::s_uint32_t hdrlen = (SocketLib::s_uint32_t)sizeof(MessageHeader);
-	SocketLib::s_uint32_t datalen = _reader.msgbuffer.Length();
+	do 
+	{
+		// 算出头部长度
+		SocketLib::s_uint32_t datalen = _reader.msgbuffer.Length();
+		if (_reader.curheader.size == 0) {
+			if (tran_byte + datalen < hdrlen) {
+				_reader.msgbuffer.Write(buf, tran_byte);
+				return true;
+			}
+			else if (datalen >= hdrlen) {
+				_reader.msgbuffer.Read(_reader.curheader);
+			}
+			else {
+				_reader.msgbuffer.Write(buf, hdrlen - datalen);
+				buf += (hdrlen - datalen);
+				tran_byte -= (hdrlen - datalen);
+				_reader.msgbuffer.Read(_reader.curheader);
+			}
 
-	// 算出头部长度
-	if (_reader.curheader.size == 0) {
-		if (tran_byte + datalen < hdrlen) {
-			_reader.msgbuffer.Write(buf, tran_byte);
-			return true;
-		}
-		else {
-			_reader.msgbuffer.Write(buf, hdrlen - datalen);
-			buf += (hdrlen - datalen);
-			tran_byte -= (hdrlen - datalen);
-
-			_reader.msgbuffer.Read(_reader.curheader);
+			// convert byte order
 			if (_reader.curheader.endian != _netio.LocalEndian()) {
 				_reader.curheader.size = g_htons(_reader.curheader.size);
 				_reader.curheader.timestamp = g_htonl(_reader.curheader.timestamp);
 			}
-
-			// 校验
+			// check
 			if (_reader.curheader.size > (0xFFFF - hdrlen))
 				return false;
 		}
-	}
 
-	// 拷贝body
-	datalen = _reader.msgbuffer.Length();
-	if (tran_byte + datalen < _reader.curheader.size) {
-		_reader.msgbuffer.Write(buf, tran_byte);
-	}
-	else {
-		_reader.msgbuffer.Write(buf, _reader.curheader.size - datalen);
-		buf += (_reader.curheader.size - datalen);
-		tran_byte -= (_reader.curheader.size - datalen);
+		// copy body data
+		datalen = _reader.msgbuffer.Length();
+		if (tran_byte + datalen < _reader.curheader.size) {
+			_reader.msgbuffer.Write(buf, tran_byte);
+			return true;
+		}
+		else {
+			_reader.msgbuffer.Write(buf, _reader.curheader.size - datalen);
+			buf += (_reader.curheader.size - datalen);
+			tran_byte -= (_reader.curheader.size - datalen);
 
-		BufferPtr tmp_bufferptr(new SocketLib::Buffer());
-		tmp_bufferptr->Write(buf, tran_byte);
-		// swap
-		tmp_bufferptr->Swap(_reader.msgbuffer);
-		if (_msgchecker)
-			if (!_msgchecker(this->shared_from_this(), _reader.curheader, tmp_bufferptr))
-				return false;
-		// notify
-		_reader.curheader.size = 0;
-		_netio.OnReceiveData(this->shared_from_this(), tmp_bufferptr);
-	}
+			// swap
+			BufferPtr tmp_bufferptr(new SocketLib::Buffer());
+			tmp_bufferptr->Swap(_reader.msgbuffer);
+			// check
+			if (_msgchecker)
+				if (!_msgchecker(this->shared_from_this(), _reader.curheader, tmp_bufferptr))
+					return false;
+
+			// notify
+			_reader.curheader.size = 0;
+			_netio.OnReceiveData(this->shared_from_this(), tmp_bufferptr);
+		}
+
+	} while (1);
+
 	return true;
 }
 
