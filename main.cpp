@@ -51,7 +51,6 @@ void SendData(netiolib::TcpConnectorPtr clisock) {
 }
 
 void ReplyData(netiolib::TcpSocketPtr clisock, netiolib::BufferPtr buffer) {
-	return;
 	std::string str("svr reply:");
 	str.append(buffer->Data(), buffer->Length());
 	clisock->Send(str.c_str(), str.length());
@@ -69,7 +68,6 @@ public:
 		}
 		else {
 			cout << "connect success : " << clisock->RemoteEndpoint().Address() << " " << clisock->RemoteEndpoint().Port() << endl;
-			//SendData(clisock);
 		}
 	}
 
@@ -134,8 +132,6 @@ void client() {
 		print_clock(true);
 		connector->SetData(i);
 		SendData(connector);
-		thread::sleep(2000);
-		connector->Close();
 	}
 }
 
