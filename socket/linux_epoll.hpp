@@ -29,19 +29,11 @@ public:
 	struct IoServiceImpl;
 
 	template<typename T>
-	struct AcceptOperation;
-	template<typename T>
 	struct AcceptOperation2;
-	template<typename T>
-	struct ConnectOperation;
 	template<typename T>
 	struct ConnectOperation2;
 	template<typename T>
-	struct WriteOperation;
-	template<typename T>
 	struct WriteOperation2;
-	template<typename T>
-	struct ReadOperation;
 	template<typename T>
 	struct ReadOperation2;
 
@@ -65,19 +57,11 @@ public:
 	{
 		friend class Access;
 		template<typename T>
-		friend struct AcceptOperation;
-		template<typename T>
 		friend struct AcceptOperation2;
-		template<typename T>
-		friend struct ConnectOperation;
 		template<typename T>
 		friend struct ConnectOperation2;
 		template<typename T>
-		friend struct WriteOperation;
-		template<typename T>
 		friend struct WriteOperation2;
-		template<typename T>
-		friend struct ReadOperation;
 		template<typename T>
 		friend struct ReadOperation2;
 
@@ -113,29 +97,11 @@ public:
 	typedef std::map<s_int32_t, IoServiceImpl*> IoServiceImplMap;
 
 	template<typename Handler>
-	struct AcceptOperation : public Operation {
-		Handler    _handler;
-		M_HANDLER_SOCKET_PTR(Handler) _socket_ptr;
-
-		M_SOCKET_DECL virtual bool Complete(EpollService::IoServiceImpl& serviceimpl, epoll_event_t* event);
-		M_SOCKET_DECL virtual void Clear();
-	};
-
-	template<typename Handler>
 	struct AcceptOperation2 : public Operation {
 		Handler    _handler;
 		Impl	   _acpt_impl;
 		Impl	   _cli_impl;
 
-		M_SOCKET_DECL virtual bool Complete(EpollService::IoServiceImpl& serviceimpl, epoll_event_t* event);
-		M_SOCKET_DECL virtual void Clear();
-	};
-
-	template<typename Handler>
-	struct ConnectOperation : public Operation {
-		Handler _handler;
-
-		M_HANDLER_SOCKET_PTR(Handler) _socket_ptr;
 		M_SOCKET_DECL virtual bool Complete(EpollService::IoServiceImpl& serviceimpl, epoll_event_t* event);
 		M_SOCKET_DECL virtual void Clear();
 	};
@@ -150,30 +116,10 @@ public:
 	};
 
 	template<typename Handler>
-	struct WriteOperation : public Operation {
-		wsabuf_t _wsabuf;
-		Handler _handler;
-
-		M_HANDLER_SOCKET_PTR(Handler) _socket_ptr;
-		M_SOCKET_DECL virtual bool Complete(EpollService::IoServiceImpl& serviceimpl, epoll_event_t* event);
-		M_SOCKET_DECL virtual void Clear();
-	};
-
-	template<typename Handler>
 	struct WriteOperation2 : public Operation {
 		wsabuf_t _wsabuf;
 		Handler _handler;
 		Impl    _impl;
-
-		M_SOCKET_DECL virtual bool Complete(EpollService::IoServiceImpl& serviceimpl, epoll_event_t* event);
-		M_SOCKET_DECL virtual void Clear();
-	};
-
-	template<typename Handler>
-	struct ReadOperation : public Operation {
-		wsabuf_t _wsabuf;
-		Handler _handler;
-		M_HANDLER_SOCKET_PTR(Handler) _socket_ptr;
 
 		M_SOCKET_DECL virtual bool Complete(EpollService::IoServiceImpl& serviceimpl, epoll_event_t* event);
 		M_SOCKET_DECL virtual void Clear();
@@ -267,30 +213,18 @@ public:
 	M_SOCKET_DECL static void Accept(EpollService& service, EpollService::Impl& impl, Impl& peer, SocketError& error);
 
 	template<typename AcceptHandler>
-	M_SOCKET_DECL static void AsyncAccept(EpollService& service, M_HANDLER_SOCKET_PTR(AcceptHandler) accept_ptr, AcceptHandler handler, SocketError& error);
-
-	template<typename AcceptHandler>
 	M_SOCKET_DECL static void AsyncAccept(EpollService& service, Impl& accept_impl, Impl& sock_impl, AcceptHandler handler, SocketError& error);
 
 	M_SOCKET_DECL static s_int32_t RecvSome(EpollService& service, EpollService::Impl& impl, s_byte_t* data, s_uint32_t size, SocketError& error);
 
 	M_SOCKET_DECL static s_int32_t SendSome(EpollService& service, EpollService::Impl& impl, const s_byte_t* data, s_uint32_t size, SocketError& error);
 
-	template<typename ReadHandler>
-	M_SOCKET_DECL static void AsyncRecvSome(EpollService& service, M_HANDLER_SOCKET_PTR(ReadHandler) socket_ptr, s_byte_t* data, s_uint32_t size, ReadHandler hander, SocketError& error);
-
 	M_SOCKET_DECL static void AsyncRecvSome(EpollService& service, Impl& impl, s_byte_t* data, s_uint32_t size, M_RW_HANDLER_TYPE(EpollService) hander, SocketError& error);
-
-	template<typename WriteHandler>
-	M_SOCKET_DECL static void AsyncSendSome(EpollService& service, M_HANDLER_SOCKET_PTR(WriteHandler) socket_ptr, const s_byte_t* data, s_uint32_t size, WriteHandler hander, SocketError& error);
 
 	M_SOCKET_DECL static void AsyncSendSome(EpollService& service, Impl& impl, const s_byte_t* data, s_uint32_t size, M_RW_HANDLER_TYPE(EpollService) hander, SocketError& error);
 
 	template<typename EndPoint>
 	M_SOCKET_DECL static void Connect(EpollService& service, EpollService::Impl& impl, const EndPoint& ep, SocketError& error);
-
-	template<typename ConnectHandler, typename EndPoint>
-	M_SOCKET_DECL static void AsyncConnect(EpollService& service, M_HANDLER_SOCKET_PTR(ConnectHandler) connect_ptr, const EndPoint& ep, ConnectHandler handler, SocketError& error);
 
 	template<typename EndPoint>
 	M_SOCKET_DECL static void AsyncConnect(EpollService& service, Impl& impl, const EndPoint& ep, M_COMMON_HANDLER_TYPE(EpollService) handler, SocketError& error);

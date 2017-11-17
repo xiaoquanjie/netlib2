@@ -276,81 +276,6 @@ M_SOCKET_DECL void IocpService2::Access::Accept(IocpService2& service, Impl& imp
 	}
 }
 
-template<typename AcceptHandler>
-M_SOCKET_DECL void IocpService2::Access::AsyncAccept(IocpService2& service, M_HANDLER_SOCKET_PTR(AcceptHandler) accept_ptr, AcceptHandler handler, SocketError& error)
-{
-	IocpService2::Impl& impl = accept_ptr->GetImpl();
-	if (M_IMPL2_FD(impl) == M_INVALID_SOCKET)
-	{
-		error = SocketError(M_ERR_BAD_DESCRIPTOR);
-		return;
-	}
-	if (M_IMPL2_G_ACCEPT_FLAG(impl))
-	{
-		error = SocketError(M_ERR_POSTED_ACCEPT);
-		return;
-	}
-	if (!M_IMPL2_G_NONBLOCK(impl))
-	{
-		if (!detail::Util::SetNonBlock(M_IMPL2_FD(impl)))
-		{
-			M_DEFAULT_SOCKET_ERROR2(error);
-			return;
-		}
-		M_IMPL2_S_NONBLOCK(impl)
-	}
-
-	if (!M_IMPL2_G_BIND(impl))
-	{
-		BindIocp(service, impl, error);
-		if (error)
-			return;
-		M_IMPL2_S_BIND(impl);
-	}
-
-	IocpService2::Impl client_impl;
-	Construct(service, client_impl, E_SOCKET_TYPE);
-	Open(service, client_impl, M_IMPL2_G_V(impl) ? Tcp::V6() : Tcp::V4(), error);
-	if (error)
-	{
-		return;
-	}
-
-	typedef IocpService2::AcceptOperation<AcceptHandler> OperationType;
-	IocpService2::OperationAlloc<OperationType>::Alloc(&M_IMPL2_OP(impl), E_ACCEPT_OP);
-	OperationType* op = dynamic_cast<OperationType*>(M_IMPL2_OP(impl)._accept_op->_oper);
-	g_bzero(op->_buf, sizeof(op->_buf));
-	op->_socket_ptr = accept_ptr;
-	op->_handler = handler;
-	op->_bytes = 0;
-	op->_impl = client_impl;
-
-	for (;;)
-	{
-		M_IMPL2_S_ACCEPT_FLAG(impl);
-		// If no error occurs, the AcceptEx function completed successfully and a value of TRUE is returned.
-		s_int32_t ret = gAcceptEx(M_IMPL2_FD(impl), M_IMPL2_FD(op->_impl), op->_buf,
-			0, sizeof(sockaddr_storage_t), sizeof(sockaddr_storage_t), (LPDWORD)&op->_bytes, M_IMPL2_OP(impl)._accept_op);
-
-		if (!ret && M_ERR_LAST == M_ECONNRESET)
-		{
-			M_DEBUG_PRINT("peer connect reset");
-			continue;
-		}
-		if (!ret && M_ERR_LAST != M_ERROR_IO_PENDING)
-		{
-			M_DEBUG_PRINT("acceptex fail");
-			M_DEFAULT_SOCKET_ERROR2(error);
-			M_IMPL2_C_ACCEPT_FLAG(impl);
-
-			SocketError error2;
-			Close(service, op->_impl, error2);
-			Destroy(service, op->_impl);
-			op->Clear();
-		}
-		break;
-	}
-}
 
 template<typename AcceptHandler>
 M_SOCKET_DECL void IocpService2::Access::AsyncAccept(IocpService2& service, Impl& accept_impl, Impl& client_impl, AcceptHandler handler, SocketError& error)
@@ -494,56 +419,6 @@ M_SOCKET_DECL s_int32_t IocpService2::Access::SendSome(IocpService2& service, Im
 	return trans_bytes;
 }
 
-template<typename ReadHandler>
-M_SOCKET_DECL void IocpService2::Access::AsyncRecvSome(IocpService2& service, M_HANDLER_SOCKET_PTR(ReadHandler) socket_ptr, s_byte_t* data, s_uint32_t size, ReadHandler hander, SocketError& error)
-{
-	IocpService2::Impl& impl = socket_ptr->GetImpl();
-	if (M_IMPL2_FD(impl) == M_INVALID_SOCKET)
-	{
-		error = SocketError(M_ERR_BAD_DESCRIPTOR);
-		return;
-	}
-	if (M_IMPL2_G_READ_FLAG(impl))
-	{
-		error = SocketError(M_ERR_POSTED_READ);
-		return;
-	}
-	if (!M_IMPL2_G_NONBLOCK(impl))
-	{
-		if (!detail::Util::SetNonBlock(M_IMPL2_FD(impl)))
-		{
-			M_DEFAULT_SOCKET_ERROR2(error);
-			return;
-		}
-		M_IMPL2_S_NONBLOCK(impl)
-	}
-	if (!M_IMPL2_G_BIND(impl))
-	{
-		BindIocp(service, impl, error);
-		if (error)
-			return;
-		M_IMPL2_S_BIND(impl);
-	}
-
-	typedef IocpService2::ReadOperation<ReadHandler> OperationType;
-	IocpService2::OperationAlloc<OperationType>::Alloc(&M_IMPL2_OP(impl), E_READ_OP);
-	OperationType* op = dynamic_cast<OperationType*>(M_IMPL2_OP(impl)._read_op->_oper);
-	op->_handler = hander;
-	op->_socket_ptr = socket_ptr;
-	op->_wsabuf.buf = data;
-	op->_wsabuf.len = size;
-
-	DWORD flag = 0;
-	M_IMPL2_S_READ_FLAG(impl);
-	s_int32_t ret = g_wsarecv(M_IMPL2_FD(impl), &op->_wsabuf, 1, 0, &flag, M_IMPL2_OP(impl)._read_op, 0);
-	if (ret == M_SOCKET_ERROR  && M_ERR_LAST != M_ERROR_IO_PENDING)
-	{
-		M_IMPL2_C_READ_FLAG(impl);
-		M_DEFAULT_SOCKET_ERROR2(error);
-		op->Clear();
-	}
-}
-
 M_SOCKET_DECL void IocpService2::Access::AsyncRecvSome(IocpService2& service, Impl& impl, s_byte_t* data, s_uint32_t size, M_RW_HANDLER_TYPE(IocpService2) hander, SocketError& error)
 {
 	if (M_IMPL2_FD(impl) == M_INVALID_SOCKET)
@@ -588,58 +463,6 @@ M_SOCKET_DECL void IocpService2::Access::AsyncRecvSome(IocpService2& service, Im
 	if (ret == M_SOCKET_ERROR  && M_ERR_LAST != M_ERROR_IO_PENDING)
 	{
 		M_IMPL2_C_READ_FLAG(impl);
-		M_DEFAULT_SOCKET_ERROR2(error);
-		op->Clear();
-	}
-}
-
-template<typename WriteHandler>
-M_SOCKET_DECL void IocpService2::Access::AsyncSendSome(IocpService2& service, M_HANDLER_SOCKET_PTR(WriteHandler) socket_ptr, const s_byte_t* data, s_uint32_t size, WriteHandler hander, SocketError& error)
-{
-	IocpService2::Impl& impl = socket_ptr->GetImpl();
-	if (M_IMPL2_FD(impl) == M_INVALID_SOCKET)
-	{
-		error = SocketError(M_ERR_BAD_DESCRIPTOR);
-		return;
-	}
-	if (M_IMPL2_G_WRITE_FLAG(impl))
-	{
-		error = SocketError(M_ERR_POSTED_WRITE);
-		return;
-	}
-	if (!M_IMPL2_G_NONBLOCK(impl))
-	{
-		if (!detail::Util::SetNonBlock(M_IMPL2_FD(impl)))
-		{
-			M_DEFAULT_SOCKET_ERROR2(error);
-			return;
-		}
-		M_IMPL2_S_NONBLOCK(impl)
-	}
-
-	if (!M_IMPL2_G_BIND(impl))
-	{
-		BindIocp(service, impl, error);
-		if (error)
-			return;
-		M_IMPL2_S_BIND(impl);
-	}
-
-	typedef IocpService2::WriteOperation<WriteHandler> OperationType;
-	IocpService2::OperationAlloc<OperationType>::Alloc(&M_IMPL2_OP(impl), E_WRITE_OP);
-	OperationType* op = dynamic_cast<OperationType*>(M_IMPL2_OP(impl)._write_op->_oper);
-	op->_handler = hander;
-	op->_socket_ptr = socket_ptr;
-	op->_wsabuf.buf = const_cast<s_byte_t*>(data);
-	op->_wsabuf.len = size;
-
-	DWORD send_bytes = 0;
-	M_IMPL2_S_WRITE_FLAG(impl);
-	// If no error occurs and the send operation has completed immediately, WSASend returns zero
-	s_int32_t ret = g_wsasend(M_IMPL2_FD(impl), &op->_wsabuf, 1, 0, 0, M_IMPL2_OP(impl)._write_op, 0);
-	if (ret == M_SOCKET_ERROR && M_ERR_LAST != M_ERROR_IO_PENDING)
-	{
-		M_IMPL2_C_WRITE_FLAG(impl);
 		M_DEFAULT_SOCKET_ERROR2(error);
 		op->Clear();
 	}
@@ -729,62 +552,6 @@ M_SOCKET_DECL void IocpService2::Access::Connect(IocpService2& service, Impl& im
 	s_int32_t ret = g_connect(M_IMPL2_FD(impl), ep_access::SockAddr(ep), ep_access::SockAddrLen(ep));
 	M_IMPL2_C_CONNECT_FLAG(impl);
 	M_DEFAULT_SOCKET_ERROR(ret != 0, error);
-}
-
-template<typename ConnectHandler, typename EndPoint>
-M_SOCKET_DECL void IocpService2::Access::AsyncConnect(IocpService2& service, M_HANDLER_SOCKET_PTR(ConnectHandler) connect_ptr, const EndPoint& ep, ConnectHandler handler, SocketError& error)
-{
-	IocpService2::Impl& impl = connect_ptr->GetImpl();
-	if (M_IMPL2_FD(impl) == M_INVALID_SOCKET)
-	{
-		error = SocketError(M_ERR_BAD_DESCRIPTOR);
-		return;
-	}
-	if (M_IMPL2_G_CONNECT_FLAG(impl))
-	{
-		error = SocketError(M_ERR_POSTED_CONNECT);
-		return;
-	}
-	if (!M_IMPL2_G_NONBLOCK(impl))
-	{
-		if (!detail::Util::SetNonBlock(M_IMPL2_FD(impl)))
-		{
-			M_DEFAULT_SOCKET_ERROR2(error);
-			return;
-		}
-		M_IMPL2_S_NONBLOCK(impl)
-	}
-	if (!M_IMPL2_G_BIND(impl))
-	{
-		BindIocp(service, impl, error);
-		if (error)
-			return;
-		M_IMPL2_S_BIND(impl);
-	}
-
-	sockaddr_storage_t addr;
-	g_bzero(&addr, sizeof(addr));
-	addr.ss_family = ep.Protocol().Family();
-	g_bind(M_IMPL2_FD(impl), (sockaddr_t*)&addr, sizeof(addr));
-
-	typedef IocpService2::ConnectOperation<ConnectHandler> OperationType;
-	IocpService2::OperationAlloc<OperationType>::Alloc(&M_IMPL2_OP(impl), E_CONNECT_OP);
-	OperationType* op = dynamic_cast<OperationType*>(M_IMPL2_OP(impl)._connect_op->_oper);
-	op->_handler = handler;
-	op->_socket_ptr = connect_ptr;
-
-	typedef typename EndPoint::Impl::endpoint_impl_access ep_access;
-	DWORD send_bytes = 0;
-
-	M_IMPL2_S_CONNECT_FLAG(impl);
-	// On success, the ConnectEx function returns TRUE. On failure, the function returns FALSE
-	s_int32_t ret = gConnectEx(M_IMPL2_FD(impl), ep_access::SockAddr(ep), ep_access::SockAddrLen(ep), 0, 0, &send_bytes, M_IMPL2_OP(impl)._connect_op);
-	if (!ret && M_ERR_LAST != M_ERROR_IO_PENDING)
-	{
-		M_IMPL2_C_CONNECT_FLAG(impl);
-		M_DEFAULT_SOCKET_ERROR2(error);
-		op->Clear();
-	}
 }
 
 template<typename EndPoint>
@@ -1005,38 +772,6 @@ M_SOCKET_DECL IocpService2::Operation::~Operation()
 }
 
 template<typename Handler>
-M_SOCKET_DECL bool IocpService2::AcceptOperation<Handler>::Complete(IocpService2& service, s_uint32_t transbyte, SocketError& error)
-{
-	if (error)
-	{
-		SocketError error2;
-		Access::Close(service, this->_impl, error2);
-	}
-	if (M_IMPL2_FD(this->_socket_ptr->GetImpl()) != M_INVALID_SOCKET) {
-		M_IMPL2_C_ACCEPT_FLAG(this->_socket_ptr->GetImpl());
-		g_setsockopt(M_IMPL2_FD(this->_impl), M_SOL_SOCKET, SO_UPDATE_ACCEPT_CONTEXT, (char*)&(M_IMPL2_FD(this->_socket_ptr->GetImpl())), 
-			sizeof(M_IMPL2_FD(this->_socket_ptr->GetImpl())));
-	}
-	
-	shard_ptr_t<TcpSocket<IocpService2> > SocketPtr(new TcpSocket<IocpService2>(service));
-	SocketPtr->GetImpl() = this->_impl;
-	Handler handler = this->_handler;
-	M_HANDLER_SOCKET_PTR(Handler) acceptor_ptr = this->_socket_ptr;
-	
-	this->Clear();
-	handler(acceptor_ptr, SocketPtr, error);
-	return true;
-}
-
-template<typename Handler>
-M_SOCKET_DECL void IocpService2::AcceptOperation<Handler>::Clear()
-{
-	this->_socket_ptr.reset();
-	this->_handler = 0;
-	this->_impl = Impl();
-}
-
-template<typename Handler>
 M_SOCKET_DECL bool IocpService2::AcceptOperation2<Handler>::Complete(IocpService2& service, s_uint32_t transbyte, SocketError& error)
 {
 	if (error)
@@ -1065,32 +800,6 @@ M_SOCKET_DECL void IocpService2::AcceptOperation2<Handler>::Clear()
 }
 
 template<typename Handler>
-M_SOCKET_DECL bool IocpService2::ConnectOperation<Handler>::Complete(IocpService2& service, s_uint32_t transbyte, SocketError& error)
-{
-	if (M_IMPL2_FD(this->_socket_ptr->GetImpl()) != M_INVALID_SOCKET)
-		M_IMPL2_C_CONNECT_FLAG(this->_socket_ptr->GetImpl());
-
-	M_HANDLER_SOCKET_PTR(Handler) connect_ptr = this->_socket_ptr;
-	Handler handler = this->_handler;
-	if (!error)
-	{
-		IocpService2::Impl& impl = connect_ptr->GetImpl();
-		g_setsockopt(M_IMPL2_FD(impl), M_SOL_SOCKET, SO_UPDATE_CONNECT_CONTEXT, NULL, 0);
-	}
-
-	this->Clear();
-	handler(connect_ptr, error);
-	return true;
-}
-
-template<typename Handler>
-M_SOCKET_DECL void IocpService2::ConnectOperation<Handler>::Clear()
-{
-	this->_socket_ptr.reset();
-	this->_handler = 0;
-}
-
-template<typename Handler>
 M_SOCKET_DECL bool IocpService2::ConnectOperation2<Handler>::Complete(IocpService2& service, s_uint32_t transbyte, SocketError& error)
 {
 	if (M_IMPL2_FD(this->_impl) != M_INVALID_SOCKET)
@@ -1115,31 +824,6 @@ M_SOCKET_DECL void IocpService2::ConnectOperation2<Handler>::Clear()
 }
 
 template<typename Handler>
-M_SOCKET_DECL bool IocpService2::WriteOperation<Handler>::Complete(IocpService2& service, s_uint32_t transbyte, SocketError& error)
-{
-	if (M_IMPL2_FD(this->_socket_ptr->GetImpl()) != M_INVALID_SOCKET)
-		M_IMPL2_C_WRITE_FLAG(this->_socket_ptr->GetImpl());
-
-	M_HANDLER_SOCKET_PTR(Handler) write_ptr = this->_socket_ptr;
-	Handler handler = this->_handler;
-	s_byte_t* data = this->_wsabuf.buf;
-	s_uint32_t size = (s_uint32_t)this->_wsabuf.len;
-
-	this->Clear();
-	handler(write_ptr, data, size, transbyte, error);
-	return true;
-}
-
-template<typename Handler>
-M_SOCKET_DECL void IocpService2::WriteOperation<Handler>::Clear()
-{
-	this->_socket_ptr.reset();
-	this->_handler = 0;
-	this->_wsabuf.buf = 0;
-	this->_wsabuf.len = 0;
-}
-
-template<typename Handler>
 M_SOCKET_DECL bool IocpService2::WriteOperation2<Handler>::Complete(IocpService2& service, s_uint32_t transbyte, SocketError& error)
 {
 	if (M_IMPL2_FD(this->_impl) != M_INVALID_SOCKET)
@@ -1156,31 +840,6 @@ template<typename Handler>
 M_SOCKET_DECL void IocpService2::WriteOperation2<Handler>::Clear()
 {
 	this->_impl = Impl();
-	this->_handler = 0;
-	this->_wsabuf.buf = 0;
-	this->_wsabuf.len = 0;
-}
-
-template<typename Handler>
-M_SOCKET_DECL bool IocpService2::ReadOperation<Handler>::Complete(IocpService2& service, s_uint32_t transbyte, SocketError& error)
-{
-	if (M_IMPL2_FD(this->_socket_ptr->GetImpl()) != M_INVALID_SOCKET)
-		M_IMPL2_C_READ_FLAG(this->_socket_ptr->GetImpl());
-
-	M_HANDLER_SOCKET_PTR(Handler) read_ptr = this->_socket_ptr;
-	Handler handler = this->_handler;
-	s_byte_t* data = this->_wsabuf.buf;
-	s_uint32_t size = (s_uint32_t)this->_wsabuf.len;
-
-	this->Clear();
-	handler(read_ptr, data, size, transbyte, error);
-	return true;
-}
-
-template<typename Handler>
-M_SOCKET_DECL void IocpService2::ReadOperation<Handler>::Clear()
-{
-	this->_socket_ptr.reset();
 	this->_handler = 0;
 	this->_wsabuf.buf = 0;
 	this->_wsabuf.len = 0;

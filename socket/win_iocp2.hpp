@@ -59,33 +59,12 @@ public:
 	};
 
 	template<typename Handler>
-	struct AcceptOperation : public Oper {
-		s_byte_t   _buf[sizeof(sockaddr_storage_t) * 2];
-		s_uint32_t _bytes;
-		Impl	   _impl;
-		Handler    _handler;
-
-		M_HANDLER_SOCKET_PTR(Handler) _socket_ptr;
-		M_SOCKET_DECL virtual bool Complete(IocpService2& service, s_uint32_t transbyte, SocketError& error);
-		M_SOCKET_DECL virtual void Clear();
-	};
-
-	template<typename Handler>
 	struct AcceptOperation2 : public Oper {
 		s_byte_t   _buf[sizeof(sockaddr_storage_t) * 2];
 		s_uint32_t _bytes;
 		Impl	   _impl;
 		Impl	   _accept_impl;
 		Handler    _handler;
-
-		M_SOCKET_DECL virtual bool Complete(IocpService2& service, s_uint32_t transbyte, SocketError& error);
-		M_SOCKET_DECL virtual void Clear();
-	};
-
-	template<typename Handler>
-	struct ConnectOperation : public Oper {
-		Handler _handler;
-		M_HANDLER_SOCKET_PTR(Handler) _socket_ptr;
 
 		M_SOCKET_DECL virtual bool Complete(IocpService2& service, s_uint32_t transbyte, SocketError& error);
 		M_SOCKET_DECL virtual void Clear();
@@ -101,31 +80,11 @@ public:
 	};
 
 	template<typename Handler>
-	struct WriteOperation : public Oper {
-		wsabuf_t _wsabuf;
-		Handler _handler;
-
-		M_HANDLER_SOCKET_PTR(Handler) _socket_ptr;
-		M_SOCKET_DECL virtual bool Complete(IocpService2& service, s_uint32_t transbyte, SocketError& error);
-		M_SOCKET_DECL virtual void Clear();
-	};
-
-	template<typename Handler>
 	struct WriteOperation2 : public Oper {
 		wsabuf_t _wsabuf;
 		Handler  _handler;
 		Impl	 _impl;
 
-		M_SOCKET_DECL virtual bool Complete(IocpService2& service, s_uint32_t transbyte, SocketError& error);
-		M_SOCKET_DECL virtual void Clear();
-	};
-
-	template<typename Handler>
-	struct ReadOperation : public Oper {
-		wsabuf_t _wsabuf;
-		Handler _handler;
-
-		M_HANDLER_SOCKET_PTR(Handler) _socket_ptr;
 		M_SOCKET_DECL virtual bool Complete(IocpService2& service, s_uint32_t transbyte, SocketError& error);
 		M_SOCKET_DECL virtual void Clear();
 	};
@@ -267,30 +226,18 @@ public:
 	M_SOCKET_DECL static void Accept(IocpService2& service, Impl& impl, Impl& peer, SocketError& error);
 
 	template<typename AcceptHandler>
-	M_SOCKET_DECL static void AsyncAccept(IocpService2& service, M_HANDLER_SOCKET_PTR(AcceptHandler) accept_ptr, AcceptHandler handler, SocketError& error);
-
-	template<typename AcceptHandler>
 	M_SOCKET_DECL static void AsyncAccept(IocpService2& service, Impl& accept_impl, Impl& client_impl,AcceptHandler handler, SocketError& error);
 
 	M_SOCKET_DECL static s_int32_t RecvSome(IocpService2& service, Impl& impl, s_byte_t* data, s_uint32_t size, SocketError& error);
 
 	M_SOCKET_DECL static s_int32_t SendSome(IocpService2& service, Impl& impl, const s_byte_t* data, s_uint32_t size, SocketError& error);
 
-	template<typename ReadHandler>
-	M_SOCKET_DECL static void AsyncRecvSome(IocpService2& service, M_HANDLER_SOCKET_PTR(ReadHandler) socket_ptr, s_byte_t* data, s_uint32_t size, ReadHandler hander, SocketError& error);
-
 	M_SOCKET_DECL static void AsyncRecvSome(IocpService2& service, Impl& impl, s_byte_t* data, s_uint32_t size, M_RW_HANDLER_TYPE(IocpService2) hander, SocketError& error);
-
-	template<typename WriteHandler>
-	M_SOCKET_DECL static void AsyncSendSome(IocpService2& service, M_HANDLER_SOCKET_PTR(WriteHandler) socket_ptr, const s_byte_t* data, s_uint32_t size, WriteHandler hander, SocketError& error);
 
 	M_SOCKET_DECL static void AsyncSendSome(IocpService2& service, Impl& impl, const s_byte_t* data, s_uint32_t size, M_RW_HANDLER_TYPE(IocpService2) hander, SocketError& error);
 
 	template<typename EndPoint>
 	M_SOCKET_DECL static void Connect(IocpService2& service, Impl& impl, const EndPoint& ep, SocketError& error);
-
-	template<typename ConnectHandler, typename EndPoint>
-	M_SOCKET_DECL static void AsyncConnect(IocpService2& service, M_HANDLER_SOCKET_PTR(ConnectHandler) connect_ptr, const EndPoint& ep, ConnectHandler handler, SocketError& error);
 
 	template<typename EndPoint>
 	M_SOCKET_DECL static void AsyncConnect(IocpService2& service, Impl& impl, const EndPoint& ep, M_COMMON_HANDLER_TYPE(IocpService2) handler, SocketError& error);

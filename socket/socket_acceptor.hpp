@@ -40,14 +40,6 @@ public:
 	template<typename Socket_Type>
 	M_SOCKET_DECL void Accept(Socket_Type& peer, SocketError& error);
 
-	/*AcceptHandler: void(TcpAcceptorPtr,TcpSocketPtr,SocketError&)*/ 
-	template<typename AcceptHandler>
-	M_SOCKET_DECL void AsyncAccept(AcceptHandler handler);
-
-	/*AcceptHandler: void(TcpAcceptorPtr,TcpSocketPtr,SocketError&)*/
-	template<typename AcceptHandler>
-	M_SOCKET_DECL void AsyncAccept(AcceptHandler handler,SocketError& error);
-
 	/*AcceptHandler: void(SocketError&)*/
 	template<typename AcceptHandler>
 	M_SOCKET_DECL void AsyncAccept(AcceptHandler handler, StreamSocketType& sock);
@@ -113,24 +105,6 @@ template<typename Socket_Type>
 M_SOCKET_DECL void TcpAcceptor<IoServiceType>::Accept(Socket_Type& peer, SocketError& error)
 {
 	this->GetObjectService().Accept(this->GetImpl(), peer.GetImpl(), error);
-}
-
-template<typename IoServiceType>
-template<typename AcceptHandler>
-M_SOCKET_DECL void TcpAcceptor<IoServiceType>::AsyncAccept(AcceptHandler handler)
-{
-	M_CHECK_ACCEPT_HANDLER(handler, IoServiceType);
-	SocketError error;
-	this->AsyncAccept(handler, error);
-	M_THROW_DEFAULT_SOCKET_ERROR2(error);
-}
-
-template<typename IoServiceType>
-template<typename AcceptHandler>
-M_SOCKET_DECL void TcpAcceptor<IoServiceType>::AsyncAccept(AcceptHandler handler,SocketError& error)
-{
-	M_CHECK_ACCEPT_HANDLER(handler, IoServiceType);
-	this->GetObjectService().AsyncAccept(this->shared_from_this(),handler, error);
 }
 
 template<typename IoServiceType>
