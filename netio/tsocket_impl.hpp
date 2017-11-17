@@ -55,7 +55,6 @@ TcpBaseSocket<T, SocketType, CheckerType>::~TcpBaseSocket() {
 	delete _socket;
 }
 
-
 template<typename T, typename SocketType, typename CheckerType>
 const SocketLib::Tcp::EndPoint& TcpBaseSocket<T, SocketType, CheckerType>::LocalEndpoint()const {
 	return _localep;
@@ -125,7 +124,6 @@ void TcpBaseSocket<T, SocketType, CheckerType>::Send(const SocketLib::s_byte_t* 
 
 template<typename T, typename SocketType, typename CheckerType>
 void TcpBaseSocket<T, SocketType, CheckerType>::_WriteHandler(SocketLib::s_uint32_t tran_byte, const SocketLib::SocketError& error) {
-	_writer.writing = false;
 	if (error) {
 		// 出错关闭连接
 		M_NETIO_LOGGER("write handler happend error:"M_ERROR_DESC_STR(error));
@@ -137,6 +135,7 @@ void TcpBaseSocket<T, SocketType, CheckerType>::_WriteHandler(SocketLib::s_uint3
 	}
 	else {
 		SocketLib::ScopedLock scoped_w(_writer.lock);
+		_writer.writing = false;
 		_writer.msgbuffer->RemoveData(tran_byte);
 		if (!_TrySendData() && !(_flag & E_TCPSOCKET_STATE_START)) {
 			// 数据发送完后，如果状态不是E_TCPSOCKET_STATE_START，则需要关闭写
