@@ -89,6 +89,12 @@
 #define M_IMPL2_OP(impl)\
 	impl._core->_operation
 
+#define M_IMPL2_MUTEX(impl)\
+	(*impl._mutex)
+
+#define M_IMPL2_SCOPED_LOCK(impl)\
+	ScopedLock _scoped_l(*impl._mutex);
+
 M_SOCKET_DECL void IocpService2::Access::Construct(IocpService2& service, Impl& impl, s_uint16_t type)
 {
 	M_IMPL2_IOCP(impl) = 0;
@@ -121,6 +127,9 @@ M_SOCKET_DECL void IocpService2::Access::Destroy(IocpService2& service, Impl& im
 
 M_SOCKET_DECL void IocpService2::Access::Close(IocpService2& service, Impl& impl, SocketError& error)
 {
+	// set lock
+	M_IMPL2_SCOPED_LOCK(impl);
+
 	if (M_IMPL2_FD(impl) != M_INVALID_SOCKET)
 	{
 		service._mutex.lock();
@@ -233,28 +242,26 @@ M_SOCKET_DECL void IocpService2::Access::Listen(IocpService2& service, Impl& imp
 
 M_SOCKET_DECL void IocpService2::Access::Accept(IocpService2& service, Impl& impl, Impl& peer, SocketError& error)
 {
-	if (M_IMPL2_FD(impl) == M_INVALID_SOCKET)
-	{
+	// set lock
+	M_IMPL2_SCOPED_LOCK(impl);
+
+	if (M_IMPL2_FD(impl) == M_INVALID_SOCKET){
 		error = SocketError(M_ERR_BAD_DESCRIPTOR);
 		return;
 	}
-	if (M_IMPL2_G_ACCEPT_FLAG(impl))
-	{
+	if (M_IMPL2_G_ACCEPT_FLAG(impl)){
 		error = SocketError(M_ERR_POSTED_ACCEPT);
 		return;
 	}
-	if (!M_IMPL2_G_BLOCK(impl))
-	{
-		if (!detail::Util::SetBlock(M_IMPL2_FD(impl)))
-		{
+	if (!M_IMPL2_G_BLOCK(impl)){
+		if (!detail::Util::SetBlock(M_IMPL2_FD(impl))){
 			M_DEFAULT_SOCKET_ERROR2(error);
 			return;
 		}
 		M_IMPL2_S_BLOCK(impl);
 	}
 
-	for (;;)
-	{
+	for (;;){
 		M_IMPL2_S_ACCEPT_FLAG(impl);
 		M_IMPL2_FD(peer) = g_accept(M_IMPL2_FD(impl), 0, 0);
 		M_IMPL2_C_ACCEPT_FLAG(impl);

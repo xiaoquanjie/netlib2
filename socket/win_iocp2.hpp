@@ -213,7 +213,7 @@ struct IocpService2::Impl
 
 	Impl()
 	{
-		_core = shard_ptr_t<core>(new core);
+		_core.reset(new core);
 		_core->_fd = M_INVALID_SOCKET;
 		_core->_iocp = 0;
 		_core->_state = 0;
@@ -221,10 +221,12 @@ struct IocpService2::Impl
 		_core->_operation._connect_op = 0;
 		_core->_operation._read_op = 0;
 		_core->_operation._write_op = 0;
+		_mutex.reset(new MutexLock);
 	}
 
 private:
 	shard_ptr_t<core> _core;
+	shard_ptr_t<MutexLock> _mutex;
 };
 
 class IocpService2::Access
