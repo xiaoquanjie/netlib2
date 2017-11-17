@@ -7,11 +7,22 @@ using namespace std;
 clock_t gbeg_time = 0;
 clock_t gend_time = 0;
 std::string gstr = "";
+int gprint = 0;
 
+int glen = 1024;
 void init_gstr() {
-	for (int i = 0; i < 1 * 1024; ++i)
+	for (int i = 0; i < glen; ++i)
 		gstr.append(".");
 }
+void init_print() {
+	cout << "select 1 to print log,or not :" << endl;
+	cin >> gprint;
+}
+
+#define _print_nothing(info) 0
+#define _print_log(info) cout << info
+#define print_log(info)\
+	(gprint==1 ? (_print_log(info),0) : 0)
 
 void print_clock(bool beg) {
 	if (beg)
@@ -28,15 +39,22 @@ void print_clock(bool beg) {
 
 void SendData(netiolib::TcpConnectorPtr clisock) {
 	unsigned int data = clisock->GetData();
-	--data;
-	clisock->SetData(data);
 	if (data > 0) {
+		--data;
+		clisock->SetData(data);
 		clisock->Send(gstr.c_str(), gstr.length());
 	}
 	else {
 		print_clock(false);
 		cout << "send over" << endl;
 	}
+}
+
+void ReplyData(netiolib::TcpSocketPtr clisock, netiolib::BufferPtr buffer) {
+	return;
+	std::string str("svr reply:");
+	str.append(buffer->Data(), buffer->Length());
+	clisock->Send(str.c_str(), str.length());
 }
 
 class TestNetIo : public netiolib::NetIo {
@@ -65,19 +83,17 @@ public:
 
 	// 数据包通知,这个函数里不要处理业务，防止堵塞
 	virtual void OnReceiveData(netiolib::TcpSocketPtr clisock, netiolib::BufferPtr buffer) {
-		//cout << "receive data from :" << clisock->RemoteEndpoint().Address() << " " << clisock->RemoteEndpoint().Port();
-		//buffer->Write('\0');
-		//cout << " : " << buffer->Data() << endl;
-
+		print_log("receive data from :" << clisock->RemoteEndpoint().Address() << " " << clisock->RemoteEndpoint().Port());
+		buffer->Write('\0');
+		print_log(" : " << buffer->Data() << endl);
+		
 		// 回复
-		std::string str("svr reply:");
-		str.append(buffer->Data(), buffer->Length());
-		clisock->Send(str.c_str(), str.length());
+		ReplyData(clisock, buffer);
 	}
 	virtual void OnReceiveData(netiolib::TcpConnectorPtr clisock, netiolib::BufferPtr buffer) {
-		//cout << "receive data from :" << clisock->RemoteEndpoint().Address() << " " << clisock->RemoteEndpoint().Port();
-		//buffer->Write('\0');
-		//cout << " : " << buffer->Data() << endl;
+		print_log("receive data from :" << clisock->RemoteEndpoint().Address() << " " << clisock->RemoteEndpoint().Port());
+		buffer->Write('\0');
+		print_log(" : " << buffer->Data() << endl);
 
 		SendData(clisock);
 	}
@@ -118,12 +134,15 @@ void client() {
 		print_clock(true);
 		connector->SetData(i);
 		SendData(connector);
+		thread::sleep(2000);
+		connector->Close();
 	}
 }
 
 int main() {
 
 	init_gstr();
+	init_print();
 	cout << "select 1 is server,or client :" << endl;
 	int i = 0;
 	cin >> i;

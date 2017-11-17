@@ -84,9 +84,13 @@ void TcpBaseSocket<T, SocketType, CheckerType>::_Close(unsigned int state) {
 	if (_flag & state) {
 		unsigned int tmp_flag = _flag;
 		_flag &= ~state;
-		if (_flag == E_TCPSOCKET_STATE_STOP
+		// if _flag is equal to stop flag or just equal to read flag ,have to close the link
+		if ((_flag == E_TCPSOCKET_STATE_STOP || _flag == E_TCPSOCKET_STATE_READ)
 			&& tmp_flag != E_TCPSOCKET_STATE_STOP) {
 			// 通知连接断开
+			_flag = E_TCPSOCKET_STATE_STOP;
+			_socket->Shutdown(SocketLib::E_Ehutdown_BOTH);
+			_socket->Close();
 			_netio.OnDisconnected(this->shared_from_this());
 		}
 	}
@@ -95,6 +99,7 @@ void TcpBaseSocket<T, SocketType, CheckerType>::_Close(unsigned int state) {
 template<typename T, typename SocketType, typename CheckerType>
 void TcpBaseSocket<T, SocketType, CheckerType>::Send(SocketLib::Buffer* buffer) {
 	SocketLib::ScopedLock scoped_w(_writer.lock);
+	SocketLib::ScopedLock scoped_r(_reader.lock);
 	if (_flag & E_TCPSOCKET_STATE_START) {
 		_writer.buffer_pool.push_back(buffer);
 		_TrySendData();
@@ -153,23 +158,21 @@ void TcpBaseSocket<T, SocketType, CheckerType>::_ReadHandler(SocketLib::s_uint32
 		_PostClose(E_TCPSOCKET_STATE_START | E_TCPSOCKET_STATE_READ);
 	}
 	else {
-		if (_CutMsgPack(_reader.readbuf, tran_byte))
-		{
-			SocketLib::ScopedLock scoped_r(_reader.lock);
-			if (_flag & E_TCPSOCKET_STATE_START) {
+		SocketLib::ScopedLock scoped_r(_reader.lock);
+		if (_flag & E_TCPSOCKET_STATE_START) {
+			if (_CutMsgPack(_reader.readbuf, tran_byte)) {
 				function_t<void(SocketLib::s_uint32_t, SocketLib::SocketError)> handler =
 					bind_t(&TcpBaseSocket::_ReadHandler, this->shared_from_this(), placeholder_1, placeholder_2);
 				_socket->AsyncRecvSome(handler, _reader.readbuf, M_READ_SIZE);
 			}
 			else {
-				_Close(E_TCPSOCKET_STATE_READ);
+				// 数据检查出错，主动断开连接
+				_socket->Shutdown(SocketLib::E_Shutdown_RD);
+				_Close(E_TCPSOCKET_STATE_START | E_TCPSOCKET_STATE_READ);
 			}
 		}
-		else {
-			// 数据检查出错，主动断开连接
-			_socket->Shutdown(SocketLib::E_Shutdown_RD);
-			_PostClose(E_TCPSOCKET_STATE_START | E_TCPSOCKET_STATE_READ);
-		}
+		else
+			_Close(E_TCPSOCKET_STATE_READ);
 	}
 }
 
