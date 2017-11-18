@@ -27,10 +27,8 @@ class IocpService2
 public:
 	class  Access;
 	struct Impl;
-	friend class Access;
 
-	struct IoServiceImpl
-	{
+	struct IoServiceImpl{
 		friend class Access;
 		M_SOCKET_DECL IoServiceImpl(IocpService2& service);
 		M_SOCKET_DECL IocpService2& GetService();
@@ -43,19 +41,17 @@ public:
 	typedef std::vector<IoServiceImpl*> IoServiceImplVector;
 	typedef std::map<HANDLE, IoServiceImpl*> IoServiceImplMap;
 
-	struct Oper
-	{
+	struct Oper{
 		virtual bool Complete(IocpService2& service, s_uint32_t transbyte, SocketError& error) = 0;
 		virtual void Clear(){}
 		virtual ~Oper() {}
 	};
 
-	struct Operation : public wsaoverlapped_t
-	{
-		s_uint8_t _type;
-		Oper* _oper;
+	struct Operation : public wsaoverlapped_t{
 		M_SOCKET_DECL Operation();
 		M_SOCKET_DECL ~Operation();
+		s_uint8_t _type;
+		Oper*	  _oper;
 	};
 
 	template<typename Handler>
@@ -99,19 +95,16 @@ public:
 		M_SOCKET_DECL virtual void Clear();
 	};
 
-	struct OperationSet
-	{
-		Operation* _accept_op;
-		Operation* _connect_op;
-		Operation* _write_op;
-		Operation* _read_op;
+	struct OperationSet{
+		Operation _aop;
+		Operation _cop;
+		Operation _wop;
+		Operation _rop;
 	};
 
 	template<typename T>
-	struct OperationAlloc
-	{
-		M_SOCKET_DECL static void Alloc(OperationSet* opset, s_int32_t type);
-		M_SOCKET_DECL static void Free(OperationSet* opset, s_int32_t type);
+	struct OperationAlloc{
+		M_SOCKET_DECL static void AllocOp(Operation& op, s_int32_t type);
 	};
 
 	M_SOCKET_DECL IocpService2();
@@ -142,23 +135,22 @@ private:
 	mutable MutexLock	_mutex;
 };
 
-struct IocpService2::Impl
-{
+M_SOCKET_DECL IocpService2::Operation::Operation() :_oper(0),_type(E_NULL_STATE){
+}
+
+M_SOCKET_DECL IocpService2::Operation::~Operation(){
+	delete _oper;
+	_oper = 0;
+}
+
+struct IocpService2::Impl{
 	friend class Access;
-	template<typename T>
-	friend struct AcceptOperation;
 	template<typename T>
 	friend struct AcceptOperation2;
 	template<typename T>
-	friend struct ConnectOperation;
-	template<typename T>
 	friend struct ConnectOperation2;
 	template<typename T>
-	friend struct WriteOperation;
-	template<typename T>
 	friend struct WriteOperation2;
-	template<typename T>
-	friend struct ReadOperation;
 	template<typename T>
 	friend struct ReadOperation2;
 
@@ -167,7 +159,7 @@ struct IocpService2::Impl
 		HANDLE		 _iocp;
 		socket_t	 _fd;
 		s_uint16_t	 _state;
-		OperationSet _operation;
+		OperationSet _op;
 	};
 
 	Impl()
@@ -176,10 +168,6 @@ struct IocpService2::Impl
 		_core->_fd = M_INVALID_SOCKET;
 		_core->_iocp = 0;
 		_core->_state = 0;
-		_core->_operation._accept_op = 0;
-		_core->_operation._connect_op = 0;
-		_core->_operation._read_op = 0;
-		_core->_operation._write_op = 0;
 		_mutex.reset(new MutexLock);
 	}
 
@@ -225,8 +213,7 @@ public:
 
 	M_SOCKET_DECL static void Accept(IocpService2& service, Impl& impl, Impl& peer, SocketError& error);
 
-	template<typename AcceptHandler>
-	M_SOCKET_DECL static void AsyncAccept(IocpService2& service, Impl& accept_impl, Impl& client_impl,AcceptHandler handler, SocketError& error);
+	M_SOCKET_DECL static void AsyncAccept(IocpService2& service, Impl& accept_impl, Impl& client_impl, M_COMMON_HANDLER_TYPE(IocpService2) handler, SocketError& error);
 
 	M_SOCKET_DECL static s_int32_t RecvSome(IocpService2& service, Impl& impl, s_byte_t* data, s_uint32_t size, SocketError& error);
 
@@ -259,25 +246,24 @@ public:
 	M_SOCKET_DECL static IocpService2::IoServiceImpl* GetIoServiceImpl(IocpService2& service, Impl& impl);
 
 	M_SOCKET_DECL static s_uint32_t GetServiceCount(const IocpService2& service);
+
+protected:
+	M_SOCKET_DECL void _SetImplState(Impl& impl, s_uint16_t flag, bool lock);
 };
 
 M_SOCKET_DECL IocpService2::IoServiceImpl::IoServiceImpl(IocpService2& service)
-	:_service(service),_handler(0),_fdcnt(0)
-{
+	:_service(service),_handler(0),_fdcnt(0){
 }
 
-M_SOCKET_DECL IocpService2& IocpService2::IoServiceImpl::GetService()
-{
+M_SOCKET_DECL IocpService2& IocpService2::IoServiceImpl::GetService(){
 	return _service;
 }
 
 M_SOCKET_DECL IocpService2::IocpService2()
-	:_implcnt(0),_implidx(0)
-{
+	:_implcnt(0),_implidx(0){
 }
 
-M_SOCKET_DECL IocpService2::~IocpService2()
-{
+M_SOCKET_DECL IocpService2::~IocpService2(){
 	ScopedLock scoped(_mutex);
 	SocketError error;
 	Stop(error);
@@ -290,37 +276,31 @@ M_SOCKET_DECL IocpService2::~IocpService2()
 	_implvector.clear();
 }
 
-M_SOCKET_DECL void IocpService2::Run()
-{
+M_SOCKET_DECL void IocpService2::Run(){
 	SocketError error;
 	this->Run(error);
 	M_THROW_DEFAULT_SOCKET_ERROR2(error);
 }
 
-M_SOCKET_DECL void IocpService2::Run(SocketError& error)
-{
+M_SOCKET_DECL void IocpService2::Run(SocketError& error){
 	Access::Run(*this, error);
 }
 
-M_SOCKET_DECL void IocpService2::Stop()
-{
+M_SOCKET_DECL void IocpService2::Stop(){
 	SocketError error;
 	this->Stop(error);
 	M_THROW_DEFAULT_SOCKET_ERROR2(error);
 }
 
-M_SOCKET_DECL void IocpService2::Stop(SocketError& error)
-{
+M_SOCKET_DECL void IocpService2::Stop(SocketError& error){
 	Access::Stop(*this, error);
 }
 
-M_SOCKET_DECL bool IocpService2::Stopped()const
-{
+M_SOCKET_DECL bool IocpService2::Stopped()const{
 	return Access::Stopped(*this);
 }
 
-M_SOCKET_DECL s_int32_t IocpService2::ServiceCount()const
-{
+M_SOCKET_DECL s_int32_t IocpService2::ServiceCount()const{
 	return Access::GetServiceCount(*this);
 }
 
