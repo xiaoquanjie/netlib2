@@ -135,8 +135,7 @@ void client() {
 	}
 }
 
-int main() {
-
+void netlib_test() {
 	init_gstr();
 	init_print();
 	cout << "select 1 is server,or client :" << endl;
@@ -146,5 +145,31 @@ int main() {
 		server();
 	else
 		client();
+}
+
+void _other_test(void*p) {
+
+	try {
+		char buf[10] = "21e3.";
+		SocketLib::TcpConnector<SocketLib::IoService>* pconnector = (SocketLib::TcpConnector<SocketLib::IoService>*)p;
+		pconnector->SendSome(buf, 10);
+	}
+	catch (SocketLib::SocketError& error) {
+		cout << thread::ctid() << "  " << error.What() << endl;
+	}
+}
+void other_test() {
+	SocketLib::IoService iosverice;
+	SocketLib::TcpConnector<SocketLib::IoService> connector(iosverice);
+	connector.Connect(SocketLib::Tcp::EndPoint(SocketLib::AddressV4("127.0.0.1"), 3001));
+	thread th1(_other_test, &connector);
+	thread th2(_other_test, &connector);
+	th1.join();
+	th2.join();
+}
+
+int main() {
+
+	other_test();
 	return 0;
 }

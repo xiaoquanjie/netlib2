@@ -28,6 +28,14 @@ public:
 
 	M_SOCKET_DECL const IoObjectService& GetObjectService()const;
 
+	M_SOCKET_DECL IoServiceType& GetIoService() {
+		return _ioobjectservice.GetIoService();
+	}
+
+	M_SOCKET_DECL IoServiceType& GetIoService()const {
+		return _ioobjectservice.GetIoService();
+	}
+
 	M_SOCKET_DECL ImplType& GetImpl();
 
 	M_SOCKET_DECL const ImplType& GetImpl()const;

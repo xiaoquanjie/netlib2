@@ -385,8 +385,8 @@ M_SOCKET_DECL void IocpService2::Access::Accept(IocpService2& service, Impl& imp
 		lock.unlock();
 		return;
 
-	} while (false);
-
+	} 
+	while (false);
 	lock.unlock();
 }
 
@@ -469,36 +469,41 @@ M_SOCKET_DECL void IocpService2::Access::AsyncAccept(IocpService2& service, Impl
 template<typename EndPoint>
 M_SOCKET_DECL void IocpService2::Access::Connect(IocpService2& service, Impl& impl, const EndPoint& ep, SocketError& error)
 {
-	if (M_IMPL2_FD(impl) == M_INVALID_SOCKET)
+	MutexLock& mlock = M_IMPL2_MUTEX(impl);
+	do 
 	{
-		error = SocketError(M_ERR_BAD_DESCRIPTOR);
-		return;
-	}
-	if (M_IMPL2_G_CONNECT_FLAG(impl))
-	{
-		error = SocketError(M_ERR_POSTED_CONNECT);
-		return;
-	}
-	if (!ep.Valid())
-	{
-		error = SocketError(M_ERR_ENDPOINT_INVALID);
-		return;
-	}
-	if (!M_IMPL2_G_BLOCK(impl))
-	{
-		if (!detail::Util::SetBlock(M_IMPL2_FD(impl)))
-		{
-			M_DEFAULT_SOCKET_ERROR2(error);
-			return;
+		mlock.lock();
+		if (M_IMPL2_FD(impl) == M_INVALID_SOCKET){
+			error = SocketError(M_ERR_BAD_DESCRIPTOR);
+			break;
 		}
-		M_IMPL2_S_BLOCK(impl);
-	}
+		if (M_IMPL2_G_CONNECT_FLAG(impl)){
+			error = SocketError(M_ERR_POSTED_CONNECT);
+			break;
+		}
+		if (!ep.Valid()){
+			error = SocketError(M_ERR_ENDPOINT_INVALID);
+			break;
+		}
+		if (M_IMPL2_G_NONBLOCK(impl)) {
+			error = SocketError(M_ERR_IS_NONBLOCK);
+			break;
+		}
+		M_IMPL2_S_CONNECT_FLAG(impl);
+		mlock.unlock();
 
-	M_IMPL2_S_CONNECT_FLAG(impl);
-	typedef typename EndPoint::Impl::endpoint_impl_access ep_access;
-	s_int32_t ret = g_connect(M_IMPL2_FD(impl), ep_access::SockAddr(ep), ep_access::SockAddrLen(ep));
-	M_IMPL2_C_CONNECT_FLAG(impl);
-	M_DEFAULT_SOCKET_ERROR(ret != 0, error);
+		typedef typename EndPoint::Impl::endpoint_impl_access ep_access;
+		s_int32_t ret = g_connect(M_IMPL2_FD(impl), ep_access::SockAddr(ep), ep_access::SockAddrLen(ep));
+		
+		mlock.lock();
+		M_IMPL2_C_CONNECT_FLAG(impl);
+		mlock.unlock();
+
+		M_DEFAULT_SOCKET_ERROR(ret != 0, error);
+		return;
+	} 
+	while (false);
+	mlock.unlock();
 }
 
 template<typename EndPoint>
@@ -561,37 +566,42 @@ M_SOCKET_DECL void IocpService2::Access::AsyncConnect(IocpService2& service, Imp
 
 M_SOCKET_DECL s_int32_t IocpService2::Access::RecvSome(IocpService2& service, Impl& impl, s_byte_t* data, s_uint32_t size, SocketError& error)
 {
-	if (M_IMPL2_FD(impl) == M_INVALID_SOCKET)
+	MutexLock& mlock = M_IMPL2_MUTEX(impl);
+	do 
 	{
-		error = SocketError(M_ERR_BAD_DESCRIPTOR);
-		return M_SOCKET_ERROR;
-	}
-	if (M_IMPL2_G_READ_FLAG(impl))
-	{
-		error = SocketError(M_ERR_POSTED_READ);
-		return M_SOCKET_ERROR;
-	}
-	if (!M_IMPL2_G_BLOCK(impl))
-	{
-		if (!detail::Util::SetBlock(M_IMPL2_FD(impl)))
-		{
-			M_DEFAULT_SOCKET_ERROR2(error);
-			return M_SOCKET_ERROR;
+		mlock.lock();
+		if (M_IMPL2_FD(impl) == M_INVALID_SOCKET){
+			error = SocketError(M_ERR_BAD_DESCRIPTOR);
+			break;
 		}
-		M_IMPL2_S_BLOCK(impl);
-	}
+		if (M_IMPL2_G_READ_FLAG(impl)){
+			error = SocketError(M_ERR_POSTED_READ);
+			break;
+		}
+		if (M_IMPL2_G_NONBLOCK(impl)) {
+			error = SocketError(M_ERR_IS_NONBLOCK);
+			break;
+		}
+		M_IMPL2_S_READ_FLAG(impl);
+		mlock.unlock();
 
-	M_IMPL2_S_READ_FLAG(impl);
-	DWORD trans_bytes = 0;
-	DWORD data_size = static_cast<DWORD>(size);
-	wsabuf_t wsabuf;
-	wsabuf.buf = data;
-	wsabuf.len = data_size;
-	DWORD flag = 0;
-	s_int32_t ret = g_wsarecv(M_IMPL2_FD(impl), &wsabuf, 1, &trans_bytes, &flag, 0, 0);
-	M_IMPL2_C_READ_FLAG(impl);
-	M_DEFAULT_SOCKET_ERROR(ret == M_SOCKET_ERROR, error);
-	return trans_bytes;
+		DWORD trans_bytes = 0;
+		wsabuf_t wsabuf;
+		wsabuf.buf = data;
+		wsabuf.len = static_cast<DWORD>(size);
+		DWORD flag = 0;
+		s_int32_t ret = g_wsarecv(M_IMPL2_FD(impl), &wsabuf, 1, &trans_bytes, &flag, 0, 0);
+		
+		mlock.lock();
+		M_IMPL2_C_READ_FLAG(impl);
+		mlock.unlock();
+
+		M_DEFAULT_SOCKET_ERROR(ret == M_SOCKET_ERROR, error);
+		return trans_bytes;
+	} 
+	while (false);
+	mlock.unlock();
+	return M_SOCKET_ERROR;
 }
 
 M_SOCKET_DECL void IocpService2::Access::AsyncRecvSome(IocpService2& service, Impl& impl, s_byte_t* data, s_uint32_t size, 
@@ -647,36 +657,41 @@ M_SOCKET_DECL void IocpService2::Access::AsyncRecvSome(IocpService2& service, Im
 
 M_SOCKET_DECL s_int32_t IocpService2::Access::SendSome(IocpService2& service, Impl& impl, const s_byte_t* data, s_uint32_t size, SocketError& error)
 {
-	if (M_IMPL2_FD(impl) == M_INVALID_SOCKET)
+	MutexLock& mlock = M_IMPL2_MUTEX(impl);
+	do 
 	{
-		error = SocketError(M_ERR_BAD_DESCRIPTOR);
-		return M_SOCKET_ERROR;
-	}
-	if (M_IMPL2_G_WRITE_FLAG(impl))
-	{
-		error = SocketError(M_ERR_POSTED_WRITE);
-		return M_SOCKET_ERROR;
-	}
-	if (!M_IMPL2_G_BLOCK(impl))
-	{
-		if (!detail::Util::SetBlock(M_IMPL2_FD(impl)))
-		{
-			M_DEFAULT_SOCKET_ERROR2(error);
-			return M_SOCKET_ERROR;
+		mlock.lock();
+		if (M_IMPL2_FD(impl) == M_INVALID_SOCKET){
+			error = SocketError(M_ERR_BAD_DESCRIPTOR);
+			break;
 		}
-		M_IMPL2_S_BLOCK(impl);
-	}
+		if (M_IMPL2_G_WRITE_FLAG(impl)){
+			error = SocketError(M_ERR_POSTED_WRITE);
+			break;
+		}
+		if (M_IMPL2_G_NONBLOCK(impl)) {
+			error = SocketError(M_ERR_IS_NONBLOCK);
+			break;
+		}
+		M_IMPL2_S_WRITE_FLAG(impl);
+		mlock.unlock();
 
-	M_IMPL2_S_WRITE_FLAG(impl);
-	DWORD trans_bytes = 0;
-	DWORD data_size = static_cast<DWORD>(size);
-	wsabuf_t wsabuf;
-	wsabuf.buf = const_cast<s_byte_t*>(data);
-	wsabuf.len = data_size;
-	s_int32_t ret = g_wsasend(M_IMPL2_FD(impl), &wsabuf, 1, &trans_bytes, 0, 0, 0);
-	M_IMPL2_C_WRITE_FLAG(impl);
-	M_DEFAULT_SOCKET_ERROR(ret == M_SOCKET_ERROR, error);
-	return trans_bytes;
+		DWORD trans_bytes = 0;
+		wsabuf_t wsabuf;
+		wsabuf.buf = const_cast<s_byte_t*>(data);
+		wsabuf.len = static_cast<DWORD>(size);;
+		s_int32_t ret = g_wsasend(M_IMPL2_FD(impl), &wsabuf, 1, &trans_bytes, 0, 0, 0);
+		
+		mlock.lock();
+		M_IMPL2_C_WRITE_FLAG(impl);
+		mlock.unlock();
+
+		M_DEFAULT_SOCKET_ERROR(ret == M_SOCKET_ERROR, error);
+		return trans_bytes;
+	} 
+	while (false);
+	mlock.unlock();
+	return M_SOCKET_ERROR;
 }
 
 M_SOCKET_DECL void IocpService2::Access::AsyncSendSome(IocpService2& service, Impl& impl, const s_byte_t* data, s_uint32_t size, 

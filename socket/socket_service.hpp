@@ -80,6 +80,10 @@ public:
 
 	M_SOCKET_DECL void Cancel(Impl& impl, SocketError& error);
 
+	M_SOCKET_DECL IoServiceType& GetIoService() {
+		return _ioservice;
+	}
+
 protected:
 	IoServiceType& _ioservice;
 };
