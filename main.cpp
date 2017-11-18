@@ -47,6 +47,7 @@ void SendData(netiolib::TcpConnectorPtr clisock) {
 	else {
 		print_clock(false);
 		cout << "send over" << endl;
+		clisock->Close();
 	}
 }
 
@@ -68,6 +69,7 @@ public:
 		}
 		else {
 			cout << "connect success : " << clisock->RemoteEndpoint().Address() << " " << clisock->RemoteEndpoint().Port() << endl;
+			SendData(clisock);
 		}
 	}
 
@@ -126,19 +128,20 @@ void client() {
 	TestNetIo test_io;
 	std::list<thread*> pthreads;
 	pthreads.push_back(new thread(&TestNetIo::Start, &test_io, 0));
+	pthreads.push_back(new thread(&TestNetIo::Start, &test_io, 0));
+	pthreads.push_back(new thread(&TestNetIo::Start, &test_io, 0));
 
-	thread::sleep(2000);
-	netiolib::TcpConnectorPtr connector(new netiolib::TcpConnector(test_io, 0));
-	connector->AsyncConnect("127.0.0.1",3001);
+	//thread::sleep(2000);
 	
-	while (true)
+	int i;
+	cin >> i;
+	for (int j=0;j<10;j++)
 	{
-		int i;
-		cin >> i;
-		print_clock(true);
-		connector->SetData(i);
-		SendData(connector);
+		netiolib::TcpConnectorPtr connector(new netiolib::TcpConnector(test_io, 0));
+		connector->SetData(5000);
+		connector->AsyncConnect("127.0.0.1", 3001);
 	}
+	cin >> i;
 }
 
 void netlib_test() {
