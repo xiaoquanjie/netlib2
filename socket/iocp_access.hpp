@@ -233,27 +233,15 @@ M_SOCKET_DECL void IocpService2::Access::Run(IocpService2& service, SocketError&
 	++service._implcnt;
 	service._mutex.unlock();
 
-	std::list<ImplCloseReq*> closereqs, closereqs2;
+	DWORD trans_bytes = 0;
+	ULONG_PTR comple_key = 0;
+	overlapped_t* overlapped = 0;
+
 	for (;;){
-		simpl->_mutex.lock();
-		closereqs.swap(simpl->_closereqs);
-		simpl->_mutex.unlock();
-
-		M_FOREACH_CLOSEREQ(iter, closereqs) {
-			_ExecClose((*iter));
-			closereqs2.push_back((*iter));
-		}
-
-		simpl->_mutex.lock();
-		simpl->_closereqs2.merge(closereqs2);
-		simpl->_mutex.unlock();
-
-		closereqs.clear();
-		closereqs2.clear();
-
-		DWORD trans_bytes = 0;
-		ULONG_PTR comple_key = 0;
-		overlapped_t* overlapped = 0;
+		_DoClose(simpl);
+		trans_bytes = 0;
+		comple_key = 0;
+		overlapped = 0;
 		g_setlasterr(0);
 
 		BOOL ret = g_getqueuedcompletionstatus(simpl->_handler, &trans_bytes,
@@ -817,11 +805,31 @@ M_SOCKET_DECL void IocpService2::Access::AsyncSendSome(IocpService2& service, Im
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-M_SOCKET_DECL void IocpService2::Access::_ExecClose(ImplCloseReq* req) {
-	g_closesocket(M_IMPL2_FD(req->_impl));
-	if (req->_handler)
-		req->_handler();
-	req->Clear();
+M_SOCKET_DECL void IocpService2::Access::_DoClose(IocpService2::IoServiceImpl* simpl) {
+	std::list<ImplCloseReq*> closereqs, closereqs2;
+	simpl->_mutex.lock();
+	closereqs.swap(simpl->_closereqs);
+	simpl->_mutex.unlock();
+
+	ImplCloseReq* req = 0;
+	M_FOREACH_CLOSEREQ(iter, closereqs) {
+		req = (*iter);
+		MutexLock& mlock = M_IMPL2_MUTEX(req->_impl);
+		mlock.lock();
+		g_closesocket(M_IMPL2_FD(req->_impl));
+		M_IMPL2_FD(req->_impl) = M_INVALID_SOCKET;
+		M_IMPL2_STATE(req->_impl) = 0;
+		mlock.unlock();
+		if (req->_handler)
+			req->_handler();
+		req->Clear();
+
+		closereqs2.push_back(req);
+	}
+
+	simpl->_mutex.lock();
+	simpl->_closereqs2.merge(closereqs2);
+	simpl->_mutex.unlock();
 }
 
 M_SOCKET_DECL IocpService2::IoServiceImpl* IocpService2::Access::_GetIoServiceImpl(IocpService2& service, Impl& impl) {
@@ -880,10 +888,10 @@ M_SOCKET_DECL bool IocpService2::ConnectOperation2<Handler>::Complete(IocpServic
 	if (!error){
 		g_setsockopt(M_IMPL2_FD(this->_impl), M_SOL_SOCKET, SO_UPDATE_CONNECT_CONTEXT, NULL, 0);
 	}
-
 	Handler handler = this->_handler;
 	this->Clear();
-	handler(error);
+	if (M_IMPL2_FD(this->_impl) != M_INVALID_SOCKET)
+		handler(error);
 	return true;
 }
 
@@ -905,7 +913,8 @@ M_SOCKET_DECL bool IocpService2::WriteOperation2<Handler>::Complete(IocpService2
 
 	Handler handler = this->_handler;
 	this->Clear();
-	handler(transbyte, error);
+	if (M_IMPL2_FD(this->_impl) != M_INVALID_SOCKET)
+		handler(transbyte, error);
 	return true;
 }
 
@@ -929,7 +938,8 @@ M_SOCKET_DECL bool IocpService2::ReadOperation2<Handler>::Complete(IocpService2&
 
 	Handler handler = this->_handler;
 	this->Clear();
-	handler(transbyte, error);
+	if (M_IMPL2_FD(this->_impl) != M_INVALID_SOCKET)
+		handler(transbyte, error);
 	return true;
 }
 

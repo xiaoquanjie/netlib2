@@ -159,8 +159,10 @@ void TcpBaseSocket<T, SocketType, CheckerType>::_ReadHandler(SocketLib::s_uint32
 		_PostClose(E_TCPSOCKET_STATE_START | E_TCPSOCKET_STATE_READ);
 	}
 	else {
-		SocketLib::ScopedLock scoped_r(_reader.lock);
+		// 加锁以免对_flag值产生误判
+		_reader.lock.lock();
 		if (_flag & E_TCPSOCKET_STATE_START) {
+			_reader.lock.unlock();
 			if (_CutMsgPack(_reader.readbuf, tran_byte)) {
 				function_t<void(SocketLib::s_uint32_t, SocketLib::SocketError)> handler =
 					bind_t(&TcpBaseSocket::_ReadHandler, this->shared_from_this(), placeholder_1, placeholder_2);
@@ -169,11 +171,11 @@ void TcpBaseSocket<T, SocketType, CheckerType>::_ReadHandler(SocketLib::s_uint32
 			else {
 				// 数据检查出错，主动断开连接
 				_socket->Shutdown(SocketLib::E_Shutdown_RD);
-				_Close(E_TCPSOCKET_STATE_START | E_TCPSOCKET_STATE_READ);
+				_PostClose(E_TCPSOCKET_STATE_START | E_TCPSOCKET_STATE_READ);
 			}
 		}
 		else
-			_Close(E_TCPSOCKET_STATE_READ);
+			_PostClose(E_TCPSOCKET_STATE_READ);
 	}
 }
 
@@ -239,8 +241,8 @@ bool TcpBaseSocket<T, SocketType, CheckerType>::_CutMsgPack(SocketLib::s_byte_t*
 			_netio.OnReceiveData(this->shared_from_this(), tmp_bufferptr);
 		}
 
-	} while (1);
-
+	} 
+	while (true);
 	return true;
 }
 

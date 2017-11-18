@@ -260,7 +260,7 @@ public:
 	M_SOCKET_DECL static void AsyncSendSome(IocpService2& service, Impl& impl, const s_byte_t* data, s_uint32_t size, M_RW_HANDLER_TYPE(IocpService2) hander, SocketError& error);
 
 protected:
-	M_SOCKET_DECL static void _ExecClose(ImplCloseReq* req);
+	M_SOCKET_DECL static void _DoClose(IocpService2::IoServiceImpl* simpl);
 
 	M_SOCKET_DECL static IocpService2::IoServiceImpl* _GetIoServiceImpl(IocpService2& service, Impl& impl);
 };
