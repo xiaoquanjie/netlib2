@@ -155,6 +155,8 @@ protected:
 
 	void _ReadHandler(SocketLib::s_uint32_t tran_byte, const SocketLib::SocketError& error);
 
+	inline void _CloseHandler();
+
 	void _PostClose(unsigned int state);
 
 	void _Close(unsigned int state);

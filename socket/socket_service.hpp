@@ -52,6 +52,8 @@ public:
 
 	M_SOCKET_DECL void Close(Impl& impl,SocketError& error);
 
+	M_SOCKET_DECL void Close(Impl& impl, function_t<void()> handler, SocketError& error);
+
 	M_SOCKET_DECL bool IsOpen(Impl& impl, SocketError& error)const;
 
 	template<typename GettableOptionType>
@@ -101,6 +103,11 @@ template<typename Protocol, typename IoServiceType>
 M_SOCKET_DECL void BaseSocketService<Protocol, IoServiceType>::Close(Impl& impl, SocketError& error)
 {
 	Access::Close(_ioservice, impl, error);
+}
+
+template<typename Protocol, typename IoServiceType>
+M_SOCKET_DECL void BaseSocketService<Protocol, IoServiceType>::Close(Impl& impl, function_t<void()> handler, SocketError& error) {
+	Access::Close(_ioservice, impl, handler, error);
 }
 
 template<typename Protocol, typename IoServiceType>

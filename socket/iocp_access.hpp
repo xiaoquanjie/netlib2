@@ -344,7 +344,7 @@ M_SOCKET_DECL void IocpService2::Access::Close(IocpService2& service, Impl& impl
 			ImplCloseReq* req = 0;
 			if (!simpl->_closereqs2.empty()) {
 				req = simpl->_closereqs2.front();
-				simpl->_closereqs.pop_front();
+				simpl->_closereqs2.pop_front();
 			}
 			else
 				req = new ImplCloseReq;

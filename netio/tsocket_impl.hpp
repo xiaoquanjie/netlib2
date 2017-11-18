@@ -89,8 +89,10 @@ void TcpBaseSocket<T, SocketType, CheckerType>::_Close(unsigned int state) {
 			// 通知连接断开
 			_flag = E_TCPSOCKET_STATE_STOP;
 			_socket->Shutdown(SocketLib::E_Ehutdown_BOTH);
-			_socket->Close();
-			_netio.OnDisconnected(this->shared_from_this());
+
+			SocketLib::SocketError error;
+			function_t<void()> handler = bind_t(&TcpBaseSocket::_CloseHandler, this->shared_from_this());
+			_socket->Close(handler, error);
 		}
 	}
 }
@@ -173,6 +175,11 @@ void TcpBaseSocket<T, SocketType, CheckerType>::_ReadHandler(SocketLib::s_uint32
 		else
 			_Close(E_TCPSOCKET_STATE_READ);
 	}
+}
+
+template<typename T, typename SocketType, typename CheckerType>
+inline void TcpBaseSocket<T, SocketType, CheckerType>::_CloseHandler() {
+	_netio.OnDisconnected(this->shared_from_this());
 }
 
 template<typename T, typename SocketType, typename CheckerType>

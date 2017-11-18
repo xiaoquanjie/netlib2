@@ -106,6 +106,7 @@ void server() {
 	TestNetIo test_io;
 	thread thr(&TestNetIo::Start, &test_io, 0);
 	thread thr2(&TestNetIo::Start, &test_io, 0);
+	thread thr3(&TestNetIo::Start, &test_io, 0);
 	thr.sleep(200);
 	if (!test_io.ListenOne("0.0.0.0", 3001)) {
 		cout << test_io.GetLastError().What() << endl;
@@ -113,10 +114,12 @@ void server() {
 	else
 		cout << "listening....." << endl;
 
-	int i = 0;
+	int i;
 	cin >> i;
-//	thr.join();
-//	thr2.join();
+	test_io.Stop();
+	thr.join();
+	thr2.join();
+	thr3.join();
 }
 
 void client() {
