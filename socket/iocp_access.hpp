@@ -393,77 +393,79 @@ M_SOCKET_DECL void IocpService2::Access::Accept(IocpService2& service, Impl& imp
 M_SOCKET_DECL void IocpService2::Access::AsyncAccept(IocpService2& service, Impl& accept_impl, Impl& client_impl, 
 	M_COMMON_HANDLER_TYPE(IocpService2) handler, SocketError& error)
 {
-	if (M_IMPL2_FD(accept_impl) == M_INVALID_SOCKET)
+	MutexLock& mlock = M_IMPL2_MUTEX(accept_impl);
+	do 
 	{
-		error = SocketError(M_ERR_BAD_DESCRIPTOR);
-		return;
-	}
-	if (M_IMPL2_G_ACCEPT_FLAG(accept_impl))
-	{
-		error = SocketError(M_ERR_POSTED_ACCEPT);
-		return;
-	}
-	if (!M_IMPL2_G_NONBLOCK(accept_impl))
-	{
-		if (!detail::Util::SetNonBlock(M_IMPL2_FD(accept_impl)))
-		{
-			M_DEFAULT_SOCKET_ERROR2(error);
-			return;
+		mlock.lock();
+		if (M_IMPL2_FD(accept_impl) == M_INVALID_SOCKET){
+			error = SocketError(M_ERR_BAD_DESCRIPTOR);
+			break;
 		}
-		M_IMPL2_S_NONBLOCK(accept_impl)
-	}
-
-	if (!M_IMPL2_G_BIND(accept_impl))
-	{
-		BindIocp(service, accept_impl, error);
+		if (M_IMPL2_G_ACCEPT_FLAG(accept_impl)){
+			error = SocketError(M_ERR_POSTED_ACCEPT);
+			break;
+		}
+		if (!M_IMPL2_G_NONBLOCK(accept_impl)){
+			if (!detail::Util::SetNonBlock(M_IMPL2_FD(accept_impl))){
+				M_DEFAULT_SOCKET_ERROR2(error);
+				break;
+			}
+			M_IMPL2_S_NONBLOCK(accept_impl)
+		}
+		if (!M_IMPL2_G_BIND(accept_impl)){
+			BindIocp(service, accept_impl, error);
+			if (error)
+				break;
+			M_IMPL2_S_BIND(accept_impl);
+		}
+		
+		ConstructImpl(service, client_impl, E_SOCKET_TYPE);
+		Open(service, client_impl, M_IMPL2_G_V(accept_impl) ? Tcp::V6() : Tcp::V4(), error);
 		if (error)
-			return;
-		M_IMPL2_S_BIND(accept_impl);
-	}
+			break;
 
-	ConstructImpl(service, client_impl, E_SOCKET_TYPE);
-	Open(service, client_impl, M_IMPL2_G_V(accept_impl) ? Tcp::V6() : Tcp::V4(), error);
-	if (error)
-	{
-		return;
-	}
-
-	typedef M_COMMON_HANDLER_TYPE(IocpService2) AcceptHandler;
-	typedef IocpService2::AcceptOperation2<AcceptHandler> OperationType;
-	IocpService2::OperationAlloc<OperationType>::AllocOp(M_IMPL2_AOP(accept_impl),
-		E_ACCEPT_OP);
-
-	OperationType* op = dynamic_cast<OperationType*>(M_IMPL2_AOP(accept_impl)._oper);
-	g_bzero(op->_buf, sizeof(op->_buf));
-	op->_handler = handler;
-	op->_bytes = 0;
-	op->_impl = client_impl;
-	op->_accept_impl = accept_impl;
-
-	for (;;)
-	{
 		M_IMPL2_S_ACCEPT_FLAG(accept_impl);
-		// If no error occurs, the AcceptEx function completed successfully and a value of TRUE is returned.
-		s_int32_t ret = gAcceptEx(M_IMPL2_FD(accept_impl), M_IMPL2_FD(op->_impl), op->_buf,
-			0, sizeof(sockaddr_storage_t), sizeof(sockaddr_storage_t), (LPDWORD)&op->_bytes, &M_IMPL2_AOP(accept_impl));
+		mlock.unlock();
 
-		if (!ret && M_ERR_LAST == M_ECONNRESET)
-		{
-			M_DEBUG_PRINT("peer connect reset");
-			continue;
-		}
-		if (!ret && M_ERR_LAST != M_ERROR_IO_PENDING)
-		{
-			M_DEBUG_PRINT("acceptex fail");
-			M_DEFAULT_SOCKET_ERROR2(error);
-			M_IMPL2_C_ACCEPT_FLAG(accept_impl);
+		typedef IocpService2::AcceptOperation2<M_COMMON_HANDLER_TYPE(IocpService2)> OperationType;
+		IocpService2::OperationAlloc<OperationType>::AllocOp(M_IMPL2_AOP(accept_impl),
+			E_ACCEPT_OP);
 
-			SocketError error2;
-			Close(service, client_impl, error2);
-			op->Clear();
+		OperationType* op = dynamic_cast<OperationType*>(M_IMPL2_AOP(accept_impl)._oper);
+		g_bzero(op->_buf, sizeof(op->_buf));
+		op->_bytes   = 0;
+		op->_handler = handler;
+		op->_impl    = client_impl;
+		op->_accept_impl = accept_impl;
+
+		for (;;){
+			
+			// If no error occurs, the AcceptEx function completed successfully and a value of TRUE is returned.
+			s_int32_t ret = gAcceptEx(M_IMPL2_FD(accept_impl), M_IMPL2_FD(op->_impl), op->_buf,
+				0, sizeof(sockaddr_storage_t), sizeof(sockaddr_storage_t), (LPDWORD)&op->_bytes, &M_IMPL2_AOP(accept_impl));
+
+			if (!ret && M_ERR_LAST == M_ECONNRESET){
+				M_DEBUG_PRINT("peer connect reset");
+				continue;
+			}
+			if (!ret && M_ERR_LAST != M_ERROR_IO_PENDING){
+				M_DEBUG_PRINT("acceptex fail");
+				M_DEFAULT_SOCKET_ERROR2(error);
+				
+				SocketError error2;
+				Close(service, client_impl, error2);
+				op->Clear();
+
+				mlock.lock();
+				M_IMPL2_C_ACCEPT_FLAG(accept_impl);
+				mlock.unlock();
+			}
+			break;
 		}
-		break;
-	}
+		return;
+	} 
+	while (false);
+	mlock.unlock();
 }
 
 template<typename EndPoint>
@@ -510,58 +512,66 @@ template<typename EndPoint>
 M_SOCKET_DECL void IocpService2::Access::AsyncConnect(IocpService2& service, Impl& impl, const EndPoint& ep, 
 	M_COMMON_HANDLER_TYPE(IocpService2) handler, SocketError& error)
 {
-	if (M_IMPL2_FD(impl) == M_INVALID_SOCKET)
+	MutexLock& mlock = M_IMPL2_MUTEX(impl);
+	do 
 	{
-		error = SocketError(M_ERR_BAD_DESCRIPTOR);
-		return;
-	}
-	if (M_IMPL2_G_CONNECT_FLAG(impl))
-	{
-		error = SocketError(M_ERR_POSTED_CONNECT);
-		return;
-	}
-	if (!M_IMPL2_G_NONBLOCK(impl))
-	{
-		if (!detail::Util::SetNonBlock(M_IMPL2_FD(impl)))
-		{
-			M_DEFAULT_SOCKET_ERROR2(error);
-			return;
+		if (M_IMPL2_FD(impl) == M_INVALID_SOCKET){
+			error = SocketError(M_ERR_BAD_DESCRIPTOR);
+			break;
 		}
-		M_IMPL2_S_NONBLOCK(impl)
-	}
-	if (!M_IMPL2_G_BIND(impl))
-	{
-		BindIocp(service, impl, error);
-		if (error)
-			return;
-		M_IMPL2_S_BIND(impl);
-	}
+		if (M_IMPL2_G_CONNECT_FLAG(impl)){
+			error = SocketError(M_ERR_POSTED_CONNECT);
+			break;
+		}
+		if (!ep.Valid()) {
+			error = SocketError(M_ERR_ENDPOINT_INVALID);
+			break;
+		}
+		if (!M_IMPL2_G_NONBLOCK(impl)){
+			if (!detail::Util::SetNonBlock(M_IMPL2_FD(impl))){
+				M_DEFAULT_SOCKET_ERROR2(error);
+				break;
+			}
+			M_IMPL2_S_NONBLOCK(impl)
+		}
+		if (!M_IMPL2_G_BIND(impl)){
+			BindIocp(service, impl, error);
+			if (error)
+				break;
+			M_IMPL2_S_BIND(impl);
+		}
 
-	sockaddr_storage_t addr;
-	g_bzero(&addr, sizeof(addr));
-	addr.ss_family = ep.Protocol().Family();
-	g_bind(M_IMPL2_FD(impl), (sockaddr_t*)&addr, sizeof(addr));
+		M_IMPL2_S_CONNECT_FLAG(impl);
+		mlock.unlock();
 
-	typedef M_COMMON_HANDLER_TYPE(IocpService2) ConnectHandler;
-	typedef IocpService2::ConnectOperation2<ConnectHandler> OperationType;
-	IocpService2::OperationAlloc<OperationType>::AllocOp(M_IMPL2_COP(impl), E_CONNECT_OP);
+		sockaddr_storage_t addr;
+		g_bzero(&addr, sizeof(addr));
+		addr.ss_family = ep.Protocol().Family();
+		g_bind(M_IMPL2_FD(impl), (sockaddr_t*)&addr, sizeof(addr));
 
-	OperationType* op = dynamic_cast<OperationType*>(M_IMPL2_COP(impl)._oper);
-	op->_handler = handler;
-	op->_impl = impl;
+		typedef IocpService2::ConnectOperation2<M_COMMON_HANDLER_TYPE(IocpService2)> OperationType;
+		IocpService2::OperationAlloc<OperationType>::AllocOp(M_IMPL2_COP(impl), E_CONNECT_OP);
 
-	typedef typename EndPoint::Impl::endpoint_impl_access ep_access;
-	DWORD send_bytes = 0;
+		OperationType* op = dynamic_cast<OperationType*>(M_IMPL2_COP(impl)._oper);
+		op->_handler = handler;
+		op->_impl = impl;
 
-	M_IMPL2_S_CONNECT_FLAG(impl);
-	// On success, the ConnectEx function returns TRUE. On failure, the function returns FALSE
-	s_int32_t ret = gConnectEx(M_IMPL2_FD(impl), ep_access::SockAddr(ep), ep_access::SockAddrLen(ep), 0, 0, &send_bytes, &M_IMPL2_COP(impl));
-	if (!ret && M_ERR_LAST != M_ERROR_IO_PENDING)
-	{
-		M_IMPL2_C_CONNECT_FLAG(impl);
-		M_DEFAULT_SOCKET_ERROR2(error);
-		op->Clear();
-	}
+		DWORD send_bytes = 0;
+		typedef typename EndPoint::Impl::endpoint_impl_access ep_access;
+		s_int32_t ret = gConnectEx(M_IMPL2_FD(impl), ep_access::SockAddr(ep), ep_access::SockAddrLen(ep), 
+			0, 0, &send_bytes, &M_IMPL2_COP(impl));
+		if (!ret && M_ERR_LAST != M_ERROR_IO_PENDING){
+			M_DEFAULT_SOCKET_ERROR2(error);
+			op->Clear();
+
+			mlock.lock();
+			M_IMPL2_C_CONNECT_FLAG(impl);
+			mlock.unlock();
+		}
+		return;
+	} 
+	while (false);
+	mlock.unlock();
 }
 
 M_SOCKET_DECL s_int32_t IocpService2::Access::RecvSome(IocpService2& service, Impl& impl, s_byte_t* data, s_uint32_t size, SocketError& error)
@@ -763,48 +773,28 @@ M_SOCKET_DECL IocpService2::IoServiceImpl* IocpService2::Access::_GetIoServiceIm
 	return iter->second;
 }
 
-M_SOCKET_DECL bool IocpService2::Access::_CheckCanDoOp(Impl& impl, s_uint16_t type, SocketError& error) {
-	if (M_INVALID_SOCKET == M_IMPL2_FD(impl)) {
-		error = SocketError(M_ERR_BAD_DESCRIPTOR);
-		return false;
-	}
-	if (E_ACCEPT_OP == type) {
-		if (M_IMPL2_G_ACCEPT_FLAG(impl))
-			error = SocketError(M_ERR_POSTED_ACCEPT);
-	}
-	else if (E_CONNECT_OP == type){
-		if (M_IMPL2_G_CONNECT_FLAG(impl))
-			error = SocketError(M_ERR_POSTED_CONNECT);
-	}
-	else if (E_READ_OP == type) {
-		if (M_IMPL2_G_READ_FLAG(impl))
-			error = SocketError(M_ERR_POSTED_READ);
-	}
-	else if (E_WRITE_OP == type) {
-		if (M_IMPL2_G_WRITE_FLAG(impl))
-			error = SocketError(M_ERR_POSTED_WRITE);
-	}
-	return (!error);
-}
-
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 template<typename Handler>
 M_SOCKET_DECL bool IocpService2::AcceptOperation2<Handler>::Complete(IocpService2& service, s_uint32_t transbyte, SocketError& error)
 {
-	if (error)
-	{
+	MutexLock& mlock = M_IMPL2_MUTEX(this->_accept_impl);
+	mlock.lock();
+	if (M_IMPL2_FD(this->_accept_impl) != M_INVALID_SOCKET)
+		M_IMPL2_C_ACCEPT_FLAG(this->_accept_impl);
+	mlock.unlock();
+
+	if (error) {
 		SocketError error2;
 		Access::Close(service, this->_impl, error2);
 	}
-	if (M_IMPL2_FD(this->_accept_impl) != M_INVALID_SOCKET) {
-		M_IMPL2_C_ACCEPT_FLAG(this->_accept_impl);
-		g_setsockopt(M_IMPL2_FD(this->_impl), M_SOL_SOCKET, SO_UPDATE_ACCEPT_CONTEXT, (char*)&(M_IMPL2_FD(this->_accept_impl)), 
-			sizeof(M_IMPL2_FD(this->_accept_impl)));
+	else {
+		if (M_IMPL2_FD(this->_accept_impl) != M_INVALID_SOCKET) {
+			g_setsockopt(M_IMPL2_FD(this->_impl), M_SOL_SOCKET, SO_UPDATE_ACCEPT_CONTEXT, 
+				(char*)&(M_IMPL2_FD(this->_accept_impl)),sizeof(M_IMPL2_FD(this->_accept_impl)));
+		}
 	}
-
 	Handler handler = this->_handler;
-
 	this->Clear();
 	handler(error);
 	return true;
@@ -820,15 +810,17 @@ M_SOCKET_DECL void IocpService2::AcceptOperation2<Handler>::Clear()
 template<typename Handler>
 M_SOCKET_DECL bool IocpService2::ConnectOperation2<Handler>::Complete(IocpService2& service, s_uint32_t transbyte, SocketError& error)
 {
+	MutexLock& mlock = M_IMPL2_MUTEX(this->_impl);
+	mlock.lock();
 	if (M_IMPL2_FD(this->_impl) != M_INVALID_SOCKET)
 		M_IMPL2_C_CONNECT_FLAG(this->_impl);
+	mlock.unlock();
 
-	Handler handler = this->_handler;
-	if (!error)
-	{
+	if (!error){
 		g_setsockopt(M_IMPL2_FD(this->_impl), M_SOL_SOCKET, SO_UPDATE_CONNECT_CONTEXT, NULL, 0);
 	}
 
+	Handler handler = this->_handler;
 	this->Clear();
 	handler(error);
 	return true;

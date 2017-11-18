@@ -170,6 +170,7 @@ void other_test() {
 
 int main() {
 
-	other_test();
+	netlib_test();
+	//other_test();
 	return 0;
 }

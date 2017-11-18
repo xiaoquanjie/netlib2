@@ -250,8 +250,6 @@ protected:
 	M_SOCKET_DECL void _SetImplState(Impl& impl, s_uint16_t flag, bool lock);
 
 	M_SOCKET_DECL static IocpService2::IoServiceImpl* _GetIoServiceImpl(IocpService2& service, Impl& impl);
-
-	M_SOCKET_DECL bool _CheckCanDoOp(Impl& impl,s_uint16_t type,SocketError& error);
 };
 
 M_SOCKET_DECL IocpService2::IoServiceImpl::IoServiceImpl(IocpService2& service)
