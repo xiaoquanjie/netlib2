@@ -879,10 +879,13 @@ M_SOCKET_DECL void IocpService2::AcceptOperation2<Handler>::Clear()
 template<typename Handler>
 M_SOCKET_DECL bool IocpService2::ConnectOperation2<Handler>::Complete(IocpService2& service, s_uint32_t transbyte, SocketError& error)
 {
+	bool notify = false;
 	MutexLock& mlock = M_IMPL2_MUTEX(this->_impl);
 	mlock.lock();
-	if (M_IMPL2_FD(this->_impl) != M_INVALID_SOCKET)
+	if (M_IMPL2_FD(this->_impl) != M_INVALID_SOCKET) {
 		M_IMPL2_C_CONNECT_FLAG(this->_impl);
+		notify = true;
+	}
 	mlock.unlock();
 
 	if (!error){
@@ -890,7 +893,7 @@ M_SOCKET_DECL bool IocpService2::ConnectOperation2<Handler>::Complete(IocpServic
 	}
 	Handler handler = this->_handler;
 	this->Clear();
-	if (M_IMPL2_FD(this->_impl) != M_INVALID_SOCKET)
+	if (notify)
 		handler(error);
 	return true;
 }
@@ -905,15 +908,18 @@ M_SOCKET_DECL void IocpService2::ConnectOperation2<Handler>::Clear()
 template<typename Handler>
 M_SOCKET_DECL bool IocpService2::WriteOperation2<Handler>::Complete(IocpService2& service, s_uint32_t transbyte, SocketError& error)
 {
+	bool notify = false;
 	MutexLock& mlock = M_IMPL2_MUTEX(this->_impl);
 	mlock.lock();
-	if (M_IMPL2_FD(this->_impl) != M_INVALID_SOCKET)
+	if (M_IMPL2_FD(this->_impl) != M_INVALID_SOCKET) {
+		notify = true;
 		M_IMPL2_C_WRITE_FLAG(this->_impl);
+	}
 	mlock.unlock();
 
 	Handler handler = this->_handler;
 	this->Clear();
-	if (M_IMPL2_FD(this->_impl) != M_INVALID_SOCKET)
+	if (notify)
 		handler(transbyte, error);
 	return true;
 }
@@ -930,15 +936,18 @@ M_SOCKET_DECL void IocpService2::WriteOperation2<Handler>::Clear()
 template<typename Handler>
 M_SOCKET_DECL bool IocpService2::ReadOperation2<Handler>::Complete(IocpService2& service, s_uint32_t transbyte, SocketError& error)
 {
+	bool notify = false;
 	MutexLock& mlock = M_IMPL2_MUTEX(this->_impl);
 	mlock.lock();
-	if (M_IMPL2_FD(this->_impl) != M_INVALID_SOCKET)
+	if (M_IMPL2_FD(this->_impl) != M_INVALID_SOCKET) {
+		notify = true;
 		M_IMPL2_C_READ_FLAG(this->_impl);
+	}
 	mlock.unlock();
 
 	Handler handler = this->_handler;
 	this->Clear();
-	if (M_IMPL2_FD(this->_impl) != M_INVALID_SOCKET)
+	if (notify)
 		handler(transbyte, error);
 	return true;
 }
