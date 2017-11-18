@@ -161,7 +161,7 @@ struct IocpService2::Impl{
 		socket_t	 _fd;
 		s_uint16_t	 _state;
 		OperationSet _op;
-		MutexLock    _mutex;
+		shard_ptr_t<MutexLock> _mutex;
 	};
 
 	Impl(){

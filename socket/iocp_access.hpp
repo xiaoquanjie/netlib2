@@ -98,10 +98,9 @@
 	impl._core->_op._cop
 
 #define M_IMPL2_MUTEX(impl)\
-	(impl._core->_mutex)
-
-#define M_IMPL2_SCOPED_LOCK(impl)\
-	ScopedLock _scoped_l(impl._core->_mutex);
+	(*impl._core->_mutex)
+#define M_IMPL2_INIT_MUTEX(impl)\
+	impl._core->_mutex.reset(new MutexLock);
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -113,6 +112,7 @@ M_SOCKET_DECL void IocpService2::Access::ConstructImpl(IocpService2& service, Im
 	M_IMPL2_S_UNBIND(impl);
 	M_IMPL2_S_BLOCK(impl);
 	M_IMPL2_S_TYPE(impl, (s_uint8_t)type);
+	M_IMPL2_INIT_MUTEX(impl);
 }
 
 M_SOCKET_DECL void IocpService2::Access::DestroyImpl(IocpService2& service, Impl& impl){
@@ -210,11 +210,11 @@ M_SOCKET_DECL void IocpService2::Access::Run(IocpService2& service, SocketError&
 {
 	IocpService2::IoServiceImpl* impl = new IocpService2::IoServiceImpl(service);
 	CreateIocp(*impl, error);
-	if (error)
-	{
+	if (error){
 		delete impl;
 		return;
 	}
+
 	MutexLock& mutex = service._mutex;
 	mutex.lock();
 	service._implvector.push_back(impl);
@@ -222,16 +222,14 @@ M_SOCKET_DECL void IocpService2::Access::Run(IocpService2& service, SocketError&
 	++service._implcnt;
 	mutex.unlock();
 
-	for (;;)
-	{
+	for (;;){
 		DWORD trans_bytes = 0;
 		ULONG_PTR comple_key = 0;
 		overlapped_t* overlapped = 0;
 		g_setlasterr(0);
 
 		BOOL ret = g_getqueuedcompletionstatus(impl->_handler, &trans_bytes, &comple_key, &overlapped, -1);
-		if (overlapped)
-		{
+		if (overlapped){
 			IocpService2::Operation* op = (IocpService2::Operation*)overlapped;
 			if (op->_type & E_FINISH_OP)
 			{
@@ -241,13 +239,11 @@ M_SOCKET_DECL void IocpService2::Access::Run(IocpService2& service, SocketError&
 			ExecOp(service, op, trans_bytes, ret ? true : false);
 			continue;
 		}
-		if (!ret)
-		{
-			if (M_ERR_LAST == WAIT_TIMEOUT)
-				1;// time out
-
-			M_DEFAULT_SOCKET_ERROR2(error);
-			break;
+		if (!ret){
+			if (M_ERR_LAST != WAIT_TIMEOUT) {
+				M_DEFAULT_SOCKET_ERROR2(error);
+				break;
+			}
 		}
 	}
 
@@ -286,7 +282,7 @@ M_SOCKET_DECL s_uint32_t IocpService2::Access::GetServiceCount(const IocpService
 
 M_SOCKET_DECL void IocpService2::Access::Close(IocpService2& service, Impl& impl, SocketError& error) {
 	// set lock
-	M_IMPL2_SCOPED_LOCK(impl);
+	//M_IMPL2_SCOPED_LOCK(impl);
 
 	if (M_IMPL2_FD(impl) != M_INVALID_SOCKET)
 	{
