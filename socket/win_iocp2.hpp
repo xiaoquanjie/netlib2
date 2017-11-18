@@ -28,6 +28,8 @@ public:
 	class  Access;
 	struct Impl;
 
+	//struct 
+
 	struct IoServiceImpl{
 		friend class Access;
 		M_SOCKET_DECL IoServiceImpl(IocpService2& service);
@@ -154,36 +156,31 @@ struct IocpService2::Impl{
 	template<typename T>
 	friend struct ReadOperation2;
 
-	struct core
-	{
+	struct core{
 		HANDLE		 _iocp;
 		socket_t	 _fd;
 		s_uint16_t	 _state;
 		OperationSet _op;
+		MutexLock    _mutex;
 	};
 
-	Impl()
-	{
+	Impl(){
 		_core.reset(new core);
 		_core->_fd = M_INVALID_SOCKET;
 		_core->_iocp = 0;
 		_core->_state = 0;
-		_mutex.reset(new MutexLock);
 	}
 
 private:
 	shard_ptr_t<core> _core;
-	shard_ptr_t<MutexLock> _mutex;
 };
 
 class IocpService2::Access
 {
 public:
-	M_SOCKET_DECL static void Construct(IocpService2& service, Impl& impl, s_uint16_t type);
+	M_SOCKET_DECL static void ConstructImpl(IocpService2& service, Impl& impl, s_uint16_t type);
 
-	M_SOCKET_DECL static void Destroy(IocpService2& service, Impl& impl);
-
-	M_SOCKET_DECL static void Close(IocpService2& service, Impl& impl, SocketError& error);
+	M_SOCKET_DECL static void DestroyImpl(IocpService2& service, Impl& impl);
 
 	M_SOCKET_DECL static bool IsOpen(IocpService2& service, Impl& impl, SocketError& error);
 
@@ -199,35 +196,7 @@ public:
 	template<typename EndPoint>
 	M_SOCKET_DECL static EndPoint LocalEndPoint(EndPoint, IocpService2& service, const Impl& impl, SocketError& error);
 
-	M_SOCKET_DECL static void Shutdown(IocpService2& service, Impl& impl, EShutdownType what, SocketError& error);
-
-	template<typename ProtocolType>
-	M_SOCKET_DECL static void Open(IocpService2& service, Impl& impl, ProtocolType pt, SocketError& error);
-
-	template<typename EndPoint>
-	M_SOCKET_DECL static void Bind(IocpService2& service, Impl& impl, const EndPoint& ep, SocketError& error);
-
 	M_SOCKET_DECL static void Cancel(IocpService2& service, Impl& impl, SocketError& error);
-
-	M_SOCKET_DECL static void Listen(IocpService2& service, Impl& impl, s_int32_t flag, SocketError& error);
-
-	M_SOCKET_DECL static void Accept(IocpService2& service, Impl& impl, Impl& peer, SocketError& error);
-
-	M_SOCKET_DECL static void AsyncAccept(IocpService2& service, Impl& accept_impl, Impl& client_impl, M_COMMON_HANDLER_TYPE(IocpService2) handler, SocketError& error);
-
-	M_SOCKET_DECL static s_int32_t RecvSome(IocpService2& service, Impl& impl, s_byte_t* data, s_uint32_t size, SocketError& error);
-
-	M_SOCKET_DECL static s_int32_t SendSome(IocpService2& service, Impl& impl, const s_byte_t* data, s_uint32_t size, SocketError& error);
-
-	M_SOCKET_DECL static void AsyncRecvSome(IocpService2& service, Impl& impl, s_byte_t* data, s_uint32_t size, M_RW_HANDLER_TYPE(IocpService2) hander, SocketError& error);
-
-	M_SOCKET_DECL static void AsyncSendSome(IocpService2& service, Impl& impl, const s_byte_t* data, s_uint32_t size, M_RW_HANDLER_TYPE(IocpService2) hander, SocketError& error);
-
-	template<typename EndPoint>
-	M_SOCKET_DECL static void Connect(IocpService2& service, Impl& impl, const EndPoint& ep, SocketError& error);
-
-	template<typename EndPoint>
-	M_SOCKET_DECL static void AsyncConnect(IocpService2& service, Impl& impl, const EndPoint& ep, M_COMMON_HANDLER_TYPE(IocpService2) handler, SocketError& error);
 
 	M_SOCKET_DECL static void CreateIocp(IocpService2::IoServiceImpl& impl, SocketError& error);
 
@@ -243,12 +212,46 @@ public:
 
 	M_SOCKET_DECL static bool Stopped(const IocpService2& service);
 
-	M_SOCKET_DECL static IocpService2::IoServiceImpl* GetIoServiceImpl(IocpService2& service, Impl& impl);
-
 	M_SOCKET_DECL static s_uint32_t GetServiceCount(const IocpService2& service);
+
+	M_SOCKET_DECL static void Close(IocpService2& service, Impl& impl, SocketError& error);
+
+	M_SOCKET_DECL static void Close(IocpService2& service, Impl& impl, function_t<void()> handler, SocketError& error);
+
+	template<typename ProtocolType>
+	M_SOCKET_DECL static void Open(IocpService2& service, Impl& impl, const ProtocolType& pt, SocketError& error);
+
+	template<typename EndPoint>
+	M_SOCKET_DECL static void Bind(IocpService2& service, Impl& impl, const EndPoint& ep, SocketError& error);
+	
+	M_SOCKET_DECL static void Listen(IocpService2& service, Impl& impl, s_int32_t flag, SocketError& error);
+	
+	M_SOCKET_DECL static void Shutdown(IocpService2& service, Impl& impl, EShutdownType what, SocketError& error);
+	
+	M_SOCKET_DECL static void Accept(IocpService2& service, Impl& impl, Impl& peer, SocketError& error);
+	
+	M_SOCKET_DECL static void AsyncAccept(IocpService2& service, Impl& accept_impl, Impl& client_impl, M_COMMON_HANDLER_TYPE(IocpService2) handler, SocketError& error);
+	
+	template<typename EndPoint>
+	M_SOCKET_DECL static void Connect(IocpService2& service, Impl& impl, const EndPoint& ep, SocketError& error);
+	
+	template<typename EndPoint>
+	M_SOCKET_DECL static void AsyncConnect(IocpService2& service, Impl& impl, const EndPoint& ep, M_COMMON_HANDLER_TYPE(IocpService2) handler, SocketError& error);
+	
+	M_SOCKET_DECL static s_int32_t RecvSome(IocpService2& service, Impl& impl, s_byte_t* data, s_uint32_t size, SocketError& error);
+	
+	M_SOCKET_DECL static void AsyncRecvSome(IocpService2& service, Impl& impl, s_byte_t* data, s_uint32_t size, M_RW_HANDLER_TYPE(IocpService2) hander, SocketError& error);
+	
+	M_SOCKET_DECL static s_int32_t SendSome(IocpService2& service, Impl& impl, const s_byte_t* data, s_uint32_t size, SocketError& error);
+	
+	M_SOCKET_DECL static void AsyncSendSome(IocpService2& service, Impl& impl, const s_byte_t* data, s_uint32_t size, M_RW_HANDLER_TYPE(IocpService2) hander, SocketError& error);
 
 protected:
 	M_SOCKET_DECL void _SetImplState(Impl& impl, s_uint16_t flag, bool lock);
+
+	M_SOCKET_DECL static IocpService2::IoServiceImpl* _GetIoServiceImpl(IocpService2& service, Impl& impl);
+
+	M_SOCKET_DECL bool _CheckCanDoOp(Impl& impl,s_uint16_t type,SocketError& error);
 };
 
 M_SOCKET_DECL IocpService2::IoServiceImpl::IoServiceImpl(IocpService2& service)

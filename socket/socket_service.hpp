@@ -26,20 +26,20 @@ enum
 };
 enum
 {
-	E_NULL_OP = 0,			// null op
-	E_ACCEPT_OP = (1<<0),	// accept op
-	E_CONNECT_OP = (1<<1),	// connect op
-	E_WRITE_OP = (1<<2),	// write op
-	E_READ_OP = (1<<3),		// read op
-	E_FINISH_OP = (1<<4),	// finish op
+	E_NULL_OP = 0,			// null op,0
+	E_ACCEPT_OP = (1<<0),	// accept op,1
+	E_CONNECT_OP = (1<<1),	// connect op,2
+	E_WRITE_OP = (1<<2),	// write op,4
+	E_READ_OP = (1<<3),		// read op,8
+	E_FINISH_OP = (1<<4),	// finish op,16
 };
 enum
 {
-	E_NULL_STATE = 0,				// non state
-	E_ACCEPTING_STATE = (1<< 0),	// accepting state
-	E_CONNECTING_STATE = (1<<1),	// connecting state
-	E_WRITING_STATE = (1<<2),		// writing state
-	E_READING_STATE = (1 << 3),		// reading state
+	E_NULL_STATE = 0,				// non state,0
+	E_ACCEPTING_STATE = (1<< 0),	// accepting state,1
+	E_CONNECTING_STATE = (1<<1),	// connecting state,2
+	E_WRITING_STATE = (1<<2),		// writing state,4
+	E_READING_STATE = (1 << 3),		// reading state,8
 };
 
 template<typename Protocol,typename IoService>
@@ -92,13 +92,13 @@ M_SOCKET_DECL BaseSocketService<Protocol, IoServiceType>::BaseSocketService(IoSe
 template<typename Protocol, typename IoServiceType>
 M_SOCKET_DECL void BaseSocketService<Protocol, IoServiceType>::Construct(Impl& impl, s_uint16_t type)
 {
-	Access::Construct(_ioservice, impl, type);
+	Access::ConstructImpl(_ioservice, impl, type);
 }
 
 template<typename Protocol, typename IoServiceType>
 M_SOCKET_DECL void BaseSocketService<Protocol, IoServiceType>::Destroy(Impl& impl)
 {
-	Access::Destroy(_ioservice, impl);
+	Access::DestroyImpl(_ioservice, impl);
 }
 
 template<typename Protocol, typename IoServiceType>
