@@ -80,6 +80,14 @@
 #define M_IMPL2_C_READ_FLAG(impl)\
 	M_CLR_BIT(impl._core->_state,8)
 
+// close flag bit(9)
+#define M_IMPL2_G_CLOSE_FLAG(impl)\
+	M_GET_BIT(impl._core->_state,9)
+#define M_IMPL2_S_CLOSE_FLAG(impl)\
+	M_SET_BIT(impl._core->_state,9)
+#define M_IMPL2_C_CLOSE_FLAG(impl)\
+	M_CLR_BIT(impl._core->_state,9)
+
 #define M_IMPL2_FD(impl)\
 	impl._core->_fd
 #define M_IMPL2_STATE(impl)\
@@ -101,6 +109,10 @@
 	(*impl._core->_mutex)
 #define M_IMPL2_INIT_MUTEX(impl)\
 	impl._core->_mutex.reset(new MutexLock);
+
+#define M_FOREACH_CLOSEREQ(item,reqlist)\
+	for (std::list<ImplCloseReq*>::iterator item=reqlist.begin();\
+		item!=reqlist.end(); ++item)
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -208,31 +220,47 @@ M_SOCKET_DECL void IocpService2::Access::ExecOp(IocpService2& service, IocpServi
 
 M_SOCKET_DECL void IocpService2::Access::Run(IocpService2& service, SocketError& error)
 {
-	IocpService2::IoServiceImpl* impl = new IocpService2::IoServiceImpl(service);
-	CreateIocp(*impl, error);
-	if (error){
-		delete impl;
+	IocpService2::IoServiceImpl* simpl = new IocpService2::IoServiceImpl(service);
+	CreateIocp(*simpl, error);
+	if (error) {
+		delete simpl;
 		return;
 	}
 
-	MutexLock& mutex = service._mutex;
-	mutex.lock();
-	service._implvector.push_back(impl);
-	service._implmap[impl->_handler] = impl;
+	service._mutex.lock();
+	service._implmap[simpl->_handler] = simpl;
+	service._implvector.push_back(simpl);
 	++service._implcnt;
-	mutex.unlock();
+	service._mutex.unlock();
 
+	std::list<ImplCloseReq*> closereqs, closereqs2;
 	for (;;){
+		simpl->_mutex.lock();
+		closereqs.swap(simpl->_closereqs);
+		simpl->_mutex.unlock();
+
+		M_FOREACH_CLOSEREQ(iter, closereqs) {
+			_ExecClose((*iter));
+			closereqs2.push_back((*iter));
+		}
+
+		simpl->_mutex.lock();
+		simpl->_closereqs2.merge(closereqs2);
+		simpl->_mutex.unlock();
+
+		closereqs.clear();
+		closereqs2.clear();
+
 		DWORD trans_bytes = 0;
 		ULONG_PTR comple_key = 0;
 		overlapped_t* overlapped = 0;
 		g_setlasterr(0);
 
-		BOOL ret = g_getqueuedcompletionstatus(impl->_handler, &trans_bytes, &comple_key, &overlapped, -1);
+		BOOL ret = g_getqueuedcompletionstatus(simpl->_handler, &trans_bytes,
+			&comple_key, &overlapped, 500);
 		if (overlapped){
 			IocpService2::Operation* op = (IocpService2::Operation*)overlapped;
-			if (op->_type & E_FINISH_OP)
-			{
+			if (op->_type & E_FINISH_OP){
 				delete op;
 				break;
 			}
@@ -247,13 +275,19 @@ M_SOCKET_DECL void IocpService2::Access::Run(IocpService2& service, SocketError&
 		}
 	}
 
-	mutex.lock();
-	service._implvector.erase(std::find(service._implvector.begin(), service._implvector.end(), impl));
-	service._implmap.erase(impl->_handler);
-	--service._implcnt;
-	mutex.unlock();
-	DestroyIocp(*impl);
-	delete impl;
+	M_FOREACH_CLOSEREQ(iter, simpl->_closereqs) {
+		(*iter)->Clear();
+		delete (*iter);
+	}
+	M_FOREACH_CLOSEREQ(iter, simpl->_closereqs2) {
+		(*iter)->Clear();
+		delete (*iter);
+	}
+
+	service._mutex.lock();
+	service._implvector.erase(std::find(service._implvector.begin(), service._implvector.end(), simpl));
+	service._implcnt--;
+	service._mutex.unlock();
 }
 
 M_SOCKET_DECL void IocpService2::Access::Stop(IocpService2& service, SocketError& error){
@@ -281,29 +315,47 @@ M_SOCKET_DECL s_uint32_t IocpService2::Access::GetServiceCount(const IocpService
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 M_SOCKET_DECL void IocpService2::Access::Close(IocpService2& service, Impl& impl, SocketError& error) {
-	// set lock
-	//M_IMPL2_SCOPED_LOCK(impl);
+	Close(service, impl, 0, error);
+}
 
-	if (M_IMPL2_FD(impl) != M_INVALID_SOCKET)
-	{
+M_SOCKET_DECL void IocpService2::Access::Close(IocpService2& service, Impl& impl, function_t<void()> handler, SocketError& error) {
+	MutexLock& mlock = M_IMPL2_MUTEX(impl);
+	mlock.lock();
+	if (M_IMPL2_FD(impl) != M_INVALID_SOCKET && !M_IMPL2_G_CLOSE_FLAG(impl)) {
 		service._mutex.lock();
-		IocpService2::IoServiceImpl* serviceimpl = _GetIoServiceImpl(service, impl);
-		if (serviceimpl)
-			::InterlockedDecrement(&serviceimpl->_fdcnt);
+		IocpService2::IoServiceImpl* simpl = _GetIoServiceImpl(service, impl);
+		if (simpl)
+			--simpl->_fdcnt;
 		service._mutex.unlock();
 
-		if (M_IMPL2_FD(impl) != M_INVALID_SOCKET)
-		{
+		if (M_IMPL2_G_BLOCK(impl)) {
 			if (g_closesocket(M_IMPL2_FD(impl)) == M_SOCKET_ERROR)
 				M_DEFAULT_SOCKET_ERROR2(error);
 			M_IMPL2_FD(impl) = M_INVALID_SOCKET;
 			M_IMPL2_STATE(impl) = 0;
 		}
+		else {
+			M_IMPL2_S_CLOSE_FLAG(impl);
+		}
+		mlock.unlock();
+
+		if (simpl) {
+			ScopedLock scoped_l(simpl->_mutex);
+			ImplCloseReq* req = 0;
+			if (!simpl->_closereqs2.empty()) {
+				req = simpl->_closereqs2.front();
+				simpl->_closereqs.pop_front();
+			}
+			else
+				req = new ImplCloseReq;
+
+			req->_handler = handler;
+			req->_impl = impl;
+			simpl->_closereqs.push_back(req);
+		}
+		return;
 	}
-}
-
-M_SOCKET_DECL void IocpService2::Access::Close(IocpService2& service, Impl& impl, function_t<void()> handler, SocketError& error) {
-
+	mlock.unlock();
 }
 
 template<typename ProtocolType>
@@ -765,8 +817,11 @@ M_SOCKET_DECL void IocpService2::Access::AsyncSendSome(IocpService2& service, Im
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-M_SOCKET_DECL void IocpService2::Access::_SetImplState(Impl& impl, s_uint16_t flag, bool lock) {
-
+M_SOCKET_DECL void IocpService2::Access::_ExecClose(ImplCloseReq* req) {
+	g_closesocket(M_IMPL2_FD(req->_impl));
+	if (req->_handler)
+		req->_handler();
+	req->Clear();
 }
 
 M_SOCKET_DECL IocpService2::IoServiceImpl* IocpService2::Access::_GetIoServiceImpl(IocpService2& service, Impl& impl) {

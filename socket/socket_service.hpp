@@ -33,14 +33,6 @@ enum
 	E_READ_OP = (1<<3),		// read op,8
 	E_FINISH_OP = (1<<4),	// finish op,16
 };
-enum
-{
-	E_NULL_STATE = 0,				// non state,0
-	E_ACCEPTING_STATE = (1<< 0),	// accepting state,1
-	E_CONNECTING_STATE = (1<<1),	// connecting state,2
-	E_WRITING_STATE = (1<<2),		// writing state,4
-	E_READING_STATE = (1 << 3),		// reading state,8
-};
 
 template<typename Protocol,typename IoService>
 class BaseSocketService

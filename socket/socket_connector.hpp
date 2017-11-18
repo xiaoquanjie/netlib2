@@ -20,8 +20,8 @@
 M_SOCKET_NAMESPACE_BEGIN
 
 template<typename IoServiceType>
-class TcpConnector : public StreamSocket<Tcp, TcpConnectorService<Tcp, IoServiceType> >,
-	public enable_shared_from_this_t<TcpConnector<IoServiceType> >
+class TcpConnector : public StreamSocket<Tcp, TcpConnectorService<Tcp, IoServiceType> >
+	//,public enable_shared_from_this_t<TcpConnector<IoServiceType> >
 {
 public:
 	typedef TcpConnector<IoServiceType> MySelf;

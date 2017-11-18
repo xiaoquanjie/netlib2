@@ -21,8 +21,8 @@
 M_SOCKET_NAMESPACE_BEGIN
 
 template<typename IoServiceType>
-class TcpSocket : public StreamSocket<Tcp, TcpSocketService<Tcp, IoServiceType> >,
-	public enable_shared_from_this_t<TcpSocket<IoServiceType> >
+class TcpSocket : public StreamSocket<Tcp, TcpSocketService<Tcp, IoServiceType> >
+	//,public enable_shared_from_this_t<TcpSocket<IoServiceType> >
 {
 public:
 	typedef StreamSocket<Tcp, TcpSocketService<Tcp, IoServiceType> > SocketType;

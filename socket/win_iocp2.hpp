@@ -22,13 +22,14 @@
 #ifdef M_PLATFORM_WIN
 M_SOCKET_NAMESPACE_BEGIN
 
+#define M_IOSERVICE_MUTEX_SIZE 128
+
 class IocpService2
 {
 public:
 	class  Access;
 	struct Impl;
-
-	//struct 
+	struct ImplCloseReq;
 
 	struct IoServiceImpl{
 		friend class Access;
@@ -39,6 +40,9 @@ public:
 		IocpService2&	_service;
 		HANDLE			_handler;
 		s_uint32_t		_fdcnt;
+		MutexLock		_mutex;
+		std::list<ImplCloseReq*> _closereqs;
+		std::list<ImplCloseReq*> _closereqs2;
 	};
 	typedef std::vector<IoServiceImpl*> IoServiceImplVector;
 	typedef std::map<HANDLE, IoServiceImpl*> IoServiceImplMap;
@@ -137,7 +141,7 @@ private:
 	mutable MutexLock	_mutex;
 };
 
-M_SOCKET_DECL IocpService2::Operation::Operation() :_oper(0),_type(E_NULL_STATE){
+M_SOCKET_DECL IocpService2::Operation::Operation() :_oper(0),_type(E_NULL_OP){
 }
 
 M_SOCKET_DECL IocpService2::Operation::~Operation(){
@@ -173,6 +177,15 @@ struct IocpService2::Impl{
 
 private:
 	shard_ptr_t<core> _core;
+};
+
+struct IocpService2::ImplCloseReq {
+	Impl _impl;
+	function_t<void()> _handler;
+	void Clear() {
+		_handler = 0;
+		_impl = Impl();
+	}
 };
 
 class IocpService2::Access
@@ -247,7 +260,7 @@ public:
 	M_SOCKET_DECL static void AsyncSendSome(IocpService2& service, Impl& impl, const s_byte_t* data, s_uint32_t size, M_RW_HANDLER_TYPE(IocpService2) hander, SocketError& error);
 
 protected:
-	M_SOCKET_DECL void _SetImplState(Impl& impl, s_uint16_t flag, bool lock);
+	M_SOCKET_DECL static void _ExecClose(ImplCloseReq* req);
 
 	M_SOCKET_DECL static IocpService2::IoServiceImpl* _GetIoServiceImpl(IocpService2& service, Impl& impl);
 };
@@ -265,12 +278,14 @@ M_SOCKET_DECL IocpService2::IocpService2()
 }
 
 M_SOCKET_DECL IocpService2::~IocpService2(){
-	ScopedLock scoped(_mutex);
 	SocketError error;
 	Stop(error);
-	for (IoServiceImplVector::iterator iter = _implvector.begin(); iter != _implvector.end(); ++iter)
-	{
-		IoServiceImpl& impl = (IoServiceImpl&)**iter;
+	while (ServiceCount()){
+		g_sleep(200);
+	}
+	ScopedLock scoped(_mutex);
+	for (IoServiceImplMap::iterator iter = _implmap.begin(); iter != _implmap.end(); ++iter){
+		IoServiceImpl& impl = (IoServiceImpl&)(*iter->second);
 		Access::DestroyIocp(impl);
 	}
 	_implmap.clear();

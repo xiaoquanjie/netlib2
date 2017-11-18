@@ -112,8 +112,11 @@ void server() {
 	}
 	else
 		cout << "listening....." << endl;
-	thr.join();
-	thr2.join();
+
+	int i = 0;
+	cin >> i;
+//	thr.join();
+//	thr2.join();
 }
 
 void client() {

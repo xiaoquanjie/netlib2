@@ -21,7 +21,7 @@ M_SOCKET_NAMESPACE_BEGIN
 
 template<typename IoServiceType>
 class TcpAcceptor : public BasicSocket<Tcp, TcpAcceptorService<Tcp, IoServiceType> >
-		,public enable_shared_from_this_t<TcpAcceptor<IoServiceType> >
+		//,public enable_shared_from_this_t<TcpAcceptor<IoServiceType> >
 {
 public:
 	typedef TcpAcceptor<IoServiceType> MySelf;
