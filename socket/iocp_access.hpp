@@ -617,52 +617,58 @@ M_SOCKET_DECL s_int32_t IocpService2::Access::RecvSome(IocpService2& service, Im
 M_SOCKET_DECL void IocpService2::Access::AsyncRecvSome(IocpService2& service, Impl& impl, s_byte_t* data, s_uint32_t size, 
 	M_RW_HANDLER_TYPE(IocpService2) hander, SocketError& error)
 {
-	if (M_IMPL2_FD(impl) == M_INVALID_SOCKET)
+	MutexLock& mlock = M_IMPL2_MUTEX(impl);
+	do 
 	{
-		error = SocketError(M_ERR_BAD_DESCRIPTOR);
-		return;
-	}
-	if (M_IMPL2_G_READ_FLAG(impl))
-	{
-		error = SocketError(M_ERR_POSTED_READ);
-		return;
-	}
-	if (!M_IMPL2_G_NONBLOCK(impl))
-	{
-		if (!detail::Util::SetNonBlock(M_IMPL2_FD(impl)))
-		{
-			M_DEFAULT_SOCKET_ERROR2(error);
-			return;
+		mlock.lock();
+		if (M_IMPL2_FD(impl) == M_INVALID_SOCKET){
+			error = SocketError(M_ERR_BAD_DESCRIPTOR);
+			break;
 		}
-		M_IMPL2_S_NONBLOCK(impl)
-	}
-	if (!M_IMPL2_G_BIND(impl))
-	{
-		BindIocp(service, impl, error);
-		if (error)
-			return;
-		M_IMPL2_S_BIND(impl);
-	}
+		if (M_IMPL2_G_READ_FLAG(impl)){
+			error = SocketError(M_ERR_POSTED_READ);
+			break;
+		}
+		if (!M_IMPL2_G_NONBLOCK(impl)){
+			if (!detail::Util::SetNonBlock(M_IMPL2_FD(impl))){
+				M_DEFAULT_SOCKET_ERROR2(error);
+				break;
+			}
+			M_IMPL2_S_NONBLOCK(impl)
+		}
+		if (!M_IMPL2_G_BIND(impl)){
+			BindIocp(service, impl, error);
+			if (error)
+				break;
+			M_IMPL2_S_BIND(impl);
+		}
 
-	typedef M_RW_HANDLER_TYPE(IocpService2) ReadHandler;
-	typedef IocpService2::ReadOperation2<ReadHandler> OperationType;
-	IocpService2::OperationAlloc<OperationType>::AllocOp(M_IMPL2_ROP(impl), E_READ_OP);
+		M_IMPL2_S_READ_FLAG(impl);
+		mlock.unlock();
 
-	OperationType* op = dynamic_cast<OperationType*>(M_IMPL2_ROP(impl)._oper);
-	op->_handler = hander;
-	op->_impl = impl;
-	op->_wsabuf.buf = data;
-	op->_wsabuf.len = size;
+		typedef IocpService2::ReadOperation2<M_RW_HANDLER_TYPE(IocpService2)> OperationType;
+		IocpService2::OperationAlloc<OperationType>::AllocOp(M_IMPL2_ROP(impl), E_READ_OP);
 
-	DWORD flag = 0;
-	M_IMPL2_S_READ_FLAG(impl);
-	s_int32_t ret = g_wsarecv(M_IMPL2_FD(impl), &op->_wsabuf, 1, 0, &flag, &M_IMPL2_ROP(impl), 0);
-	if (ret == M_SOCKET_ERROR  && M_ERR_LAST != M_ERROR_IO_PENDING)
-	{
-		M_IMPL2_C_READ_FLAG(impl);
-		M_DEFAULT_SOCKET_ERROR2(error);
-		op->Clear();
-	}
+		OperationType* op = dynamic_cast<OperationType*>(M_IMPL2_ROP(impl)._oper);
+		op->_handler = hander;
+		op->_impl = impl;
+		op->_wsabuf.buf = data;
+		op->_wsabuf.len = size;
+
+		DWORD flag = 0;
+		s_int32_t ret = g_wsarecv(M_IMPL2_FD(impl), &op->_wsabuf, 1, 0, &flag, &M_IMPL2_ROP(impl), 0);
+		if (ret == M_SOCKET_ERROR  && M_ERR_LAST != M_ERROR_IO_PENDING){
+			M_DEFAULT_SOCKET_ERROR2(error);
+			op->Clear();
+
+			mlock.lock();
+			M_IMPL2_C_READ_FLAG(impl);
+			mlock.unlock();
+		}
+		return;
+	} 
+	while (false);
+	mlock.unlock();
 }
 
 M_SOCKET_DECL s_int32_t IocpService2::Access::SendSome(IocpService2& service, Impl& impl, const s_byte_t* data, s_uint32_t size, SocketError& error)
@@ -707,54 +713,58 @@ M_SOCKET_DECL s_int32_t IocpService2::Access::SendSome(IocpService2& service, Im
 M_SOCKET_DECL void IocpService2::Access::AsyncSendSome(IocpService2& service, Impl& impl, const s_byte_t* data, s_uint32_t size, 
 	M_RW_HANDLER_TYPE(IocpService2) hander, SocketError& error)
 {
-	if (M_IMPL2_FD(impl) == M_INVALID_SOCKET)
+	MutexLock& mlock = M_IMPL2_MUTEX(impl);
+	do 
 	{
-		error = SocketError(M_ERR_BAD_DESCRIPTOR);
-		return;
-	}
-	if (M_IMPL2_G_WRITE_FLAG(impl))
-	{
-		error = SocketError(M_ERR_POSTED_WRITE);
-		return;
-	}
-	if (!M_IMPL2_G_NONBLOCK(impl))
-	{
-		if (!detail::Util::SetNonBlock(M_IMPL2_FD(impl)))
-		{
-			M_DEFAULT_SOCKET_ERROR2(error);
+		mlock.lock();
+		if (M_IMPL2_FD(impl) == M_INVALID_SOCKET){
+			error = SocketError(M_ERR_BAD_DESCRIPTOR);
+			break;
+		}
+		if (M_IMPL2_G_WRITE_FLAG(impl)){
+			error = SocketError(M_ERR_POSTED_WRITE);
 			return;
 		}
-		M_IMPL2_S_NONBLOCK(impl)
-	}
+		if (!M_IMPL2_G_NONBLOCK(impl)){
+			if (!detail::Util::SetNonBlock(M_IMPL2_FD(impl))){
+				M_DEFAULT_SOCKET_ERROR2(error);
+				break;
+			}
+			M_IMPL2_S_NONBLOCK(impl)
+		}
+		if (!M_IMPL2_G_BIND(impl)){
+			BindIocp(service, impl, error);
+			if (error)
+				break;
+			M_IMPL2_S_BIND(impl);
+		}
 
-	if (!M_IMPL2_G_BIND(impl))
-	{
-		BindIocp(service, impl, error);
-		if (error)
-			return;
-		M_IMPL2_S_BIND(impl);
-	}
+		M_IMPL2_S_WRITE_FLAG(impl);
+		mlock.unlock();
 
-	typedef M_RW_HANDLER_TYPE(IocpService2) WriteHandler;
-	typedef IocpService2::WriteOperation2<WriteHandler> OperationType;
-	IocpService2::OperationAlloc<OperationType>::AllocOp(M_IMPL2_WOP(impl), E_WRITE_OP);
+		typedef IocpService2::WriteOperation2< M_RW_HANDLER_TYPE(IocpService2)> OperationType;
+		IocpService2::OperationAlloc<OperationType>::AllocOp(M_IMPL2_WOP(impl), E_WRITE_OP);
 
-	OperationType* op = dynamic_cast<OperationType*>(M_IMPL2_WOP(impl)._oper);
-	op->_handler = hander;
-	op->_impl = impl;
-	op->_wsabuf.buf = const_cast<s_byte_t*>(data);
-	op->_wsabuf.len = size;
+		OperationType* op = dynamic_cast<OperationType*>(M_IMPL2_WOP(impl)._oper);
+		op->_handler = hander;
+		op->_impl = impl;
+		op->_wsabuf.buf = const_cast<s_byte_t*>(data);
+		op->_wsabuf.len = size;
 
-	DWORD send_bytes = 0;
-	M_IMPL2_S_WRITE_FLAG(impl);
-	// If no error occurs and the send operation has completed immediately, WSASend returns zero
-	s_int32_t ret = g_wsasend(M_IMPL2_FD(impl), &op->_wsabuf, 1, 0, 0, &M_IMPL2_WOP(impl), 0);
-	if (ret == M_SOCKET_ERROR && M_ERR_LAST != M_ERROR_IO_PENDING)
-	{
-		M_IMPL2_C_WRITE_FLAG(impl);
-		M_DEFAULT_SOCKET_ERROR2(error);
-		op->Clear();
-	}
+		DWORD send_bytes = 0;
+		// If no error occurs and the send operation has completed immediately, WSASend returns zero
+		s_int32_t ret = g_wsasend(M_IMPL2_FD(impl), &op->_wsabuf, 1, 0, 0, &M_IMPL2_WOP(impl), 0);
+		if (ret == M_SOCKET_ERROR && M_ERR_LAST != M_ERROR_IO_PENDING){
+			M_DEFAULT_SOCKET_ERROR2(error);
+			op->Clear();
+
+			mlock.lock();
+			M_IMPL2_C_WRITE_FLAG(impl);
+			mlock.unlock();
+		}
+	} 
+	while (false);
+	mlock.unlock();
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -836,11 +846,13 @@ M_SOCKET_DECL void IocpService2::ConnectOperation2<Handler>::Clear()
 template<typename Handler>
 M_SOCKET_DECL bool IocpService2::WriteOperation2<Handler>::Complete(IocpService2& service, s_uint32_t transbyte, SocketError& error)
 {
+	MutexLock& mlock = M_IMPL2_MUTEX(this->_impl);
+	mlock.lock();
 	if (M_IMPL2_FD(this->_impl) != M_INVALID_SOCKET)
 		M_IMPL2_C_WRITE_FLAG(this->_impl);
+	mlock.unlock();
 
 	Handler handler = this->_handler;
-
 	this->Clear();
 	handler(transbyte, error);
 	return true;
@@ -858,11 +870,13 @@ M_SOCKET_DECL void IocpService2::WriteOperation2<Handler>::Clear()
 template<typename Handler>
 M_SOCKET_DECL bool IocpService2::ReadOperation2<Handler>::Complete(IocpService2& service, s_uint32_t transbyte, SocketError& error)
 {
+	MutexLock& mlock = M_IMPL2_MUTEX(this->_impl);
+	mlock.lock();
 	if (M_IMPL2_FD(this->_impl) != M_INVALID_SOCKET)
 		M_IMPL2_C_READ_FLAG(this->_impl);
+	mlock.unlock();
 
 	Handler handler = this->_handler;
-	
 	this->Clear();
 	handler(transbyte, error);
 	return true;
