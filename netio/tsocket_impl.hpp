@@ -88,8 +88,6 @@ void TcpBaseSocket<T, SocketType, CheckerType>::_Close(unsigned int state) {
 			&& tmp_flag != E_TCPSOCKET_STATE_STOP) {
 			// 通知连接断开
 			_flag = E_TCPSOCKET_STATE_STOP;
-			_socket->Shutdown(SocketLib::E_Ehutdown_BOTH);
-
 			SocketLib::SocketError error;
 			function_t<void()> handler = bind_t(&TcpBaseSocket::_CloseHandler, this->shared_from_this());
 			_socket->Close(handler, error);
@@ -174,8 +172,10 @@ void TcpBaseSocket<T, SocketType, CheckerType>::_ReadHandler(SocketLib::s_uint32
 				_PostClose(E_TCPSOCKET_STATE_START | E_TCPSOCKET_STATE_READ);
 			}
 		}
-		else
+		else {
+			_reader.lock.unlock();
 			_PostClose(E_TCPSOCKET_STATE_READ);
+		}
 	}
 }
 
