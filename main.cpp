@@ -68,8 +68,8 @@ public:
 			cout << "connect fail :" << error.What() << endl;
 		}
 		else {
-			cout << "connect success : " << clisock->RemoteEndpoint().Address() << " " << clisock->RemoteEndpoint().Port() << endl;
-			SendData(clisock);
+			cout << "connect success : " << clisock->LocalEndpoint().Address() << " " << clisock->LocalEndpoint().Port() << endl;
+			//SendData(clisock);
 		}
 	}
 
@@ -78,12 +78,12 @@ public:
 		cout << "OnDisconnected one : " << clisock->RemoteEndpoint().Address() << " " << clisock->RemoteEndpoint().Port() << endl;
 	}
 	virtual void OnDisconnected(netiolib::TcpConnectorPtr clisock) {
-		cout << "OnDisconnected one : " << clisock->RemoteEndpoint().Address() << " " << clisock->RemoteEndpoint().Port() << endl;
+		cout << "OnDisconnected one : " << clisock->LocalEndpoint().Address() << " " << clisock->LocalEndpoint().Port() << endl;
 	}
 
 	// 数据包通知,这个函数里不要处理业务，防止堵塞
 	virtual void OnReceiveData(netiolib::TcpSocketPtr clisock, netiolib::BufferPtr buffer) {
-		print_log("receive data from :" << clisock->RemoteEndpoint().Address() << " " << clisock->RemoteEndpoint().Port());
+		print_log("receive data from :" << clisock->RemoteEndpoint().Address() << " " << clisock->RemoteEndpoint().Port()<<endl);
 		buffer->Write('\0');
 		print_log(" : " << buffer->Data() << endl);
 		
@@ -91,10 +91,9 @@ public:
 		ReplyData(clisock, buffer);
 	}
 	virtual void OnReceiveData(netiolib::TcpConnectorPtr clisock, netiolib::BufferPtr buffer) {
-		print_log("receive data from :" << clisock->RemoteEndpoint().Address() << " " << clisock->RemoteEndpoint().Port());
+		print_log("receive data from :" << clisock->LocalEndpoint().Address() << " " << clisock->LocalEndpoint().Port() << endl);
 		buffer->Write('\0');
 		print_log(" : " << buffer->Data() << endl);
-
 		SendData(clisock);
 	}
 
@@ -107,8 +106,8 @@ public:
 void server() {
 	TestNetIo test_io;
 	thread thr(&TestNetIo::Start, &test_io, 0);
-//	thread thr2(&TestNetIo::Start, &test_io, 0);
-//	thread thr3(&TestNetIo::Start, &test_io, 0);
+	thread thr2(&TestNetIo::Start, &test_io, 0);
+	thread thr3(&TestNetIo::Start, &test_io, 0);
 	thr.sleep(200);
 	if (!test_io.ListenOne("0.0.0.0", 3001)) {
 		cout << test_io.GetLastError().What() << endl;
@@ -128,19 +127,31 @@ void client() {
 	TestNetIo test_io;
 	std::list<thread*> pthreads;
 	pthreads.push_back(new thread(&TestNetIo::Start, &test_io, 0));
-//	pthreads.push_back(new thread(&TestNetIo::Start, &test_io, 0));
-//	pthreads.push_back(new thread(&TestNetIo::Start, &test_io, 0));
+	pthreads.push_back(new thread(&TestNetIo::Start, &test_io, 0));
+	pthreads.push_back(new thread(&TestNetIo::Start, &test_io, 0));
 
-	//thread::sleep(2000);
-	
+	std::vector<netiolib::TcpConnectorPtr> ptrlist;
+	cout << "select socket count:";
 	int i;
 	cin >> i;
+	cout << "select packet count:";
+	int k;
+	cin >> k;
 	for (int j=0;j<i;j++)
 	{
 		netiolib::TcpConnectorPtr connector(new netiolib::TcpConnector(test_io, 0));
-		connector->SetData(2);
+		connector->SetData(k);
 		connector->AsyncConnect("127.0.0.1", 3001);
+		ptrlist.push_back(connector);
 	}
+
+	cout << "enter to begin..." << endl;
+	cin >> i;
+	print_clock(true);
+	for (int j = 0; j < ptrlist.size(); ++j) {
+		SendData(ptrlist[j]);
+	}
+
 	cin >> i;
 }
 
