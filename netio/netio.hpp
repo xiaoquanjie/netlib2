@@ -37,13 +37,14 @@ class NetIo;
 class TcpSocket;
 class TcpConnector;
 
+typedef SocketLib::Buffer Buffer;
 typedef shard_ptr_t<SocketLib::Buffer> BufferPtr;
 typedef shard_ptr_t<TcpSocket>		   TcpSocketPtr;
 typedef shard_ptr_t<TcpConnector>	   TcpConnectorPtr;
 typedef shard_ptr_t<SocketLib::TcpAcceptor<SocketLib::IoService> > NetIoTcpAcceptorPtr;
 
-typedef function_t<bool(TcpSocketPtr, MessageHeader&, BufferPtr)> MessageChecker;
-typedef function_t<bool(TcpConnectorPtr, MessageHeader&, BufferPtr)> MessageChecker2;
+typedef function_t<bool(TcpSocketPtr, MessageHeader&, Buffer&)> MessageChecker;
+typedef function_t<bool(TcpConnectorPtr, MessageHeader&, Buffer&)> MessageChecker2;
 
 #define lasterror tlsdata<SocketLib::SocketError,0>::data()
 
@@ -88,8 +89,8 @@ public:
 	virtual void OnDisconnected(TcpConnectorPtr clisock);
 
 	// 数据包通知,这个函数里不要处理业务，防止堵塞
-	virtual void OnReceiveData(TcpSocketPtr clisock, BufferPtr buffer);
-	virtual void OnReceiveData(TcpConnectorPtr clisock, BufferPtr buffer);
+	virtual void OnReceiveData(TcpSocketPtr clisock, SocketLib::Buffer& buffer);
+	virtual void OnReceiveData(TcpConnectorPtr clisock, SocketLib::Buffer& buffer);
 
 protected:
 	void AcceptHandler(SocketLib::SocketError error, TcpSocketPtr clisock, NetIoTcpAcceptorPtr acceptor);
@@ -118,6 +119,7 @@ protected:
 	struct _readerinfo_ {
 		SocketLib::s_byte_t*  readbuf;
 		SocketLib::Buffer	  msgbuffer;
+		SocketLib::Buffer	  msgbuffer2;
 		MessageHeader		  curheader;
 		SocketLib::MutexLock  lock;
 

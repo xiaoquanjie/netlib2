@@ -229,16 +229,16 @@ bool TcpBaseSocket<T, SocketType, CheckerType>::_CutMsgPack(SocketLib::s_byte_t*
 			tran_byte -= (_reader.curheader.size - datalen);
 
 			// swap
-			BufferPtr tmp_bufferptr(new SocketLib::Buffer());
-			tmp_bufferptr->Swap(_reader.msgbuffer);
+			_reader.msgbuffer2.Swap(_reader.msgbuffer);
 			// check
 			if (_msgchecker)
-				if (!_msgchecker(this->shared_from_this(), _reader.curheader, tmp_bufferptr))
+				if (!_msgchecker(this->shared_from_this(), _reader.curheader, _reader.msgbuffer2))
 					return false;
 
 			// notify
 			_reader.curheader.size = 0;
-			_netio.OnReceiveData(this->shared_from_this(), tmp_bufferptr);
+			_netio.OnReceiveData(this->shared_from_this(), _reader.msgbuffer2);
+			_reader.msgbuffer2.Clear();
 		}
 
 	} 

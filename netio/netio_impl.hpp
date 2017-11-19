@@ -132,10 +132,10 @@ void NetIo::OnDisconnected(TcpConnectorPtr clisock) {
 }
 
 // 数据包通知,这个函数里不要处理业务，防止堵塞
-void NetIo::OnReceiveData(TcpSocketPtr clisock, BufferPtr buffer) {
+void NetIo::OnReceiveData(TcpSocketPtr clisock, SocketLib::Buffer& buffer) {
 
 }
-void NetIo::OnReceiveData(TcpConnectorPtr clisock, BufferPtr buffer) {
+void NetIo::OnReceiveData(TcpConnectorPtr clisock, SocketLib::Buffer& buffer) {
 
 }
 
