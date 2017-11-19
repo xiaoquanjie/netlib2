@@ -51,9 +51,9 @@ void SendData(netiolib::TcpConnectorPtr clisock) {
 	}
 }
 
-void ReplyData(netiolib::TcpSocketPtr clisock, netiolib::BufferPtr buffer) {
+void ReplyData(netiolib::TcpSocketPtr clisock, netiolib::Buffer& buffer) {
 	std::string str("svr reply:");
-	str.append(buffer->Data(), buffer->Length());
+	str.append(buffer.Data(), buffer.Length());
 	clisock->Send(str.c_str(), str.length());
 }
 
@@ -82,18 +82,18 @@ public:
 	}
 
 	// 数据包通知,这个函数里不要处理业务，防止堵塞
-	virtual void OnReceiveData(netiolib::TcpSocketPtr clisock, netiolib::BufferPtr buffer) {
+	virtual void OnReceiveData(netiolib::TcpSocketPtr clisock, netiolib::Buffer& buffer) {
 		print_log("receive data from :" << clisock->RemoteEndpoint().Address() << " " << clisock->RemoteEndpoint().Port()<<endl);
-		buffer->Write('\0');
-		print_log(" : " << buffer->Data() << endl);
+		buffer.Write('\0');
+		print_log(" : " << buffer.Data() << endl);
 		
 		// 回复
 		ReplyData(clisock, buffer);
 	}
-	virtual void OnReceiveData(netiolib::TcpConnectorPtr clisock, netiolib::BufferPtr buffer) {
+	virtual void OnReceiveData(netiolib::TcpConnectorPtr clisock, netiolib::Buffer& buffer) {
 		print_log("receive data from :" << clisock->LocalEndpoint().Address() << " " << clisock->LocalEndpoint().Port() << endl);
-		buffer->Write('\0');
-		print_log(" : " << buffer->Data() << endl);
+		buffer.Write('\0');
+		print_log(" : " << buffer.Data() << endl);
 		SendData(clisock);
 	}
 
