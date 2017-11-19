@@ -33,6 +33,7 @@ TcpBaseSocket<T, SocketType, CheckerType>::_readerinfo_::~_readerinfo_() {
 template<typename T, typename SocketType, typename CheckerType>
 TcpBaseSocket<T, SocketType, CheckerType>::_writerinfo_::_writerinfo_() {
 	writing = false;
+	msgbuffer = 0;
 }
 
 template<typename T, typename SocketType, typename CheckerType>
@@ -40,7 +41,12 @@ TcpBaseSocket<T, SocketType, CheckerType>::_writerinfo_::~_writerinfo_() {
 	for (std::list<SocketLib::Buffer*>::iterator iter = buffer_pool.begin();
 		iter != buffer_pool.end(); ++iter)
 		delete (*iter);
+	for (std::list<SocketLib::Buffer*>::iterator iter = buffer_pool2.begin();
+		iter != buffer_pool2.end(); ++iter)
+		delete (*iter);
 	buffer_pool.clear();
+	buffer_pool2.clear();
+	delete msgbuffer;
 }
 
 template<typename T, typename SocketType, typename CheckerType>
@@ -116,10 +122,26 @@ void TcpBaseSocket<T, SocketType, CheckerType>::Send(const SocketLib::s_byte_t* 
 	hdr.size = len;
 	hdr.timestamp = (unsigned int)time(0);
 
-	SocketLib::Buffer* buffer = new SocketLib::Buffer();
+	SocketLib::ScopedLock scoped_w(_writer.lock);
+	SocketLib::Buffer* buffer;
+	if (!_writer.buffer_pool2.empty()) {
+		buffer = _writer.buffer_pool2.front();
+		_writer.buffer_pool2.pop_front();
+	}
+	else
+		buffer = new SocketLib::Buffer();
+
+	buffer->Clear();
 	buffer->Write(hdr);
 	buffer->Write((void*)data, len);
-	Send(buffer);
+
+	SocketLib::ScopedLock scoped_r(_reader.lock);
+	if (_flag & E_TCPSOCKET_STATE_START) {
+		_writer.buffer_pool.push_back(buffer);
+		_TrySendData();
+	}
+	else
+		delete buffer;
 }
 
 template<typename T, typename SocketType, typename CheckerType>
@@ -253,7 +275,9 @@ bool TcpBaseSocket<T, SocketType, CheckerType>::_TrySendData() {
 		if ((!_writer.msgbuffer || _writer.msgbuffer->Length() == 0)
 			&& _writer.buffer_pool.size() > 0) {
 			SocketLib::Buffer* pbuffer = _writer.buffer_pool.front();
-			_writer.msgbuffer.reset(pbuffer);
+			if (_writer.msgbuffer)
+				_writer.buffer_pool2.push_back(_writer.msgbuffer);
+			_writer.msgbuffer = pbuffer;
 			_writer.buffer_pool.pop_front();
 		}
 		if (_writer.msgbuffer && _writer.msgbuffer->Length() != 0) {
