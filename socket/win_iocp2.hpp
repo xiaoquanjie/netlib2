@@ -169,10 +169,14 @@ struct IocpService2::Impl{
 	};
 
 	Impl(){
-		_core.reset(new core);
-		_core->_fd = M_INVALID_SOCKET;
-		_core->_iocp = 0;
-		_core->_state = 0;
+	}
+	void Init() {
+		if (!_core) {
+			_core.reset(new core);
+			_core->_fd = M_INVALID_SOCKET;
+			_core->_iocp = 0;
+			_core->_state = 0;
+		}
 	}
 
 private:

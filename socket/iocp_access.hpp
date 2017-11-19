@@ -117,6 +117,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
 M_SOCKET_DECL void IocpService2::Access::ConstructImpl(IocpService2& service, Impl& impl, s_uint16_t type){
+	impl.Init();
 	M_IMPL2_IOCP(impl) = 0;
 	M_IMPL2_FD(impl) = M_INVALID_SOCKET;
 	M_IMPL2_STATE(impl) = 0;
