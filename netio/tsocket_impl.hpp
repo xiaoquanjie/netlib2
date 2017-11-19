@@ -123,7 +123,7 @@ void TcpBaseSocket<T, SocketType, CheckerType>::Send(const SocketLib::s_byte_t* 
 }
 
 template<typename T, typename SocketType, typename CheckerType>
-void TcpBaseSocket<T, SocketType, CheckerType>::_WriteHandler(SocketLib::s_uint32_t tran_byte, const SocketLib::SocketError& error) {
+void TcpBaseSocket<T, SocketType, CheckerType>::_WriteHandler(SocketLib::s_uint32_t tran_byte, SocketLib::SocketError error) {
 	if (error) {
 		// 出错关闭连接
 		M_NETIO_LOGGER("write handler happend error:"M_ERROR_DESC_STR(error));
@@ -139,14 +139,14 @@ void TcpBaseSocket<T, SocketType, CheckerType>::_WriteHandler(SocketLib::s_uint3
 		_writer.msgbuffer->RemoveData(tran_byte);
 		if (!_TrySendData() && !(_flag & E_TCPSOCKET_STATE_START)) {
 			// 数据发送完后，如果状态不是E_TCPSOCKET_STATE_START，则需要关闭写
-			_socket->Shutdown(SocketLib::E_Shutdown_WR);
+			_socket->Shutdown(SocketLib::E_Shutdown_WR,error);
 			_Close(E_TCPSOCKET_STATE_WRITE);
 		}
 	}
 }
 
 template<typename T, typename SocketType, typename CheckerType>
-void TcpBaseSocket<T, SocketType, CheckerType>::_ReadHandler(SocketLib::s_uint32_t tran_byte, const SocketLib::SocketError& error) {
+void TcpBaseSocket<T, SocketType, CheckerType>::_ReadHandler(SocketLib::s_uint32_t tran_byte, SocketLib::SocketError error) {
 	if (error) {
 		// 出错关闭连接
 		M_NETIO_LOGGER("read handler happend error:" << M_ERROR_DESC_STR(error));
@@ -164,11 +164,11 @@ void TcpBaseSocket<T, SocketType, CheckerType>::_ReadHandler(SocketLib::s_uint32
 			if (_CutMsgPack(_reader.readbuf, tran_byte)) {
 				function_t<void(SocketLib::s_uint32_t, SocketLib::SocketError)> handler =
 					bind_t(&TcpBaseSocket::_ReadHandler, this->shared_from_this(), placeholder_1, placeholder_2);
-				_socket->AsyncRecvSome(handler, _reader.readbuf, M_READ_SIZE);
+				_socket->AsyncRecvSome(handler, _reader.readbuf, M_READ_SIZE, error);
 			}
 			else {
 				// 数据检查出错，主动断开连接
-				_socket->Shutdown(SocketLib::E_Shutdown_RD);
+				_socket->Shutdown(SocketLib::E_Shutdown_RD,error);
 				_PostClose(E_TCPSOCKET_STATE_START | E_TCPSOCKET_STATE_READ);
 			}
 		}
@@ -261,7 +261,8 @@ bool TcpBaseSocket<T, SocketType, CheckerType>::_TrySendData() {
 			_flag |= E_TCPSOCKET_STATE_WRITE;
 			function_t<void(SocketLib::s_uint32_t, SocketLib::SocketError)> handler =
 				bind_t(&TcpBaseSocket::_WriteHandler, this->shared_from_this(), placeholder_1, placeholder_2);
-			_socket->AsyncSendSome(handler, _writer.msgbuffer->Data(), _writer.msgbuffer->Length());
+			SocketLib::SocketError error;
+			_socket->AsyncSendSome(handler, _writer.msgbuffer->Data(), _writer.msgbuffer->Length(),error);
 			return true;
 		}
 		else {

@@ -151,9 +151,9 @@ public:
 	void Send(const SocketLib::s_byte_t* data, SocketLib::s_uint32_t len);
 
 protected:
-	void _WriteHandler(SocketLib::s_uint32_t tran_byte, const SocketLib::SocketError& error);
+	void _WriteHandler(SocketLib::s_uint32_t tran_byte, SocketLib::SocketError error);
 
-	void _ReadHandler(SocketLib::s_uint32_t tran_byte, const SocketLib::SocketError& error);
+	void _ReadHandler(SocketLib::s_uint32_t tran_byte, SocketLib::SocketError error);
 
 	inline void _CloseHandler();
 

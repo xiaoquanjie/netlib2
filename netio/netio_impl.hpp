@@ -46,10 +46,15 @@ bool NetIo::ListenOne(const std::string& addr, SocketLib::s_uint16_t port) {
 }
 
 void NetIo::ConnectOne(const SocketLib::Tcp::EndPoint& ep, unsigned int data) {
-	netiolib::TcpConnectorPtr connector(new netiolib::TcpConnector(*this, 0));
-	connector->SetData(data);
-	connector->AsyncConnect("127.0.0.1", 3001);
-	connector.reset();
+	try {
+		netiolib::TcpConnectorPtr connector(new netiolib::TcpConnector(*this, 0));
+		connector->SetData(data);
+		connector->AsyncConnect("127.0.0.1", 3001);
+		connector.reset();
+	}
+	catch (SocketLib::SocketError& error) {
+		lasterror = error;
+	}
 }
 void NetIo::ConnectOne(const std::string& addr, SocketLib::s_uint16_t port, unsigned int data) {
 	SocketLib::Tcp::EndPoint ep(SocketLib::AddressV4(addr), port);
@@ -95,14 +100,11 @@ void NetIo::AcceptHandler(SocketLib::SocketError error, TcpSocketPtr clisock, Ne
 	else {
 		clisock->Init();
 	}
-	if (!_ioservice.Stopped()) {
-		TcpSocketPtr clisock(new TcpSocket(*this, 0));
-		function_t<void(SocketLib::SocketError)> handler = bind_t(&NetIo::AcceptHandler, this, placeholder_1, clisock, acceptor);
-		SocketLib::SocketError error2;
-		acceptor->AsyncAccept(handler, clisock->GetSocket(),error2);
-		if (error2)
-			lasterror = error2;
-	}
+	TcpSocketPtr newclisock(new TcpSocket(*this, 0));
+	function_t<void(SocketLib::SocketError)> handler = bind_t(&NetIo::AcceptHandler, this, placeholder_1, newclisock, acceptor);
+	acceptor->AsyncAccept(handler, newclisock->GetSocket(), error);
+	if (error)
+		lasterror = error;
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
