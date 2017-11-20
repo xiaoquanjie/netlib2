@@ -152,7 +152,7 @@ void client() {
 	for (int j = 0; j < ptrlist.size(); ++j) {
 		SendData(ptrlist[j]);
 	}
-
+	ptrlist.clear();
 	cin >> i;
 }
 
