@@ -47,6 +47,7 @@ void SendData(netiolib::TcpConnectorPtr clisock) {
 	else {
 		print_clock(false);
 		cout << "send over" << endl;
+		cout << clisock.use_count() << endl;
 		clisock->Close();
 	}
 }

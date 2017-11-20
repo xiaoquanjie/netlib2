@@ -52,7 +52,7 @@ TcpBaseSocket<T, SocketType, CheckerType>::_writerinfo_::~_writerinfo_() {
 template<typename T, typename SocketType, typename CheckerType>
 TcpBaseSocket<T, SocketType, CheckerType>::TcpBaseSocket(NetIo& netio, CheckerType checker)
 	:_netio(netio) ,_msgchecker(checker){
-	_flag = E_TCPSOCKET_STATE_STOP;
+	_flag = E_STATE_STOP;
 	_socket = new SocketType(_netio.GetIoService());
 }
 
@@ -73,27 +73,25 @@ const SocketLib::Tcp::EndPoint& TcpBaseSocket<T, SocketType, CheckerType>::Remot
 
 template<typename T, typename SocketType, typename CheckerType>
 void TcpBaseSocket<T, SocketType, CheckerType>::Close() {
-	_PostClose(E_TCPSOCKET_STATE_START);
+	_PostClose(E_STATE_START);
 }
 
 template<typename T, typename SocketType, typename CheckerType>
 void TcpBaseSocket<T, SocketType, CheckerType>::_PostClose(unsigned int state) {
-	// 这里一定要写双锁，可以思考下重要性
-	SocketLib::ScopedLock scoped_r(_reader.lock);
 	SocketLib::ScopedLock scoped_w(_writer.lock);
 	_Close(state);
 }
 
 template<typename T, typename SocketType, typename CheckerType>
 void TcpBaseSocket<T, SocketType, CheckerType>::_Close(unsigned int state) {
-	if (_flag & state) {
-		unsigned int tmp_flag = _flag;
-		_flag &= ~state;
-		// if _flag is equal to stop flag or just equal to read flag ,have to close the link
-		if ((_flag == E_TCPSOCKET_STATE_STOP || _flag == E_TCPSOCKET_STATE_READ)
-			&& tmp_flag != E_TCPSOCKET_STATE_STOP) {
-			// 通知连接断开
-			_flag = E_TCPSOCKET_STATE_STOP;
+	if (_flag == E_STATE_START || _writer.writing) {
+		if (state == E_STATE_START)
+			_flag = E_STATE_STOP;
+		else if (state == E_STATE_WRITE) {
+			_writer.writing = false;
+			_flag = E_STATE_STOP;
+		}
+		if (_flag == E_STATE_STOP && !_writer.writing) {
 			SocketLib::SocketError error;
 			function_t<void()> handler = bind_t(&TcpBaseSocket::_CloseHandler, this->shared_from_this());
 			_socket->Close(handler, error);
@@ -104,8 +102,7 @@ void TcpBaseSocket<T, SocketType, CheckerType>::_Close(unsigned int state) {
 template<typename T, typename SocketType, typename CheckerType>
 void TcpBaseSocket<T, SocketType, CheckerType>::Send(SocketLib::Buffer* buffer) {
 	SocketLib::ScopedLock scoped_w(_writer.lock);
-	SocketLib::ScopedLock scoped_r(_reader.lock);
-	if (_flag & E_TCPSOCKET_STATE_START) {
+	if (_flag == E_STATE_START) {
 		_writer.buffer_pool.push_back(buffer);
 		_TrySendData();
 	}
@@ -115,33 +112,30 @@ void TcpBaseSocket<T, SocketType, CheckerType>::Send(SocketLib::Buffer* buffer) 
 
 template<typename T, typename SocketType, typename CheckerType>
 void TcpBaseSocket<T, SocketType, CheckerType>::Send(const SocketLib::s_byte_t* data, SocketLib::s_uint32_t len) {
-	if (len <= 0)
-		return;
-	MessageHeader hdr;
-	hdr.endian = _netio.LocalEndian();
-	hdr.size = len;
-	hdr.timestamp = (unsigned int)time(0);
+	if (len > 0) {
+		SocketLib::ScopedLock scoped_w(_writer.lock);
+		if (_flag != E_STATE_START)
+			return;
 
-	SocketLib::ScopedLock scoped_w(_writer.lock);
-	SocketLib::Buffer* buffer;
-	if (!_writer.buffer_pool2.empty()) {
-		buffer = _writer.buffer_pool2.front();
-		_writer.buffer_pool2.pop_front();
-	}
-	else
-		buffer = new SocketLib::Buffer();
+		MessageHeader hdr;
+		hdr.endian = _netio.LocalEndian();
+		hdr.size = len;
+		hdr.timestamp = (unsigned int)time(0);
 
-	buffer->Clear();
-	buffer->Write(hdr);
-	buffer->Write((void*)data, len);
+		SocketLib::Buffer* buffer;
+		if (!_writer.buffer_pool2.empty()) {
+			buffer = _writer.buffer_pool2.front();
+			_writer.buffer_pool2.pop_front();
+		}
+		else
+			buffer = new SocketLib::Buffer();
 
-	SocketLib::ScopedLock scoped_r(_reader.lock);
-	if (_flag & E_TCPSOCKET_STATE_START) {
+		buffer->Clear();
+		buffer->Write(hdr);
+		buffer->Write((void*)data, len);
 		_writer.buffer_pool.push_back(buffer);
 		_TrySendData();
 	}
-	else
-		delete buffer;
 }
 
 template<typename T, typename SocketType, typename CheckerType>
@@ -149,20 +143,19 @@ void TcpBaseSocket<T, SocketType, CheckerType>::_WriteHandler(SocketLib::s_uint3
 	if (error) {
 		// 出错关闭连接
 		M_NETIO_LOGGER("write handler happend error:"M_ERROR_DESC_STR(error));
-		_PostClose(E_TCPSOCKET_STATE_START | E_TCPSOCKET_STATE_WRITE);
+		_PostClose(E_STATE_WRITE);
 	}
 	else if (tran_byte <= 0) {
 		// 连接已经关闭
-		_PostClose(E_TCPSOCKET_STATE_START | E_TCPSOCKET_STATE_WRITE);
+		_PostClose(E_STATE_WRITE);
 	}
 	else {
 		SocketLib::ScopedLock scoped_w(_writer.lock);
-		_writer.writing = false;
 		_writer.msgbuffer->RemoveData(tran_byte);
-		if (!_TrySendData() && !(_flag & E_TCPSOCKET_STATE_START)) {
+		if (!_TrySendData(true) && !(_flag == E_STATE_START)) {
 			// 数据发送完后，如果状态不是E_TCPSOCKET_STATE_START，则需要关闭写
 			_socket->Shutdown(SocketLib::E_Shutdown_WR,error);
-			_Close(E_TCPSOCKET_STATE_WRITE);
+			_Close(E_STATE_WRITE);
 		}
 	}
 }
@@ -172,31 +165,25 @@ void TcpBaseSocket<T, SocketType, CheckerType>::_ReadHandler(SocketLib::s_uint32
 	if (error) {
 		// 出错关闭连接
 		M_NETIO_LOGGER("read handler happend error:" << M_ERROR_DESC_STR(error));
-		_PostClose(E_TCPSOCKET_STATE_START | E_TCPSOCKET_STATE_READ);
+		_PostClose(E_STATE_START);
 	}
 	else if (tran_byte <= 0) {
 		// 对方关闭写
-		_PostClose(E_TCPSOCKET_STATE_START | E_TCPSOCKET_STATE_READ);
+		_PostClose(E_STATE_START);
 	}
 	else {
-		// 加锁以免对_flag值产生误判
-		_reader.lock.lock();
-		if (_flag & E_TCPSOCKET_STATE_START) {
-			_reader.lock.unlock();
+		if (_flag == E_STATE_START) {
 			if (_CutMsgPack(_reader.readbuf, tran_byte)) {
-				function_t<void(SocketLib::s_uint32_t, SocketLib::SocketError)> handler =
-					bind_t(&TcpBaseSocket::_ReadHandler, this->shared_from_this(), placeholder_1, placeholder_2);
-				_socket->AsyncRecvSome(handler, _reader.readbuf, M_READ_SIZE, error);
+				_TryRecvData();
 			}
 			else {
 				// 数据检查出错，主动断开连接
 				_socket->Shutdown(SocketLib::E_Shutdown_RD,error);
-				_PostClose(E_TCPSOCKET_STATE_START | E_TCPSOCKET_STATE_READ);
+				_PostClose(E_STATE_START);
 			}
 		}
 		else {
-			_reader.lock.unlock();
-			_PostClose(E_TCPSOCKET_STATE_READ);
+			_PostClose(E_STATE_START);
 		}
 	}
 }
@@ -269,8 +256,8 @@ bool TcpBaseSocket<T, SocketType, CheckerType>::_CutMsgPack(SocketLib::s_byte_t*
 }
 
 template<typename T, typename SocketType, typename CheckerType>
-bool TcpBaseSocket<T, SocketType, CheckerType>::_TrySendData() {
-	if (!_writer.writing)
+bool TcpBaseSocket<T, SocketType, CheckerType>::_TrySendData(bool ignore) {
+	if (!_writer.writing || ignore)
 	{
 		if ((!_writer.msgbuffer || _writer.msgbuffer->Length() == 0)
 			&& _writer.buffer_pool.size() > 0) {
@@ -282,19 +269,29 @@ bool TcpBaseSocket<T, SocketType, CheckerType>::_TrySendData() {
 		}
 		if (_writer.msgbuffer && _writer.msgbuffer->Length() != 0) {
 			_writer.writing = true;
-			_flag |= E_TCPSOCKET_STATE_WRITE;
 			function_t<void(SocketLib::s_uint32_t, SocketLib::SocketError)> handler =
 				bind_t(&TcpBaseSocket::_WriteHandler, this->shared_from_this(), placeholder_1, placeholder_2);
 			SocketLib::SocketError error;
 			_socket->AsyncSendSome(handler, _writer.msgbuffer->Data(), _writer.msgbuffer->Length(),error);
-			return true;
+			if (error)
+				_Close(E_STATE_WRITE);
+			return (!error);
 		}
 		else {
-			_flag &= ~E_TCPSOCKET_STATE_WRITE;
 			_writer.writing = false;
 		}
 	}
 	return false;
+}
+
+template<typename T, typename SocketType, typename CheckerType>
+void TcpBaseSocket<T, SocketType, CheckerType>::_TryRecvData() {
+	function_t<void(SocketLib::s_uint32_t, SocketLib::SocketError)> handler =
+		bind_t(&TcpBaseSocket::_ReadHandler, this->shared_from_this(), placeholder_1, placeholder_2);
+	SocketLib::SocketError error;
+	_socket->AsyncRecvSome(handler, _reader.readbuf, M_READ_SIZE, error);
+	if (error)
+		_PostClose(E_STATE_START);
 }
 
 /////////////////////////////////////////////////////////////////////////////////
@@ -311,12 +308,9 @@ void TcpSocket::Init() {
 	try {
 		_remoteep = _socket->RemoteEndPoint();
 		_localep = _socket->LocalEndPoint();
-		_flag = E_TCPSOCKET_STATE_START;
+		_flag = E_STATE_START;
 		_netio.OnConnected(this->shared_from_this());
-		_flag |= E_TCPSOCKET_STATE_READ;
-		function_t<void(SocketLib::s_uint32_t, SocketLib::SocketError)> handler = 
-			bind_t(&TcpSocket::_ReadHandler, this->shared_from_this(), placeholder_1, placeholder_2);
-		_socket->AsyncRecvSome(handler,_reader.readbuf,M_READ_SIZE);
+		this->_TryRecvData();
 	}
 	catch (const SocketLib::SocketError& e) {
 		lasterror = e;

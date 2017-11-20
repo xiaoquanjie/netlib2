@@ -106,10 +106,9 @@ private:
 };
 
 enum {
-	E_TCPSOCKET_STATE_STOP = 0,
-	E_TCPSOCKET_STATE_START = 1 << 0,
-	E_TCPSOCKET_STATE_READ = 1 << 1,
-	E_TCPSOCKET_STATE_WRITE = 1 << 2,
+	E_STATE_STOP =  0,
+	E_STATE_START = 1,
+	E_STATE_WRITE = 3,
 };
 
 template<typename T, typename SocketType,typename CheckerType>
@@ -121,7 +120,7 @@ protected:
 		SocketLib::Buffer	  msgbuffer;
 		SocketLib::Buffer	  msgbuffer2;
 		MessageHeader		  curheader;
-		SocketLib::MutexLock  lock;
+		//SocketLib::MutexLock  lock;
 
 		_readerinfo_();
 		~_readerinfo_();
@@ -167,7 +166,9 @@ protected:
 	// 裁减出数据包，返回false意味着数据包有错
 	bool _CutMsgPack(SocketLib::s_byte_t* buf, SocketLib::s_uint32_t tran_byte);
 
-	bool _TrySendData();
+	bool _TrySendData(bool ignore = false);
+
+	void _TryRecvData();
 
 protected:
 	NetIo& _netio;
