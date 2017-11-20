@@ -829,7 +829,9 @@ M_SOCKET_DECL void IocpService2::Access::_DoClose(IocpService2::IoServiceImpl* s
 	}
 
 	simpl->_mutex.lock();
-	simpl->_closereqs2.merge(closereqs2);
+	for (std::list<ImplCloseReq*>::iterator iter = closereqs2.begin();
+		iter != closereqs2.end(); ++iter)
+		simpl->_closereqs2.push_back(*iter);
 	simpl->_mutex.unlock();
 }
 
