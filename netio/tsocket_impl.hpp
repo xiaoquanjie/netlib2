@@ -44,10 +44,11 @@ TcpBaseSocket<T, SocketType, CheckerType>::_writerinfo_::~_writerinfo_() {
 		buffer_pool.pop_front();
 		delete pbuffer;
 	}
-	for (std::vector<SocketLib::Buffer*>::iterator iter = buffer_pool2.begin();
-		iter != buffer_pool2.end(); ++iter)
-		delete (*iter);
-	buffer_pool2.clear();
+	while (buffer_pool2.size()){
+		pbuffer = buffer_pool2.front();
+		buffer_pool2.pop_front();
+		delete pbuffer;
+	}
 	delete msgbuffer;
 }
 
@@ -125,9 +126,9 @@ void TcpBaseSocket<T, SocketType, CheckerType>::Send(const SocketLib::s_byte_t* 
 		hdr.timestamp = (unsigned int)time(0);
 
 		SocketLib::Buffer* buffer;
-		if (!_writer.buffer_pool2.empty()) {
-			buffer = _writer.buffer_pool2.back();
-			_writer.buffer_pool2.pop_back();
+		if (_writer.buffer_pool2.size()) {
+			buffer = _writer.buffer_pool2.front();
+			_writer.buffer_pool2.pop_front();
 		}
 		else
 			buffer = new SocketLib::Buffer();

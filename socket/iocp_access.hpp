@@ -242,8 +242,7 @@ M_SOCKET_DECL void IocpService2::Access::Run(IocpService2& service, SocketError&
 	overlapped_t* overlapped = 0;
 
 	//std::list<ImplCloseReq*> closereqs;
-	slist<ImplCloseReq*> closereqs;
-	std::vector<ImplCloseReq*> closereqs2;
+	slist<ImplCloseReq*> closereqs,closereqs2;
 	for (;;){
 		_DoClose(simpl,closereqs,closereqs2);
 		trans_bytes = 0;
@@ -270,20 +269,17 @@ M_SOCKET_DECL void IocpService2::Access::Run(IocpService2& service, SocketError&
 		}
 	}
 
-	/*M_FOREACH_CLOSEREQ(iter, simpl->_closereqs) {
-		(*iter)->Clear();
-		delete (*iter);
-	}*/
 	while (simpl->_closereqs.size()){
 		ImplCloseReq* req = simpl->_closereqs.front();
 		simpl->_closereqs.pop_front();
 		delete req;
 	}
-	M_FOREACH_CLOSEREQ2(iter, simpl->_closereqs2) {
-		(*iter)->Clear();
-		delete (*iter);
+	while (simpl->_closereqs2.size()) {
+		ImplCloseReq* req = simpl->_closereqs2.front();
+		simpl->_closereqs2.pop_front();
+		delete req;
 	}
-
+	
 	service._mutex.lock();
 	service._implvector.erase(std::find(service._implvector.begin(), service._implvector.end(), simpl));
 	service._implcnt--;
@@ -342,9 +338,9 @@ M_SOCKET_DECL void IocpService2::Access::Close(IocpService2& service, Impl& impl
 		if (simpl) {
 			ScopedLock scoped_l(simpl->_mutex);
 			ImplCloseReq* req = 0;
-			if (!simpl->_closereqs2.empty()) {
-				req = simpl->_closereqs2.back();
-				simpl->_closereqs2.pop_back();
+			if (simpl->_closereqs2.size()) {
+				req = simpl->_closereqs2.front();
+				simpl->_closereqs2.pop_front();
 			}
 			else
 				req = new ImplCloseReq;
@@ -818,7 +814,7 @@ M_SOCKET_DECL void IocpService2::Access::AsyncSendSome(IocpService2& service, Im
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 M_SOCKET_DECL void IocpService2::Access::_DoClose(IocpService2::IoServiceImpl* simpl, 
-	slist<ImplCloseReq*>&closereqs, std::vector<ImplCloseReq*>&closereqs2) {
+	slist<ImplCloseReq*>&closereqs, slist<ImplCloseReq*>&closereqs2) {
 	simpl->_mutex.lock();
 	closereqs.swap(simpl->_closereqs);
 	simpl->_mutex.unlock();
@@ -840,12 +836,11 @@ M_SOCKET_DECL void IocpService2::Access::_DoClose(IocpService2::IoServiceImpl* s
 	}
 
 	simpl->_mutex.lock();
-	for (std::vector<ImplCloseReq*>::iterator iter = closereqs2.begin();
-		iter != closereqs2.end(); ++iter)
-		simpl->_closereqs2.push_back(*iter);
+	while (closereqs2.size()){
+		simpl->_closereqs2.push_back(closereqs2.front());
+		closereqs2.pop_front();
+	}
 	simpl->_mutex.unlock();
-
-	closereqs2.clear();
 }
 
 M_SOCKET_DECL IocpService2::IoServiceImpl* IocpService2::Access::_GetIoServiceImpl(IocpService2& service, Impl& impl) {

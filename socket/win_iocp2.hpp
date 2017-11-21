@@ -41,9 +41,8 @@ public:
 		HANDLE			_handler;
 		s_uint32_t		_fdcnt;
 		MutexLock		_mutex;
-		//std::list<ImplCloseReq*> _closereqs;
 		slist<ImplCloseReq*> _closereqs;
-		std::vector<ImplCloseReq*> _closereqs2;
+		slist<ImplCloseReq*> _closereqs2;
 	};
 	typedef std::vector<IoServiceImpl*> IoServiceImplVector;
 	typedef std::map<HANDLE, IoServiceImpl*> IoServiceImplMap;
@@ -270,7 +269,7 @@ public:
 
 protected:
 	M_SOCKET_DECL static void _DoClose(IocpService2::IoServiceImpl* simpl
-		, slist<ImplCloseReq*>&closereqs, std::vector<ImplCloseReq*>&closereqs2);
+		, slist<ImplCloseReq*>&closereqs, slist<ImplCloseReq*>&closereqs2);
 
 	M_SOCKET_DECL static IocpService2::IoServiceImpl* _GetIoServiceImpl(IocpService2& service, Impl& impl);
 };
