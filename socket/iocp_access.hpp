@@ -241,7 +241,8 @@ M_SOCKET_DECL void IocpService2::Access::Run(IocpService2& service, SocketError&
 	ULONG_PTR comple_key = 0;
 	overlapped_t* overlapped = 0;
 
-	std::list<ImplCloseReq*> closereqs;
+	//std::list<ImplCloseReq*> closereqs;
+	slist<ImplCloseReq*> closereqs;
 	std::vector<ImplCloseReq*> closereqs2;
 	for (;;){
 		_DoClose(simpl,closereqs,closereqs2);
@@ -269,9 +270,14 @@ M_SOCKET_DECL void IocpService2::Access::Run(IocpService2& service, SocketError&
 		}
 	}
 
-	M_FOREACH_CLOSEREQ(iter, simpl->_closereqs) {
+	/*M_FOREACH_CLOSEREQ(iter, simpl->_closereqs) {
 		(*iter)->Clear();
 		delete (*iter);
+	}*/
+	while (simpl->_closereqs.size()){
+		ImplCloseReq* req = simpl->_closereqs.front();
+		simpl->_closereqs.pop_front();
+		delete req;
 	}
 	M_FOREACH_CLOSEREQ2(iter, simpl->_closereqs2) {
 		(*iter)->Clear();
@@ -812,14 +818,13 @@ M_SOCKET_DECL void IocpService2::Access::AsyncSendSome(IocpService2& service, Im
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 M_SOCKET_DECL void IocpService2::Access::_DoClose(IocpService2::IoServiceImpl* simpl, 
-	std::list<ImplCloseReq*>&closereqs, std::vector<ImplCloseReq*>&closereqs2) {
+	slist<ImplCloseReq*>&closereqs, std::vector<ImplCloseReq*>&closereqs2) {
 	simpl->_mutex.lock();
 	closereqs.swap(simpl->_closereqs);
 	simpl->_mutex.unlock();
 
-	ImplCloseReq* req = 0;
-	M_FOREACH_CLOSEREQ(iter, closereqs) {
-		req = (*iter);
+	while (closereqs.size()){
+		ImplCloseReq* req = closereqs.front();
 		MutexLock& mlock = M_IMPL2_MUTEX(req->_impl);
 		mlock.lock();
 		g_closesocket(M_IMPL2_FD(req->_impl));
@@ -831,6 +836,7 @@ M_SOCKET_DECL void IocpService2::Access::_DoClose(IocpService2::IoServiceImpl* s
 		req->Clear();
 
 		closereqs2.push_back(req);
+		closereqs.pop_front();
 	}
 
 	simpl->_mutex.lock();
@@ -839,7 +845,6 @@ M_SOCKET_DECL void IocpService2::Access::_DoClose(IocpService2::IoServiceImpl* s
 		simpl->_closereqs2.push_back(*iter);
 	simpl->_mutex.unlock();
 
-	closereqs.clear();
 	closereqs2.clear();
 }
 

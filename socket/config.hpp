@@ -247,3 +247,4 @@
 #include "error.hpp"
 #include "mutexlock.hpp"
 #include "lock_dispatcher.hpp"
+#include "slist.hpp"

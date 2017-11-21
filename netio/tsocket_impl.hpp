@@ -38,13 +38,15 @@ TcpBaseSocket<T, SocketType, CheckerType>::_writerinfo_::_writerinfo_() {
 
 template<typename T, typename SocketType, typename CheckerType>
 TcpBaseSocket<T, SocketType, CheckerType>::_writerinfo_::~_writerinfo_() {
-	for (std::list<SocketLib::Buffer*>::iterator iter = buffer_pool.begin();
-		iter != buffer_pool.end(); ++iter)
-		delete (*iter);
+	SocketLib::Buffer* pbuffer;
+	while (buffer_pool.size()){
+		pbuffer = buffer_pool.front();
+		buffer_pool.pop_front();
+		delete pbuffer;
+	}
 	for (std::vector<SocketLib::Buffer*>::iterator iter = buffer_pool2.begin();
 		iter != buffer_pool2.end(); ++iter)
 		delete (*iter);
-	buffer_pool.clear();
 	buffer_pool2.clear();
 	delete msgbuffer;
 }

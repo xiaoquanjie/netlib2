@@ -127,11 +127,10 @@ void server() {
 
 void client() {
 	TestNetIo test_io;
-	std::list<thread*> pthreads;
-	pthreads.push_back(new thread(&TestNetIo::Start, &test_io, 0));
-	pthreads.push_back(new thread(&TestNetIo::Start, &test_io, 0));
-	pthreads.push_back(new thread(&TestNetIo::Start, &test_io, 0));
-
+	for (int i = 0; i < 3; ++i) {
+		new thread(&TestNetIo::Start, &test_io, 0);
+	}
+	
 	std::vector<netiolib::TcpConnectorPtr> ptrlist;
 	cout << "select socket count:";
 	int i;
@@ -190,8 +189,25 @@ void other_test() {
 	th2.join();
 }
 
+struct TO {
+public:
+	~TO() {
+		cout << this << " ~con" << endl;
+	}
+};
+
+void slist_test() {
+	TO* p = new TO;
+	SocketLib::slist<TO> sli, sli2;
+	sli.push_back(*p);
+	sli.push_back(*p);
+	sli2.swap(sli);
+	sli.push_back(*p);
+}
+
 int main() {
 
+	//slist_test();
 	netlib_test();
 	//other_test();
 	return 0;
