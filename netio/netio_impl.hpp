@@ -93,7 +93,7 @@ inline SocketLib::s_uint32_t NetIo::LocalEndian()const {
 	return _endian;
 }
 
-void NetIo::AcceptHandler(SocketLib::SocketError error, TcpSocketPtr clisock, NetIoTcpAcceptorPtr acceptor) {
+void NetIo::AcceptHandler(SocketLib::SocketError error, TcpSocketPtr& clisock, NetIoTcpAcceptorPtr& acceptor) {
 	if (error) {
 		M_NETIO_LOGGER("accept handler happend error:" << M_NETIO_LOGGER(error));
 	}
@@ -116,26 +116,26 @@ void NetIo::AcceptHandler(SocketLib::SocketError error, TcpSocketPtr clisock, Ne
 */
 
 // 连线通知,这个函数里不要处理业务，防止堵塞
-void NetIo::OnConnected(TcpSocketPtr clisock) {
+void NetIo::OnConnected(TcpSocketPtr& clisock) {
 
 }
-void NetIo::OnConnected(TcpConnectorPtr clisock, SocketLib::SocketError error) {
+void NetIo::OnConnected(TcpConnectorPtr& clisock, SocketLib::SocketError error) {
 
 }
 
 // 掉线通知,这个函数里不要处理业务，防止堵塞
-void NetIo::OnDisconnected(TcpSocketPtr clisock) {
+void NetIo::OnDisconnected(TcpSocketPtr& clisock) {
 
 }
-void NetIo::OnDisconnected(TcpConnectorPtr clisock) {
+void NetIo::OnDisconnected(TcpConnectorPtr& clisock) {
 
 }
 
 // 数据包通知,这个函数里不要处理业务，防止堵塞
-void NetIo::OnReceiveData(TcpSocketPtr clisock, SocketLib::Buffer& buffer) {
+void NetIo::OnReceiveData(TcpSocketPtr& clisock, SocketLib::Buffer& buffer) {
 
 }
-void NetIo::OnReceiveData(TcpConnectorPtr clisock, SocketLib::Buffer& buffer) {
+void NetIo::OnReceiveData(TcpConnectorPtr& clisock, SocketLib::Buffer& buffer) {
 
 }
 

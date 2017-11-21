@@ -61,10 +61,10 @@ void ReplyData(netiolib::TcpSocketPtr clisock, netiolib::Buffer& buffer) {
 class TestNetIo : public netiolib::NetIo {
 public:
 	// 连线通知,这个函数里不要处理业务，防止堵塞
-	virtual void OnConnected(netiolib::TcpSocketPtr clisock) {
+	virtual void OnConnected(netiolib::TcpSocketPtr& clisock) {
 		cout << "OnConnected one : " << clisock->RemoteEndpoint().Address() << " " << clisock->RemoteEndpoint().Port() << endl;
 	}
-	virtual void OnConnected(netiolib::TcpConnectorPtr clisock, SocketLib::SocketError error) {
+	virtual void OnConnected(netiolib::TcpConnectorPtr& clisock, SocketLib::SocketError error) {
 		if (error) {
 			cout << "connect fail :" << error.What() << endl;
 		}
@@ -75,15 +75,15 @@ public:
 	}
 
 	// 掉线通知,这个函数里不要处理业务，防止堵塞
-	virtual void OnDisconnected(netiolib::TcpSocketPtr clisock) {
+	virtual void OnDisconnected(netiolib::TcpSocketPtr& clisock) {
 		cout << "OnDisconnected one : " << clisock->RemoteEndpoint().Address() << " " << clisock->RemoteEndpoint().Port() << endl;
 	}
-	virtual void OnDisconnected(netiolib::TcpConnectorPtr clisock) {
+	virtual void OnDisconnected(netiolib::TcpConnectorPtr& clisock) {
 		cout << "OnDisconnected one : " << clisock->LocalEndpoint().Address() << " " << clisock->LocalEndpoint().Port() << endl;
 	}
 
 	// 数据包通知,这个函数里不要处理业务，防止堵塞
-	virtual void OnReceiveData(netiolib::TcpSocketPtr clisock, netiolib::Buffer& buffer) {
+	virtual void OnReceiveData(netiolib::TcpSocketPtr& clisock, netiolib::Buffer& buffer) {
 		print_log("receive data from :" << clisock->RemoteEndpoint().Address() << " " << clisock->RemoteEndpoint().Port()<<endl);
 		buffer.Write('\0');
 		print_log(" : " << buffer.Data() << endl);
@@ -91,7 +91,7 @@ public:
 		// 回复
 		ReplyData(clisock, buffer);
 	}
-	virtual void OnReceiveData(netiolib::TcpConnectorPtr clisock, netiolib::Buffer& buffer) {
+	virtual void OnReceiveData(netiolib::TcpConnectorPtr& clisock, netiolib::Buffer& buffer) {
 		print_log("receive data from :" << clisock->LocalEndpoint().Address() << " " << clisock->LocalEndpoint().Port() << endl);
 		buffer.Write('\0');
 		print_log(" : " << buffer.Data() << endl);
@@ -106,10 +106,11 @@ public:
 
 void server() {
 	TestNetIo test_io;
-	thread thr(&TestNetIo::Start, &test_io, 0);
-	thread thr2(&TestNetIo::Start, &test_io, 0);
-	thread thr3(&TestNetIo::Start, &test_io, 0);
-	thr.sleep(200);
+	for (int i = 0; i < 32; ++i) {
+		new thread(&TestNetIo::Start, &test_io, 0);
+	}
+	
+	thread::sleep(200);
 	if (!test_io.ListenOne("0.0.0.0", 3001)) {
 		cout << test_io.GetLastError().What() << endl;
 	}
@@ -121,7 +122,7 @@ void server() {
 	test_io.Stop();
 	//thr.join();
 	//thr2.join();
-//hr3.join();
+	//hr3.join();
 }
 
 void client() {
