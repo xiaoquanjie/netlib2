@@ -127,7 +127,7 @@ protected:
 	};
 	struct _writerinfo_ {
 		std::list<SocketLib::Buffer*> buffer_pool;
-		std::list<SocketLib::Buffer*> buffer_pool2;
+		std::vector<SocketLib::Buffer*> buffer_pool2;
 		SocketLib::Buffer*   msgbuffer;
 		SocketLib::MutexLock lock;
 		bool writing;

@@ -41,7 +41,7 @@ TcpBaseSocket<T, SocketType, CheckerType>::_writerinfo_::~_writerinfo_() {
 	for (std::list<SocketLib::Buffer*>::iterator iter = buffer_pool.begin();
 		iter != buffer_pool.end(); ++iter)
 		delete (*iter);
-	for (std::list<SocketLib::Buffer*>::iterator iter = buffer_pool2.begin();
+	for (std::vector<SocketLib::Buffer*>::iterator iter = buffer_pool2.begin();
 		iter != buffer_pool2.end(); ++iter)
 		delete (*iter);
 	buffer_pool.clear();
@@ -124,8 +124,8 @@ void TcpBaseSocket<T, SocketType, CheckerType>::Send(const SocketLib::s_byte_t* 
 
 		SocketLib::Buffer* buffer;
 		if (!_writer.buffer_pool2.empty()) {
-			buffer = _writer.buffer_pool2.front();
-			_writer.buffer_pool2.pop_front();
+			buffer = _writer.buffer_pool2.back();
+			_writer.buffer_pool2.pop_back();
 		}
 		else
 			buffer = new SocketLib::Buffer();

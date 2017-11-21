@@ -42,7 +42,7 @@ public:
 		s_uint32_t		_fdcnt;
 		MutexLock		_mutex;
 		std::list<ImplCloseReq*> _closereqs;
-		std::list<ImplCloseReq*> _closereqs2;
+		std::vector<ImplCloseReq*> _closereqs2;
 	};
 	typedef std::vector<IoServiceImpl*> IoServiceImplVector;
 	typedef std::map<HANDLE, IoServiceImpl*> IoServiceImplMap;
@@ -268,7 +268,8 @@ public:
 		, const M_RW_HANDLER_TYPE(IocpService2)& hander, SocketError& error);
 
 protected:
-	M_SOCKET_DECL static void _DoClose(IocpService2::IoServiceImpl* simpl);
+	M_SOCKET_DECL static void _DoClose(IocpService2::IoServiceImpl* simpl
+		, std::list<ImplCloseReq*>&closereqs, std::vector<ImplCloseReq*>&closereqs2);
 
 	M_SOCKET_DECL static IocpService2::IoServiceImpl* _GetIoServiceImpl(IocpService2& service, Impl& impl);
 };
