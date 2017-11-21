@@ -198,11 +198,15 @@ public:
 
 void slist_test() {
 	TO* p = new TO;
-	SocketLib::slist<TO> sli, sli2;
-	sli.push_back(*p);
-	sli.push_back(*p);
-	sli2.swap(sli);
-	sli.push_back(*p);
+	SocketLib::slist<int> sli, sli2;
+	sli.push_back(1);
+	sli.push_back(2);
+	sli2.join(sli);
+	cout << sli2.size() << endl;
+	sli.push_back(3);
+	sli2.join(sli);
+	cout << sli2.size() << endl;
+	cout << sli.size() << endl;
 }
 
 int main() {

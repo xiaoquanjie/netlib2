@@ -287,6 +287,7 @@ M_SOCKET_DECL void IocpService2::Access::Run(IocpService2& service, SocketError&
 }
 
 M_SOCKET_DECL void IocpService2::Access::Stop(IocpService2& service, SocketError& error){
+	service._mutex.lock();
 	for (IocpService2::IoServiceImplVector::iterator iter = service._implvector.begin();
 		iter != service._implvector.end(); ++iter){
 		Operation* op = new Operation;
@@ -296,6 +297,7 @@ M_SOCKET_DECL void IocpService2::Access::Stop(IocpService2& service, SocketError
 			M_DEFAULT_SOCKET_ERROR2(error);
 		}
 	}
+	service._mutex.unlock();
 }
 
 M_SOCKET_DECL bool IocpService2::Access::Stopped(const IocpService2& service){
@@ -835,12 +837,11 @@ M_SOCKET_DECL void IocpService2::Access::_DoClose(IocpService2::IoServiceImpl* s
 		closereqs.pop_front();
 	}
 
-	simpl->_mutex.lock();
-	while (closereqs2.size()){
-		simpl->_closereqs2.push_back(closereqs2.front());
-		closereqs2.pop_front();
+	if (closereqs2.size()) {
+		simpl->_mutex.lock();
+		simpl->_closereqs2.join(closereqs2);
+		simpl->_mutex.unlock();
 	}
-	simpl->_mutex.unlock();
 }
 
 M_SOCKET_DECL IocpService2::IoServiceImpl* IocpService2::Access::_GetIoServiceImpl(IocpService2& service, Impl& impl) {

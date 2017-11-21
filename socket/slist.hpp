@@ -43,6 +43,8 @@ public:
 		this->_tail = h;
 	}
 
+	inline void join(slist<T>& other);
+
 private:
 	int   _count;
 	Node* _head;
@@ -121,6 +123,23 @@ inline void slist<T>::clear()
 	}
 	_head = NULL;
 	_count = 0;
+}
+
+template<class T>
+inline void slist<T>::join(slist<T>& other) {
+	if (this == &other)
+		return;
+	if (_tail) {
+		_tail->next = other._head;
+		_tail = other._head;
+	}
+	else {
+		_head = other._head;
+		_tail = other._tail;
+	}
+	other._head = other._tail = 0;
+	this->_count += other._count;
+	other._count = 0;
 }
 
 M_SOCKET_NAMESPACE_END
