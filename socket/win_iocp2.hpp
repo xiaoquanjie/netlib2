@@ -247,21 +247,25 @@ public:
 	
 	M_SOCKET_DECL static void Accept(IocpService2& service, Impl& impl, Impl& peer, SocketError& error);
 	
-	M_SOCKET_DECL static void AsyncAccept(IocpService2& service, Impl& accept_impl, Impl& client_impl, M_COMMON_HANDLER_TYPE(IocpService2) handler, SocketError& error);
+	M_SOCKET_DECL static void AsyncAccept(IocpService2& service, Impl& accept_impl, Impl& client_impl
+		, const M_COMMON_HANDLER_TYPE(IocpService2)& handler, SocketError& error);
 	
 	template<typename EndPoint>
 	M_SOCKET_DECL static void Connect(IocpService2& service, Impl& impl, const EndPoint& ep, SocketError& error);
 	
 	template<typename EndPoint>
-	M_SOCKET_DECL static void AsyncConnect(IocpService2& service, Impl& impl, const EndPoint& ep, M_COMMON_HANDLER_TYPE(IocpService2) handler, SocketError& error);
+	M_SOCKET_DECL static void AsyncConnect(IocpService2& service, Impl& impl, const EndPoint& ep
+		, const M_COMMON_HANDLER_TYPE(IocpService2)& handler, SocketError& error);
 	
 	M_SOCKET_DECL static s_int32_t RecvSome(IocpService2& service, Impl& impl, s_byte_t* data, s_uint32_t size, SocketError& error);
 	
-	M_SOCKET_DECL static void AsyncRecvSome(IocpService2& service, Impl& impl, s_byte_t* data, s_uint32_t size, M_RW_HANDLER_TYPE(IocpService2) hander, SocketError& error);
+	M_SOCKET_DECL static void AsyncRecvSome(IocpService2& service, Impl& impl, s_byte_t* data, s_uint32_t size
+		, const M_RW_HANDLER_TYPE(IocpService2)& hander, SocketError& error);
 	
 	M_SOCKET_DECL static s_int32_t SendSome(IocpService2& service, Impl& impl, const s_byte_t* data, s_uint32_t size, SocketError& error);
 	
-	M_SOCKET_DECL static void AsyncSendSome(IocpService2& service, Impl& impl, const s_byte_t* data, s_uint32_t size, M_RW_HANDLER_TYPE(IocpService2) hander, SocketError& error);
+	M_SOCKET_DECL static void AsyncSendSome(IocpService2& service, Impl& impl, const s_byte_t* data, s_uint32_t size
+		, const M_RW_HANDLER_TYPE(IocpService2)& hander, SocketError& error);
 
 protected:
 	M_SOCKET_DECL static void _DoClose(IocpService2::IoServiceImpl* simpl);

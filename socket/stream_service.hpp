@@ -31,15 +31,9 @@ public:
 
 	M_SOCKET_DECL s_int32_t SendSome(Impl& impl, const s_byte_t* data, s_uint32_t size, SocketError& error);
 
-	template<typename ReadHandler>
-	M_SOCKET_DECL void AsyncRecvSome(M_HANDLER_SOCKET_PTR(ReadHandler) impl, s_byte_t* data, s_uint32_t size, ReadHandler handler, SocketError& error);
+	M_SOCKET_DECL void AsyncRecvSome(Impl& impl, s_byte_t* data, s_uint32_t size, const M_RW_HANDLER_TYPE(IoServiceType)& handler, SocketError& error);
 
-	M_SOCKET_DECL void AsyncRecvSome(Impl& impl, s_byte_t* data, s_uint32_t size, M_RW_HANDLER_TYPE(IoServiceType) handler, SocketError& error);
-
-	template<typename WriteHandler>
-	M_SOCKET_DECL void AsyncSendSome(M_HANDLER_SOCKET_PTR(WriteHandler) impl, const s_byte_t* data, s_uint32_t size, WriteHandler handler, SocketError& error);
-
-	M_SOCKET_DECL void AsyncSendSome(Impl& impl, const s_byte_t* data, s_uint32_t size, M_RW_HANDLER_TYPE(IoServiceType) handler, SocketError& error);
+	M_SOCKET_DECL void AsyncSendSome(Impl& impl, const s_byte_t* data, s_uint32_t size, const M_RW_HANDLER_TYPE(IoServiceType)& handler, SocketError& error);
 
 };
 
@@ -73,27 +67,15 @@ M_SOCKET_DECL s_int32_t StreamSocketService<Protocol, IoServiceType>::SendSome(I
 }
 
 template<typename Protocol, typename IoServiceType>
-template<typename ReadHandler>
-M_SOCKET_DECL void StreamSocketService<Protocol, IoServiceType>::AsyncRecvSome(M_HANDLER_SOCKET_PTR(ReadHandler) impl, s_byte_t* data, s_uint32_t size, ReadHandler handler, SocketError& error)
+M_SOCKET_DECL void StreamSocketService<Protocol, IoServiceType>::AsyncRecvSome(Impl& impl, s_byte_t* data, s_uint32_t size
+	, const M_RW_HANDLER_TYPE(IoServiceType)& handler, SocketError& error)
 {
 	Access::AsyncRecvSome(this->_ioservice, impl, data, size, handler, error);
 }
 
 template<typename Protocol, typename IoServiceType>
-M_SOCKET_DECL void StreamSocketService<Protocol, IoServiceType>::AsyncRecvSome(Impl& impl, s_byte_t* data, s_uint32_t size, M_RW_HANDLER_TYPE(IoServiceType) handler, SocketError& error)
-{
-	Access::AsyncRecvSome(this->_ioservice, impl, data, size, handler, error);
-}
-
-template<typename Protocol, typename IoServiceType>
-template<typename WriteHandler>
-M_SOCKET_DECL void StreamSocketService<Protocol, IoServiceType>::AsyncSendSome(M_HANDLER_SOCKET_PTR(WriteHandler) impl, const s_byte_t* data, s_uint32_t size, WriteHandler handler, SocketError& error)
-{
-	Access::AsyncSendSome(this->_ioservice, impl, data, size, handler, error);
-}
-
-template<typename Protocol, typename IoServiceType>
-M_SOCKET_DECL void StreamSocketService<Protocol, IoServiceType>::AsyncSendSome(Impl& impl, const s_byte_t* data, s_uint32_t size, M_RW_HANDLER_TYPE(IoServiceType) handler, SocketError& error)
+M_SOCKET_DECL void StreamSocketService<Protocol, IoServiceType>::AsyncSendSome(Impl& impl, const s_byte_t* data, s_uint32_t size
+	, const M_RW_HANDLER_TYPE(IoServiceType)& handler, SocketError& error)
 {
 	Access::AsyncSendSome(this->_ioservice, impl, data, size, handler, error);
 }

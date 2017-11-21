@@ -30,16 +30,16 @@ public:
 	M_SOCKET_DECL TcpSocket(IoServiceType& ioservice);
 
 	/*ReadHandler: void(s_uint32 trans,SocketError error)*/
-	M_SOCKET_DECL void AsyncRecvSome(M_RW_HANDLER_TYPE(IoServiceType) handler, s_byte_t* data, s_uint32_t size);
+	M_SOCKET_DECL void AsyncRecvSome(const M_RW_HANDLER_TYPE(IoServiceType)& handler, s_byte_t* data, s_uint32_t size);
 
 	/*ReadHandler: void(s_uint32 trans,SocketError error)*/
-	M_SOCKET_DECL void AsyncRecvSome(M_RW_HANDLER_TYPE(IoServiceType) handler, s_byte_t* data, s_uint32_t size, SocketError& error);
+	M_SOCKET_DECL void AsyncRecvSome(const M_RW_HANDLER_TYPE(IoServiceType)& handler, s_byte_t* data, s_uint32_t size, SocketError& error);
 
 	/*WriteHandler: void(s_uint32 trans,SocketError error)*/
-	M_SOCKET_DECL void AsyncSendSome(M_RW_HANDLER_TYPE(IoServiceType) handler, s_byte_t* data, s_uint32_t size);
+	M_SOCKET_DECL void AsyncSendSome(const M_RW_HANDLER_TYPE(IoServiceType)& handler, s_byte_t* data, s_uint32_t size);
 
 	/*WriteHandler: void(s_uint32 trans,SocketError error)*/
-	M_SOCKET_DECL void AsyncSendSome(M_RW_HANDLER_TYPE(IoServiceType) handler, const s_byte_t* data, s_uint32_t size, SocketError& error);
+	M_SOCKET_DECL void AsyncSendSome(const M_RW_HANDLER_TYPE(IoServiceType)& handler, const s_byte_t* data, s_uint32_t size, SocketError& error);
 };
 
 template<typename IoServiceType>
@@ -50,7 +50,7 @@ M_SOCKET_DECL TcpSocket<IoServiceType>::TcpSocket(IoServiceType& ioservice)
 }
 
 template<typename IoServiceType>
-M_SOCKET_DECL void TcpSocket<IoServiceType>::AsyncRecvSome(M_RW_HANDLER_TYPE(IoServiceType) handler, s_byte_t* data, s_uint32_t size)
+M_SOCKET_DECL void TcpSocket<IoServiceType>::AsyncRecvSome(const M_RW_HANDLER_TYPE(IoServiceType)& handler, s_byte_t* data, s_uint32_t size)
 {
 	SocketError error;
 	this->AsyncRecvSome(handler, data, size, error);
@@ -58,13 +58,13 @@ M_SOCKET_DECL void TcpSocket<IoServiceType>::AsyncRecvSome(M_RW_HANDLER_TYPE(IoS
 }
 
 template<typename IoServiceType>
-M_SOCKET_DECL void TcpSocket<IoServiceType>::AsyncRecvSome(M_RW_HANDLER_TYPE(IoServiceType) handler, s_byte_t* data, s_uint32_t size, SocketError& error)
+M_SOCKET_DECL void TcpSocket<IoServiceType>::AsyncRecvSome(const M_RW_HANDLER_TYPE(IoServiceType)& handler, s_byte_t* data, s_uint32_t size, SocketError& error)
 {
 	this->GetObjectService().AsyncRecvSome(this->GetImpl(), data, size, handler, error);
 }
 
 template<typename IoServiceType>
-M_SOCKET_DECL void TcpSocket<IoServiceType>::AsyncSendSome(M_RW_HANDLER_TYPE(IoServiceType) handler, s_byte_t* data, s_uint32_t size)
+M_SOCKET_DECL void TcpSocket<IoServiceType>::AsyncSendSome(const M_RW_HANDLER_TYPE(IoServiceType)& handler, s_byte_t* data, s_uint32_t size)
 {
 	SocketError error;
 	this->AsyncSendSome(handler, data, size, error);
@@ -72,7 +72,7 @@ M_SOCKET_DECL void TcpSocket<IoServiceType>::AsyncSendSome(M_RW_HANDLER_TYPE(IoS
 }
 
 template<typename IoServiceType>
-M_SOCKET_DECL void TcpSocket<IoServiceType>::AsyncSendSome(M_RW_HANDLER_TYPE(IoServiceType) handler, const s_byte_t* data, s_uint32_t size, SocketError& error)
+M_SOCKET_DECL void TcpSocket<IoServiceType>::AsyncSendSome(const M_RW_HANDLER_TYPE(IoServiceType)& handler, const s_byte_t* data, s_uint32_t size, SocketError& error)
 {
 	this->GetObjectService().AsyncSendSome(this->GetImpl(), data, size, handler, error);
 }

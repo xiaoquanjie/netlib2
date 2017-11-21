@@ -42,11 +42,11 @@ public:
 
 	/*AcceptHandler: void(SocketError&)*/
 	template<typename AcceptHandler>
-	M_SOCKET_DECL void AsyncAccept(AcceptHandler handler, StreamSocketType& sock);
+	M_SOCKET_DECL void AsyncAccept(const AcceptHandler& handler, StreamSocketType& sock);
 
 	/*AcceptHandler: void(SocketError&)*/
 	template<typename AcceptHandler>
-	M_SOCKET_DECL void AsyncAccept(AcceptHandler handler, StreamSocketType& sock, SocketError& error);
+	M_SOCKET_DECL void AsyncAccept(const AcceptHandler& handler, StreamSocketType& sock, SocketError& error);
 };
 
 template<typename IoServiceType>
@@ -109,7 +109,7 @@ M_SOCKET_DECL void TcpAcceptor<IoServiceType>::Accept(Socket_Type& peer, SocketE
 
 template<typename IoServiceType>
 template<typename AcceptHandler>
-M_SOCKET_DECL void TcpAcceptor<IoServiceType>::AsyncAccept(AcceptHandler handler,StreamSocketType& sock)
+M_SOCKET_DECL void TcpAcceptor<IoServiceType>::AsyncAccept(const AcceptHandler& handler,StreamSocketType& sock)
 {
 	M_CHECK_COMMON_HANDLER(handler, IoServiceType);
 	SocketError error;
@@ -119,7 +119,7 @@ M_SOCKET_DECL void TcpAcceptor<IoServiceType>::AsyncAccept(AcceptHandler handler
 
 template<typename IoServiceType>
 template<typename AcceptHandler>
-M_SOCKET_DECL void TcpAcceptor<IoServiceType>::AsyncAccept(AcceptHandler handler, StreamSocketType& sock, SocketError& error)
+M_SOCKET_DECL void TcpAcceptor<IoServiceType>::AsyncAccept(const AcceptHandler& handler, StreamSocketType& sock, SocketError& error)
 {
 	M_CHECK_COMMON_HANDLER(handler, IoServiceType);
 	this->GetObjectService().AsyncAccept(this->GetImpl(), sock.GetImpl(), handler, error);

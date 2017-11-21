@@ -427,8 +427,8 @@ M_SOCKET_DECL void IocpService2::Access::Accept(IocpService2& service, Impl& imp
 	lock.unlock();
 }
 
-M_SOCKET_DECL void IocpService2::Access::AsyncAccept(IocpService2& service, Impl& accept_impl, Impl& client_impl, 
-	M_COMMON_HANDLER_TYPE(IocpService2) handler, SocketError& error)
+M_SOCKET_DECL void IocpService2::Access::AsyncAccept(IocpService2& service, Impl& accept_impl, Impl& client_impl
+	, const M_COMMON_HANDLER_TYPE(IocpService2)& handler, SocketError& error)
 {
 	MutexLock& mlock = M_IMPL2_MUTEX(accept_impl);
 	do 
@@ -546,8 +546,8 @@ M_SOCKET_DECL void IocpService2::Access::Connect(IocpService2& service, Impl& im
 }
 
 template<typename EndPoint>
-M_SOCKET_DECL void IocpService2::Access::AsyncConnect(IocpService2& service, Impl& impl, const EndPoint& ep, 
-	M_COMMON_HANDLER_TYPE(IocpService2) handler, SocketError& error)
+M_SOCKET_DECL void IocpService2::Access::AsyncConnect(IocpService2& service, Impl& impl, const EndPoint& ep
+	, const M_COMMON_HANDLER_TYPE(IocpService2)& handler, SocketError& error)
 {
 	MutexLock& mlock = M_IMPL2_MUTEX(impl);
 	do 
@@ -651,8 +651,8 @@ M_SOCKET_DECL s_int32_t IocpService2::Access::RecvSome(IocpService2& service, Im
 	return M_SOCKET_ERROR;
 }
 
-M_SOCKET_DECL void IocpService2::Access::AsyncRecvSome(IocpService2& service, Impl& impl, s_byte_t* data, s_uint32_t size, 
-	M_RW_HANDLER_TYPE(IocpService2) hander, SocketError& error)
+M_SOCKET_DECL void IocpService2::Access::AsyncRecvSome(IocpService2& service, Impl& impl, s_byte_t* data, s_uint32_t size
+	, const M_RW_HANDLER_TYPE(IocpService2)& hander, SocketError& error)
 {
 	MutexLock& mlock = M_IMPL2_MUTEX(impl);
 	do 
@@ -747,8 +747,8 @@ M_SOCKET_DECL s_int32_t IocpService2::Access::SendSome(IocpService2& service, Im
 	return M_SOCKET_ERROR;
 }
 
-M_SOCKET_DECL void IocpService2::Access::AsyncSendSome(IocpService2& service, Impl& impl, const s_byte_t* data, s_uint32_t size, 
-	M_RW_HANDLER_TYPE(IocpService2) hander, SocketError& error)
+M_SOCKET_DECL void IocpService2::Access::AsyncSendSome(IocpService2& service, Impl& impl, const s_byte_t* data, s_uint32_t size
+	, const M_RW_HANDLER_TYPE(IocpService2)& hander, SocketError& error)
 {
 	MutexLock& mlock = M_IMPL2_MUTEX(impl);
 	do 
