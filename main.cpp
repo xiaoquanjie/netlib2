@@ -171,9 +171,13 @@ void netlib_test() {
 void _other_test(void*p) {
 
 	try {
+
+
 		char buf[10] = "21e3.";
-		SocketLib::TcpConnector<SocketLib::IoService>* pconnector = (SocketLib::TcpConnector<SocketLib::IoService>*)p;
-		pconnector->SendSome(buf, 10);
+		SocketLib::TcpConnector<SocketLib::IoService>* sock = (SocketLib::TcpConnector<SocketLib::IoService>*)p;
+		SocketLib::TcpSocket<SocketLib::IoService> clisock(sock->GetIoService());
+		//sock->Accept(clisock);
+		sock->Connect(SocketLib::Tcp::EndPoint(SocketLib::AddressV4("192.168.62.154"), 3001));
 	}
 	catch (SocketLib::SocketError& error) {
 		cout << thread::ctid() << "  " << error.What() << endl;
@@ -181,10 +185,37 @@ void _other_test(void*p) {
 }
 void other_test() {
 	SocketLib::IoService iosverice;
-	SocketLib::TcpConnector<SocketLib::IoService> connector(iosverice);
-	connector.Connect(SocketLib::Tcp::EndPoint(SocketLib::AddressV4("127.0.0.1"), 3001));
-	thread th1(_other_test, &connector);
-	thread th2(_other_test, &connector);
+	cout << "select 1 be server or 0 be client :";
+	int i;
+	cin >> i;
+
+	void* p;
+	if (1 == i) {
+		SocketLib::TcpAcceptor<SocketLib::IoService> 
+			sock(iosverice, SocketLib::Tcp::EndPoint(SocketLib::AddressV4("0.0.0.0"), 3001));
+		p = &sock;
+
+		SocketLib::TcpSocket<SocketLib::IoService> clisock(sock.GetIoService());
+		sock.Accept(clisock);
+
+		char buf[100] = { 0 };
+		int s = clisock.RecvSome(buf, 100);
+		cout << buf << endl;
+		std::string reply = std::string("svr reply :") + buf;
+		clisock.SendSome(reply.c_str(), reply.length());
+	}
+	else {
+		SocketLib::TcpConnector<SocketLib::IoService> sock(iosverice);
+		p = &sock;
+		sock.Connect(SocketLib::Tcp::EndPoint(SocketLib::AddressV4("127.0.0.1"), 3001));
+		sock.SendSome("xiaoquanjie", 11);
+		char buf[100] = { 0 };
+		int s = sock.RecvSome(buf, 100);
+		cout << buf << endl;
+	}
+	
+	thread th1(_other_test, p);
+	thread th2(_other_test, p);
 	th1.join();
 	th2.join();
 }
@@ -212,7 +243,7 @@ void slist_test() {
 int main() {
 
 	//slist_test();
-	netlib_test();
-	//other_test();
+	//netlib_test();
+	other_test();
 	return 0;
 }

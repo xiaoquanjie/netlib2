@@ -420,7 +420,7 @@ M_SOCKET_DECL void IocpService2::Access::Accept(IocpService2& service, Impl& imp
 				break;
 			}
 			if (M_ECONNRESET == M_ERR_LAST) {
-				break;
+				continue;
 			}
 			M_DEFAULT_SOCKET_ERROR2(error);
 			break;
