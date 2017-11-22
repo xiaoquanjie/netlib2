@@ -97,6 +97,14 @@
 	impl._core->_epoll
 #define M_IMPL_OP(impl)\
 	impl._core->_op
+#define M_IMPL_AOP(impl)\
+	impl._core->_op._aop._oper
+#define M_IMPL_COP(impl)\
+	impl._core->_op._cop._oper
+#define M_IMPL_ROP(impl)\
+	impl._core->_op._rop._oper
+#define M_IMPL_WOP(impl)\
+	impl._core->_op._wop._oper
 
 #define M_IMPL_INIT(impl)\
 	impl.Init()
@@ -495,54 +503,43 @@ M_SOCKET_DECL void EpollService::Access::Accept(EpollService& service, EpollServ
 	mlock.unlock();
 }
 
-M_SOCKET_DECL void EpollService::Access::AsyncAccept(EpollService& service, Impl& accept_impl, Impl& sock_impl
+M_SOCKET_DECL void EpollService::Access::AsyncAccept(EpollService& service, Impl& accept_impl, Impl& cli_impl
 	, const M_COMMON_HANDLER_TYPE(IocpService2)& handler, SocketError& error)
 {
-	//if (M_IMPL_FD(accept_impl) == M_INVALID_SOCKET)
-	//{
-	//	error = SocketError(M_ERR_BAD_DESCRIPTOR);
-	//	return;
-	//}
-	//if (M_IMPL_G_ACCEPT_FLAG(accept_impl))
-	//{
-	//	error = SocketError(M_ERR_POSTED_ACCEPT);
-	//	return;
-	//}
-	//if (!M_IMPL_G_NONBLOCK(accept_impl))
-	//{
-	//	if (!detail::Util::SetNonBlock(M_IMPL_FD(accept_impl)))
-	//	{
-	//		M_DEFAULT_SOCKET_ERROR2(error);
-	//		return;
-	//	}
-	//	M_IMPL_S_NONBLOCK(accept_impl)
-	//}
+	ScopedLock scoped_l(M_IMPL_MUTEX(accept_impl));
+	if (M_IMPL_FD(accept_impl) == M_INVALID_SOCKET) {
+		error = SocketError(M_ERR_BAD_DESCRIPTOR);
+		return;
+	}
+	if (M_IMPL_G_ACCEPT_FLAG(accept_impl)) {
+		error = SocketError(M_ERR_POSTED_ACCEPT);
+		return;
+	}
+	if (!M_IMPL_G_NONBLOCK(accept_impl)) {
+		if (!detail::Util::SetNonBlock(M_IMPL_FD(accept_impl))) {
+			M_DEFAULT_SOCKET_ERROR2(error);
+			return;
+		}
+		M_IMPL_S_NONBLOCK(accept_impl)
+	}
 
-	//typedef EpollService::AcceptOperation2 OperationType;
-	//OperationType* accept_op = 0;// dynamic_cast<OperationType*>(M_IMPL_OP(accept_impl)._aop);
-	//if (!accept_op)
-	//{
-	//	EpollService::OperationAlloc<OperationType>::Alloc(&M_IMPL_OP(accept_impl), E_ACCEPT_OP);
-	//	//accept_op = dynamic_cast<OperationType*>(M_IMPL_OP(accept_impl)._aop);
-	//	M_IMPL_OP(accept_impl)._type = E_ACCEPT_OP;
-	//}
-	//accept_op->_handler = handler;
-	//accept_op->_acpt_impl = accept_impl;
-	//accept_op->_cli_impl = sock_impl;
+	M_IMPL_S_ACCEPT_FLAG(accept_impl);
+	M_IMPL_OP(accept_impl)._type = E_ACCEPT_OP;
 
-	//M_IMPL_S_ACCEPT_FLAG(accept_impl);
-	//if (!M_IMPL_G_BIND(accept_impl))
-	//{
-	//	M_IMPL_S_BIND(accept_impl);
-	//	CtlEpoll(service, accept_impl, &M_IMPL_OP(accept_impl), M_EPOLL_CTL_ADD, M_EPOLLIN, error);
-	//}
-	//if (error)
-	//{
-	//	M_IMPL_C_ACCEPT_FLAG(accept_impl);
-	//	M_IMPL_S_UNBIND(accept_impl);
-	//	accept_op->Clear();
-	//	return;
-	//}
+	AcceptOperation2* aop = dynamic_cast<AcceptOperation2*>(M_IMPL_AOP(accept_impl));
+	aop->_handler = handler;
+	aop->_acpt_impl = accept_impl;
+	aop->_cli_impl = cli_impl;
+
+	if (!M_IMPL_G_BIND(accept_impl)) {
+		M_IMPL_S_BIND(accept_impl);
+		CtlEpoll(service, accept_impl, &M_IMPL_OP(accept_impl), M_EPOLL_CTL_ADD, M_EPOLLIN, error);
+	}
+	if (error) {
+		M_IMPL_C_ACCEPT_FLAG(accept_impl);
+		M_IMPL_S_UNBIND(accept_impl);
+		aop->Clear();
+	}
 }
 
 template<typename EndPoint>

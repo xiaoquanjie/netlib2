@@ -171,13 +171,6 @@ void netlib_test() {
 void _other_test(void*p) {
 
 	try {
-
-
-		char buf[10] = "21e3.";
-		SocketLib::TcpConnector<SocketLib::IoService>* sock = (SocketLib::TcpConnector<SocketLib::IoService>*)p;
-		SocketLib::TcpSocket<SocketLib::IoService> clisock(sock->GetIoService());
-		//sock->Accept(clisock);
-		sock->Connect(SocketLib::Tcp::EndPoint(SocketLib::AddressV4("192.168.62.154"), 3001));
 	}
 	catch (SocketLib::SocketError& error) {
 		cout << thread::ctid() << "  " << error.What() << endl;

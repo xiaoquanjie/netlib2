@@ -46,7 +46,7 @@ public:
 
 	struct Oper {
 		virtual bool Complete(EpollService::IoServiceImpl& serviceimpl, epoll_event_t* event) = 0;
-		virtual void Clear() {}
+		virtual void Clear() = 0;
 		virtual ~Oper() {}
 	};
 
@@ -126,15 +126,7 @@ struct EpollService::Impl {
 		OperationSet _op;
 		MutexLock    _mutex;
 	};
-	void Init() {
-		if (!_core) {
-			_core.reset(new core);
-			_core->_epoll = -1;
-			_core->_fd = M_INVALID_SOCKET;
-			_core->_state = 0;
-			_core->_op._type = 0;
-		}
-	}
+	void Init();
 private:
 	shard_ptr_t<core> _core;
 };
@@ -179,6 +171,20 @@ struct EpollService::FinishOperation : public EpollService::Oper {
 	M_SOCKET_DECL virtual void Clear();
 	s_int32_t _fd;
 };
+
+void EpollService::Impl::Init() {
+	if (!_core) {
+		_core.reset(new core);
+		_core->_epoll = -1;
+		_core->_fd = M_INVALID_SOCKET;
+		_core->_state = 0;
+		_core->_op._type = 0;
+		_core->_op._aop._oper = new AcceptOperation2;
+		_core->_op._cop._oper = new ConnectOperation2;
+		_core->_op._wop._oper = new WriteOperation2;
+		_core->_op._rop._oper = new ReadOperation2;
+	}
+}
 
 struct EpollService::ImplCloseReq {
 	Impl _impl;
