@@ -817,9 +817,11 @@ M_SOCKET_DECL void IocpService2::Access::AsyncSendSome(IocpService2& service, Im
 
 M_SOCKET_DECL void IocpService2::Access::_DoClose(IocpService2::IoServiceImpl* simpl, 
 	slist<ImplCloseReq*>&closereqs, slist<ImplCloseReq*>&closereqs2) {
-	simpl->_mutex.lock();
-	closereqs.swap(simpl->_closereqs);
-	simpl->_mutex.unlock();
+	if (simpl->_closereqs.size()) {
+		simpl->_mutex.lock();
+		closereqs.swap(simpl->_closereqs);
+		simpl->_mutex.unlock();
+	}
 
 	while (closereqs.size()){
 		ImplCloseReq* req = closereqs.front();
