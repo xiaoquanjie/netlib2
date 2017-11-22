@@ -116,26 +116,26 @@ void NetIo::AcceptHandler(SocketLib::SocketError error, TcpSocketPtr& clisock, N
 */
 
 // 连线通知,这个函数里不要处理业务，防止堵塞
-void NetIo::OnConnected(TcpSocketPtr& clisock) {
+void NetIo::OnConnected(const TcpSocketPtr& clisock) {
 
 }
-void NetIo::OnConnected(TcpConnectorPtr& clisock, SocketLib::SocketError error) {
+void NetIo::OnConnected(const TcpConnectorPtr& clisock, SocketLib::SocketError error) {
 
 }
 
 // 掉线通知,这个函数里不要处理业务，防止堵塞
-void NetIo::OnDisconnected(TcpSocketPtr& clisock) {
+void NetIo::OnDisconnected(const TcpSocketPtr& clisock) {
 
 }
-void NetIo::OnDisconnected(TcpConnectorPtr& clisock) {
+void NetIo::OnDisconnected(const TcpConnectorPtr& clisock) {
 
 }
 
 // 数据包通知,这个函数里不要处理业务，防止堵塞
-void NetIo::OnReceiveData(TcpSocketPtr& clisock, SocketLib::Buffer& buffer) {
+void NetIo::OnReceiveData(const TcpSocketPtr& clisock, SocketLib::Buffer& buffer) {
 
 }
-void NetIo::OnReceiveData(TcpConnectorPtr& clisock, SocketLib::Buffer& buffer) {
+void NetIo::OnReceiveData(const TcpConnectorPtr& clisock, SocketLib::Buffer& buffer) {
 
 }
 

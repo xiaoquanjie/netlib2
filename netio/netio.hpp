@@ -81,16 +81,16 @@ public:
 	 */
 
 	// 连线通知,这个函数里不要处理业务，防止堵塞
-	virtual void OnConnected(TcpSocketPtr& clisock);
-	virtual void OnConnected(TcpConnectorPtr& clisock,SocketLib::SocketError error);
+	virtual void OnConnected(const TcpSocketPtr& clisock);
+	virtual void OnConnected(const TcpConnectorPtr& clisock,SocketLib::SocketError error);
 
 	// 掉线通知,这个函数里不要处理业务，防止堵塞
-	virtual void OnDisconnected(TcpSocketPtr& clisock);
-	virtual void OnDisconnected(TcpConnectorPtr& clisock);
+	virtual void OnDisconnected(const TcpSocketPtr& clisock);
+	virtual void OnDisconnected(const TcpConnectorPtr& clisock);
 
 	// 数据包通知,这个函数里不要处理业务，防止堵塞
-	virtual void OnReceiveData(TcpSocketPtr& clisock, SocketLib::Buffer& buffer);
-	virtual void OnReceiveData(TcpConnectorPtr& clisock, SocketLib::Buffer& buffer);
+	virtual void OnReceiveData(const TcpSocketPtr& clisock, SocketLib::Buffer& buffer);
+	virtual void OnReceiveData(const TcpConnectorPtr& clisock, SocketLib::Buffer& buffer);
 
 protected:
 	void AcceptHandler(SocketLib::SocketError error, TcpSocketPtr& clisock, NetIoTcpAcceptorPtr& acceptor);
