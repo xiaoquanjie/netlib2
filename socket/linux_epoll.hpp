@@ -70,12 +70,6 @@ public:
 	struct ReadOperation2;
 	struct FinishOperation;
 
-	template<typename T>
-	struct OperationAlloc
-	{
-		M_SOCKET_DECL static void Alloc(OperationSet* opset, s_int32_t type);
-	};
-
 	M_SOCKET_DECL EpollService();
 
 	M_SOCKET_DECL ~EpollService();
@@ -141,7 +135,7 @@ struct EpollService::AcceptOperation2 : public EpollService::Oper {
 };
 
 struct EpollService::ConnectOperation2 : public EpollService::Oper {
-	M_SOCKET_DECL virtual bool Complete(EpollService::IoServiceImpl& serviceimpl, epoll_event_t* event);
+	M_SOCKET_DECL virtual bool Complete(IoServiceImpl& serviceimpl, epoll_event_t* event);
 	M_SOCKET_DECL virtual void Clear();
 	Impl  _impl;
 	function_t <void(SocketError)>
@@ -149,7 +143,7 @@ struct EpollService::ConnectOperation2 : public EpollService::Oper {
 };
 
 struct EpollService::WriteOperation2 : public EpollService::Oper {
-	M_SOCKET_DECL virtual bool Complete(EpollService::IoServiceImpl& serviceimpl, epoll_event_t* event);
+	M_SOCKET_DECL virtual bool Complete(IoServiceImpl& serviceimpl, epoll_event_t* event);
 	M_SOCKET_DECL virtual void Clear();
 	wsabuf_t _wsabuf;
 	Impl     _impl;
@@ -158,7 +152,7 @@ struct EpollService::WriteOperation2 : public EpollService::Oper {
 };
 
 struct EpollService::ReadOperation2 : public EpollService::Oper {
-	M_SOCKET_DECL virtual bool Complete(EpollService::IoServiceImpl& serviceimpl, epoll_event_t* event);
+	M_SOCKET_DECL virtual bool Complete(IoServiceImpl& serviceimpl, epoll_event_t* event);
 	M_SOCKET_DECL virtual void Clear();
 	wsabuf_t _wsabuf;
 	Impl     _impl;
@@ -167,7 +161,7 @@ struct EpollService::ReadOperation2 : public EpollService::Oper {
 };
 
 struct EpollService::FinishOperation : public EpollService::Oper {
-	M_SOCKET_DECL virtual bool Complete(EpollService::IoServiceImpl& serviceimpl, epoll_event_t* event);
+	M_SOCKET_DECL virtual bool Complete(IoServiceImpl& serviceimpl, epoll_event_t* event);
 	M_SOCKET_DECL virtual void Clear();
 	s_int32_t _fd;
 };
