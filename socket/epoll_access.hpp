@@ -244,75 +244,65 @@ M_SOCKET_DECL void EpollService::Access::ExecOp(IoServiceImpl& serviceimpl, Epol
 
 M_SOCKET_DECL void EpollService::Access::Run(EpollService& service, SocketError& error)
 {
-	//EpollService::IoServiceImpl* impl = new EpollService::IoServiceImpl(service);
-	//CreateEpoll(*impl, error);
-	//if (error)
-	//{
-	//	delete impl;
-	//	return;
-	//}
-	//MutexLock& lock = service._mutex;
-	//lock.lock();
-	//service._implvector.push_back(impl);
-	//service._implmap[impl->_handler] = impl;
-	//++service._implcnt;
-	//lock.unlock();
+	IoServiceImpl* simpl = new IoServiceImpl(service);
+	CreateEpoll(*simpl, error);
+	if (error) {
+		delete simpl;
+		return;
+	}
 
-	//const int max_events = 100;
-	//epoll_event_t events[max_events];
-	//for (;;)
-	//{
-	//	/*for (ImplVector::iterator iter=impl->_closeimplvector.begin(); iter!=impl->_closeimplvector.end();
-	//		)
-	//	{
-	//		Impl& imple = *iter;
-	//		if (M_IMPL_OP(imple)._aop)
-	//			M_IMPL_OP(imple)._aop->Clear();
-	//		if (M_IMPL_OP(imple)._cop)
-	//			M_IMPL_OP(imple)._cop->Clear();
-	//		if (M_IMPL_OP(imple)._rop)
-	//			M_IMPL_OP(imple)._rop->Clear();
-	//		if (M_IMPL_OP(imple)._wop)
-	//			M_IMPL_OP(imple)._wop->Clear();
+	service._mutex.lock();
+	service._implmap[simpl->_handler] = simpl;
+	service._implvector.push_back(simpl);
+	++service._implcnt;
+	service._mutex.unlock();
 
-	//		iter = impl->_closeimplvector.erase(iter);
-	//	}*/
+	const int max_events = 128;
+	epoll_event_t events[max_events];
+	slist<ImplCloseReq*> closereqs, closereqs2;
+	for (;;){
+		_DoClose(simpl, closereqs, closereqs2);
+		g_setlasterr(0);
+		g_bzero(&events, sizeof(events));
+		s_int32_t ret = g_epoll_wait(simpl->_handler, events, max_events, -1);
+		if (ret == 0){
+			1; // time out
+			continue;
+		}
+		if (ret < 0 && M_ERR_LAST != M_EINTR){
+			M_DEFAULT_SOCKET_ERROR2(error);
+			break;;
+		}
+		bool brk = false;
+		for (s_int32_t idx = 0; idx < ret; ++idx){
+			EpollService::OperationSet* opset = (EpollService::OperationSet*)events[idx].data.ptr;
+			ExecOp(*simpl, opset, &events[idx]);
+			if (opset->_type & E_FINISH_OP){
+				delete opset;
+				brk = true;
+			}
+		}
+		if (brk)
+			break;
+	}
 
-	//	g_setlasterr(0);
-	//	g_bzero(&events, sizeof(events));
-	//	s_int32_t ret = g_epoll_wait(impl->_handler, events, max_events, -1);
-	//	if (ret == 0)
-	//	{
-	//		1; // time out
-	//		continue;
-	//	}
-	//	if (ret < 0 && M_ERR_LAST != M_EINTR)
-	//	{
-	//		M_DEFAULT_SOCKET_ERROR2(error);
-	//		break;;
-	//	}
-	//	bool brk = false;
-	//	for (s_int32_t idx = 0; idx < ret; ++idx)
-	//	{
-	//		EpollService::OperationSet* opset = (EpollService::OperationSet*)events[idx].data.ptr;
-	//		ExecOp(*impl, opset, &events[idx]);
-	//		if (opset->_type & E_FINISH_OP)
-	//		{
-	//			brk = true;
-	//			delete opset;
-	//		}
-	//	}
-	//	if (brk)
-	//		break;
-	//}
+	simpl->_mutex.lock();
+	while (simpl->_closereqs.size()) {
+		ImplCloseReq* req = simpl->_closereqs.front();
+		simpl->_closereqs.pop_front();
+		delete req;
+	}
+	while (simpl->_closereqs2.size()) {
+		ImplCloseReq* req = simpl->_closereqs2.front();
+		simpl->_closereqs2.pop_front();
+		delete req;
+	}
+	simpl->_mutex.unlock();
 
-	//lock.lock();
-	//service._implvector.erase(std::find(service._implvector.begin(), service._implvector.end(), impl));
-	//service._implmap.erase(impl->_handler);
-	//--service._implcnt;
-	//lock.unlock();
-	//DestroyEpoll(*impl);
-	//delete impl;
+	service._mutex.lock();
+	service._implvector.erase(std::find(service._implvector.begin(), service._implvector.end(), simpl));
+	service._implcnt--;
+	service._mutex.unlock();
 }
 
 M_SOCKET_DECL void EpollService::Access::Stop(EpollService& service, SocketError& error){
@@ -347,6 +337,37 @@ M_SOCKET_DECL EpollService::IoServiceImpl* EpollService::Access::_GetIoServiceIm
 	if (iter == service._implmap.end())
 		return 0;
 	return iter->second;
+}
+
+M_SOCKET_DECL void EpollService::Access::_DoClose(IoServiceImpl* simpl
+	, slist<ImplCloseReq*>&closereqs, slist<ImplCloseReq*>&closereqs2) {
+	if (simpl->_closereqs.size()) {
+		simpl->_mutex.lock();
+		closereqs.swap(simpl->_closereqs);
+		simpl->_mutex.unlock();
+	}
+
+	while (closereqs.size()) {
+		ImplCloseReq* req = closereqs.front();
+		MutexLock& mlock = M_IMPL_MUTEX(req->_impl);
+		mlock.lock();
+		g_closesocket(M_IMPL_FD(req->_impl));
+		M_IMPL_FD(req->_impl) = M_INVALID_SOCKET;
+		M_IMPL_STATE(req->_impl) = 0;
+		mlock.unlock();
+		if (req->_handler)
+			req->_handler();
+		req->Clear();
+
+		closereqs2.push_back(req);
+		closereqs.pop_front();
+	}
+
+	if (closereqs2.size()) {
+		simpl->_mutex.lock();
+		simpl->_closereqs2.join(closereqs2);
+		simpl->_mutex.unlock();
+	}
 }
 
 M_SOCKET_DECL s_uint32_t EpollService::Access::GetServiceCount(const EpollService& service){

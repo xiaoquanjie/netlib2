@@ -271,6 +271,8 @@ public:
 protected:
 	M_SOCKET_DECL static EpollService::IoServiceImpl* _GetIoServiceImpl(EpollService& service, Impl& impl);
 
+	M_SOCKET_DECL static void _DoClose(IoServiceImpl* simpl
+		, slist<ImplCloseReq*>&closereqs, slist<ImplCloseReq*>&closereqs2);
 };
 
 M_SOCKET_DECL EpollService::IoServiceImpl::IoServiceImpl(EpollService& service)

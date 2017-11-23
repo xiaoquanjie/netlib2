@@ -269,6 +269,7 @@ M_SOCKET_DECL void IocpService2::Access::Run(IocpService2& service, SocketError&
 		}
 	}
 
+	simpl->_mutex.lock();
 	while (simpl->_closereqs.size()){
 		ImplCloseReq* req = simpl->_closereqs.front();
 		simpl->_closereqs.pop_front();
@@ -279,6 +280,7 @@ M_SOCKET_DECL void IocpService2::Access::Run(IocpService2& service, SocketError&
 		simpl->_closereqs2.pop_front();
 		delete req;
 	}
+	simpl->_mutex.unlock();
 	
 	service._mutex.lock();
 	service._implvector.erase(std::find(service._implvector.begin(), service._implvector.end(), simpl));
