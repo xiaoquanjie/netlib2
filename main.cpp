@@ -236,7 +236,7 @@ void slist_test() {
 int main() {
 
 	//slist_test();
-	//netlib_test();
-	other_test();
+	netlib_test();
+	//other_test();
 	return 0;
 }

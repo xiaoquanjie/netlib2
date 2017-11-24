@@ -68,7 +68,6 @@ public:
 	struct ConnectOperation2;
 	struct WriteOperation2;
 	struct ReadOperation2;
-	struct FinishOperation;
 
 	M_SOCKET_DECL EpollService();
 
@@ -158,12 +157,6 @@ struct EpollService::ReadOperation2 : public EpollService::Oper {
 	Impl     _impl;
 	function_t <void(s_uint32_t, SocketError)>
 			 _handler;
-};
-
-struct EpollService::FinishOperation : public EpollService::Oper {
-	M_SOCKET_DECL virtual bool Complete(IoServiceImpl& serviceimpl, epoll_event_t* event);
-	M_SOCKET_DECL virtual void Clear();
-	s_int32_t _fd;
 };
 
 void EpollService::Impl::Init() {

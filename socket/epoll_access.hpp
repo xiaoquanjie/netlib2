@@ -204,42 +204,34 @@ M_SOCKET_DECL void EpollService::Access::CtlEpoll(EpollService& service, Impl& i
 	M_DEFAULT_SOCKET_ERROR(ret != 0, error);
 }
 
-M_SOCKET_DECL void EpollService::Access::ExecOp(IoServiceImpl& serviceimpl, EpollService::OperationSet* opset, epoll_event_t* event)
-{
-	/*if (opset->_type & E_ACCEPT_OP)
-	{
-		opset->_aop.Complete(serviceimpl, event);
+M_SOCKET_DECL void EpollService::Access::ExecOp(IoServiceImpl& serviceimpl
+	, EpollService::OperationSet* opset, epoll_event_t* event){
+	if ((opset->_type & E_ACCEPT_OP)) {
+		opset->_aop._oper->Complete(serviceimpl, event);
 		return;
 	}
-	if (opset->_type & E_CONNECT_OP)
-	{
-		opset->_cop->Complete(serviceimpl, event);
+	if (opset->_type & E_CONNECT_OP) {
+		opset->_cop._oper->Complete(serviceimpl, event);
 		return;
 	}
-	if (opset->_type & E_FINISH_OP)
-	{
-		opset->_aop.Complete(serviceimpl, event);
-		return;
-	}
+
 	bool flag = false;
 	if (opset->_type & E_READ_OP &&
-		(event->events&M_EPOLLIN || event->events&M_EPOLLERR || event->events&M_EPOLLHUP))
-	{
+		(event->events&M_EPOLLIN || event->events&M_EPOLLERR || event->events&M_EPOLLHUP)){
 		flag = true;
-		opset->_rop->Complete(serviceimpl, event);
+		opset->_rop._oper->Complete(serviceimpl, event);
 	}
 	if (opset->_type & E_WRITE_OP &&
-		(event->events&M_EPOLLOUT || event->events&M_EPOLLERR || event->events&M_EPOLLHUP))
-	{
+		(event->events&M_EPOLLOUT || event->events&M_EPOLLERR || event->events&M_EPOLLHUP)){
 		flag = true;
-		opset->_wop->Complete(serviceimpl, event);
+		opset->_wop._oper->Complete(serviceimpl, event);
 		return;
 	}
 	if (!flag)
 	{
 		M_DEBUG_PRINT("type: " << opset->_type);
 		assert(0);
-	}*/
+	}
 }
 
 M_SOCKET_DECL void EpollService::Access::Run(EpollService& service, SocketError& error)
@@ -276,11 +268,12 @@ M_SOCKET_DECL void EpollService::Access::Run(EpollService& service, SocketError&
 		bool brk = false;
 		for (s_int32_t idx = 0; idx < ret; ++idx){
 			EpollService::OperationSet* opset = (EpollService::OperationSet*)events[idx].data.ptr;
-			ExecOp(*simpl, opset, &events[idx]);
 			if (opset->_type & E_FINISH_OP){
 				delete opset;
 				brk = true;
 			}
+			else
+				ExecOp(*simpl, opset, &events[idx]);
 		}
 		if (brk)
 			break;
@@ -820,6 +813,7 @@ M_SOCKET_DECL void EpollService::Access::AsyncSendSome(EpollService& service, Im
 			M_IMPL_S_UNBIND(impl);
 			wop->Clear();
 		}
+		return;
 	} 
 	while (false);
 	wop->Clear();
@@ -863,7 +857,7 @@ M_SOCKET_DECL void EpollService::AcceptOperation2::Clear(){
 	this->_acpt_impl = this->_cli_impl = Impl();
 }
 
-M_SOCKET_DECL bool EpollService::ConnectOperation2::Complete(EpollService::IoServiceImpl& serviceimpl, epoll_event_t* event){
+M_SOCKET_DECL bool EpollService::ConnectOperation2::Complete(IoServiceImpl& serviceimpl, epoll_event_t* event){
 	bool notify = false;
 	MutexLock& mlock = M_IMPL_MUTEX(this->_impl);
 	mlock.lock();
@@ -894,7 +888,7 @@ M_SOCKET_DECL void EpollService::ConnectOperation2::Clear(){
 	this->_impl = Impl();
 }
 
-M_SOCKET_DECL bool EpollService::WriteOperation2::Complete(EpollService::IoServiceImpl& serviceimpl, epoll_event_t* event){
+M_SOCKET_DECL bool EpollService::WriteOperation2::Complete(IoServiceImpl& serviceimpl, epoll_event_t* event){
 	bool notify = false;
 	SocketError error;
 	MutexLock& mlock = M_IMPL_MUTEX(this->_impl);
@@ -933,7 +927,7 @@ M_SOCKET_DECL void EpollService::WriteOperation2::Clear(){
 	this->_wsabuf.len = 0;
 }
 
-M_SOCKET_DECL bool EpollService::ReadOperation2::Complete(EpollService::IoServiceImpl& serviceimpl, epoll_event_t* event){
+M_SOCKET_DECL bool EpollService::ReadOperation2::Complete(IoServiceImpl& serviceimpl, epoll_event_t* event){
 	SocketError error;
 	bool notify = false;
 	MutexLock& mlock = M_IMPL_MUTEX(this->_impl);
@@ -971,16 +965,6 @@ M_SOCKET_DECL void EpollService::ReadOperation2::Clear(){
 	this->_handler = 0;
 	this->_wsabuf.buf = 0;
 	this->_wsabuf.len = 0;
-}
-
-M_SOCKET_DECL bool EpollService::FinishOperation::Complete(EpollService::IoServiceImpl& serviceimpl, epoll_event_t* event)
-{
-	/*g_closesocket(this->_fd);
-	this->_fd = M_INVALID_SOCKET;
-	return true;*/
-}
-
-M_SOCKET_DECL void EpollService::FinishOperation::Clear(){
 }
 
 
