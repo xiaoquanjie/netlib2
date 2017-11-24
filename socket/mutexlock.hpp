@@ -50,7 +50,7 @@ class MutexLock
 public:
 	MutexLock()
 	{
-		pthread_mutex_init(&_mutex, 0);
+		assert(pthread_mutex_init(&_mutex, 0) == 0);
 	}
 	~MutexLock()
 	{
@@ -58,11 +58,11 @@ public:
 	}
 	void lock()
 	{
-		pthread_mutex_lock(&_mutex);
+		assert(pthread_mutex_lock(&_mutex) == 0);
 	}
 	void unlock()
 	{
-		pthread_mutex_unlock(&_mutex);
+		assert(pthread_mutex_unlock(&_mutex) == 0);
 	}
 
 private:

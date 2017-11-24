@@ -361,6 +361,8 @@ M_SOCKET_DECL void EpollService::Access::_DoClose(IoServiceImpl* simpl
 		simpl->_closereqs2.join(closereqs2);
 		simpl->_mutex.unlock();
 	}
+	assert(closereqs.size() == 0);
+	assert(closereqs2.size() == 0);
 }
 
 M_SOCKET_DECL s_uint32_t EpollService::Access::GetServiceCount(const EpollService& service){
@@ -420,7 +422,8 @@ M_SOCKET_DECL void EpollService::Access::Close(EpollService& service, Impl& impl
 		mlock.unlock();
 
 		if (simpl) {
-			ScopedLock scoped_l(simpl->_mutex);
+			//ScopedLock scoped_l(simpl->_mutex);
+			simpl->_mutex.lock();
 			ImplCloseReq* req = 0;
 			if (simpl->_closereqs2.size()) {
 				req = simpl->_closereqs2.front();
@@ -432,6 +435,7 @@ M_SOCKET_DECL void EpollService::Access::Close(EpollService& service, Impl& impl
 			req->_handler = handler;
 			req->_impl = impl;
 			simpl->_closereqs.push_back(req);
+			simpl->_mutex.unlock();
 		}
 		return;
 	}

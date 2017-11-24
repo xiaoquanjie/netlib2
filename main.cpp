@@ -228,15 +228,17 @@ void slist_test() {
 	sli2.join(sli);
 	cout << sli2.size() << endl;
 	sli.push_back(3);
+	sli.push_back(4);
 	sli2.join(sli);
-	cout << sli2.size() << endl;
-	cout << sli.size() << endl;
+	while (sli2.size()){
+		sli2.pop_front();
+	}
 }
 
 int main() {
 
-	//slist_test();
-	netlib_test();
+	slist_test();
+	//netlib_test();
 	//other_test();
 	return 0;
 }
