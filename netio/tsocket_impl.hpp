@@ -96,8 +96,7 @@ void TcpBaseSocket<T, SocketType, CheckerType>::_Close(unsigned int state) {
 		}
 		if (_flag == E_STATE_STOP && !_writer.writing) {
 			SocketLib::SocketError error;
-			function_t<void()> handler = bind_t(&TcpBaseSocket::_CloseHandler, this->shared_from_this());
-			_socket->Close(handler, error);
+			_socket->Close(bind_t(&TcpBaseSocket::_CloseHandler, this->shared_from_this()), error);
 		}
 	}
 }
@@ -272,10 +271,9 @@ bool TcpBaseSocket<T, SocketType, CheckerType>::_TrySendData(bool ignore) {
 		}
 		if (_writer.msgbuffer && _writer.msgbuffer->Length() != 0) {
 			_writer.writing = true;
-			function_t<void(SocketLib::s_uint32_t, SocketLib::SocketError)> handler =
-				bind_t(&TcpBaseSocket::_WriteHandler, this->shared_from_this(), placeholder_1, placeholder_2);
 			SocketLib::SocketError error;
-			_socket->AsyncSendSome(handler, _writer.msgbuffer->Data(), _writer.msgbuffer->Length(),error);
+			_socket->AsyncSendSome(bind_t(&TcpBaseSocket::_WriteHandler, this->shared_from_this(), placeholder_1, placeholder_2)
+				, _writer.msgbuffer->Data(), _writer.msgbuffer->Length(),error);
 			if (error)
 				_Close(E_STATE_WRITE);
 			return (!error);
@@ -289,10 +287,9 @@ bool TcpBaseSocket<T, SocketType, CheckerType>::_TrySendData(bool ignore) {
 
 template<typename T, typename SocketType, typename CheckerType>
 void TcpBaseSocket<T, SocketType, CheckerType>::_TryRecvData() {
-	function_t<void(SocketLib::s_uint32_t, SocketLib::SocketError)> handler =
-		bind_t(&TcpBaseSocket::_ReadHandler, this->shared_from_this(), placeholder_1, placeholder_2);
 	SocketLib::SocketError error;
-	_socket->AsyncRecvSome(handler, _reader.readbuf, M_READ_SIZE, error);
+	_socket->AsyncRecvSome(bind_t(&TcpBaseSocket::_ReadHandler, this->shared_from_this(), placeholder_1, placeholder_2)
+		, _reader.readbuf, M_READ_SIZE, error);
 	if (error)
 		_PostClose(E_STATE_START);
 }

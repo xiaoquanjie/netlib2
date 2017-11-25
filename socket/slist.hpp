@@ -4,8 +4,9 @@
 M_SOCKET_NAMESPACE_BEGIN
 
 #define M_SLIST_CHECK(sli)\
-	if ((sli)._head==0)\
-		assert((sli)._tail==0 && (sli)._count==0);
+	//if ((sli)._head==0)\
+	//	assert((sli)._tail==0 && (sli)._count==0);
+
 
 template<class T>
 class slist

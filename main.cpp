@@ -53,9 +53,9 @@ void SendData(netiolib::TcpConnectorPtr clisock) {
 }
 
 void ReplyData(netiolib::TcpSocketPtr clisock, netiolib::Buffer& buffer) {
-	std::string str("svr reply:");
-	str.append(buffer.Data(), buffer.Length());
-	clisock->Send(str.c_str(), str.length());
+	//std::string str("svr reply:");
+	//str.append(buffer.Data(), buffer.Length());
+	clisock->Send(buffer.Data(), buffer.Length());
 }
 
 class TestNetIo : public netiolib::NetIo {
@@ -142,7 +142,7 @@ void client() {
 	{
 		netiolib::TcpConnectorPtr connector(new netiolib::TcpConnector(test_io, 0));
 		connector->SetData(k);
-		connector->AsyncConnect("127.0.0.1", 3001);
+		connector->AsyncConnect(/*"192.168.10.128"*/"127.0.0.1", 3001);
 		ptrlist.push_back(connector);
 	}
 

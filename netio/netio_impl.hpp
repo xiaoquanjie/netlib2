@@ -30,8 +30,7 @@ bool NetIo::ListenOne(const SocketLib::Tcp::EndPoint& ep) {
 	try {
 		NetIoTcpAcceptorPtr acceptor(new SocketLib::TcpAcceptor<SocketLib::IoService>(_ioservice, ep, _backlog));
 		TcpSocketPtr clisock(new TcpSocket(*this, 0));
-		function_t<void(SocketLib::SocketError)> handler = bind_t(&NetIo::AcceptHandler, this, placeholder_1, clisock, acceptor);
-		acceptor->AsyncAccept(handler, clisock->GetSocket());
+		acceptor->AsyncAccept(bind_t(&NetIo::AcceptHandler, this, placeholder_1, clisock, acceptor), clisock->GetSocket());
 	}
 	catch (SocketLib::SocketError& error) {
 		lasterror = error;
@@ -101,8 +100,7 @@ void NetIo::AcceptHandler(SocketLib::SocketError error, TcpSocketPtr& clisock, N
 		clisock->Init();
 	}
 	TcpSocketPtr newclisock(new TcpSocket(*this, 0));
-	function_t<void(SocketLib::SocketError)> handler = bind_t(&NetIo::AcceptHandler, this, placeholder_1, newclisock, acceptor);
-	acceptor->AsyncAccept(handler, newclisock->GetSocket(), error);
+	acceptor->AsyncAccept(bind_t(&NetIo::AcceptHandler, this, placeholder_1, newclisock, acceptor), newclisock->GetSocket(), error);
 	if (error)
 		lasterror = error;
 }
