@@ -422,8 +422,7 @@ M_SOCKET_DECL void EpollService::Access::Close(EpollService& service, Impl& impl
 		mlock.unlock();
 
 		if (simpl) {
-			//ScopedLock scoped_l(simpl->_mutex);
-			simpl->_mutex.lock();
+			ScopedLock scoped_l(simpl->_mutex);
 			ImplCloseReq* req = 0;
 			if (simpl->_closereqs2.size()) {
 				req = simpl->_closereqs2.front();
@@ -435,7 +434,6 @@ M_SOCKET_DECL void EpollService::Access::Close(EpollService& service, Impl& impl
 			req->_handler = handler;
 			req->_impl = impl;
 			simpl->_closereqs.push_back(req);
-			simpl->_mutex.unlock();
 		}
 		return;
 	}

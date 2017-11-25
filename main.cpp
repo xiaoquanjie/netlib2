@@ -127,7 +127,7 @@ void server() {
 
 void client() {
 	TestNetIo test_io;
-	for (int i = 0; i < 3; ++i) {
+	for (int i = 0; i < 32; ++i) {
 		new thread(&TestNetIo::Start, &test_io, 0);
 	}
 	
@@ -237,8 +237,8 @@ void slist_test() {
 
 int main() {
 
-	slist_test();
-	//netlib_test();
+	//slist_test();
+	netlib_test();
 	//other_test();
 	return 0;
 }

@@ -141,7 +141,7 @@ inline void slist<T>::join(slist<T>& other) {
 		return;
 	if (_tail) {
 		_tail->next = other._head;
-		_tail = other._head;
+		_tail = other._tail;
 	}
 	else {
 		_head = other._head;
