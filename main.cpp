@@ -235,8 +235,11 @@ void slist_test() {
 	}
 }
 
+void test1(TO& t){}
+
 int main() {
 
+	//test1(TO());
 	//slist_test();
 	netlib_test();
 	//other_test();

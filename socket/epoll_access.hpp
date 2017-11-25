@@ -848,7 +848,8 @@ M_SOCKET_DECL bool EpollService::AcceptOperation2::Complete(IoServiceImpl& servi
 		}
 	}
 
-	function_t<void(SocketError)> handler = this->_handler;
+	function_t<void(SocketError)> handler;
+	handler.swap(this->_handler);
 	this->Clear();
 	handler(error);
 	return true;
@@ -878,7 +879,8 @@ M_SOCKET_DECL bool EpollService::ConnectOperation2::Complete(IoServiceImpl& serv
 		error = error ? SocketError(M_ERR_ASYNC_CONNECT_FAIL) : SocketError(error_opt.Value());
 	}
 
-	function_t <void(SocketError)> handler = this->_handler;
+	function_t <void(SocketError)> handler;
+	handler.swap(this->_handler);
 	this->Clear();
 	if (notify)
 		handler(error);
@@ -915,7 +917,8 @@ M_SOCKET_DECL bool EpollService::WriteOperation2::Complete(IoServiceImpl& servic
 		error = error ? SocketError(M_ERR_ASYNC_WRITE_FAIL) : SocketError(error_opt.Value());
 	}
 
-	function_t <void(s_uint32_t, SocketError)> handler = this->_handler;
+	function_t <void(s_uint32_t, SocketError)> handler;
+	handler.swap(this->_handler);
 	this->Clear();
 	if (notify)
 		handler(ret < 0 ? 0 : ret, error);
@@ -955,7 +958,8 @@ M_SOCKET_DECL bool EpollService::ReadOperation2::Complete(IoServiceImpl& service
 		error = (error) ? SocketError(M_ERR_ASYNC_READ_FAIL) : SocketError(error_opt.Value());
 	}
 
-	function_t <void(s_uint32_t, SocketError)> handler = this->_handler;
+	function_t <void(s_uint32_t, SocketError)> handler;
+	handler.swap(this->_handler);
 	this->Clear();
 	if (notify)
 		handler(ret < 0 ? 0 : ret, error);

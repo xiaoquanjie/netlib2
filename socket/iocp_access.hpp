@@ -879,7 +879,8 @@ M_SOCKET_DECL bool IocpService2::AcceptOperation2<Handler>::Complete(IocpService
 				(char*)&(M_IMPL2_FD(this->_accept_impl)),sizeof(M_IMPL2_FD(this->_accept_impl)));
 		}
 	}
-	Handler handler = this->_handler;
+	Handler handler;
+	handler.swap(this->_handler);
 	this->Clear();
 	handler(error);
 	return true;
@@ -907,7 +908,8 @@ M_SOCKET_DECL bool IocpService2::ConnectOperation2<Handler>::Complete(IocpServic
 	if (!error){
 		g_setsockopt(M_IMPL2_FD(this->_impl), M_SOL_SOCKET, SO_UPDATE_CONNECT_CONTEXT, NULL, 0);
 	}
-	Handler handler = this->_handler;
+	Handler handler;
+	handler.swap(this->_handler);
 	this->Clear();
 	if (notify)
 		handler(error);
@@ -933,7 +935,8 @@ M_SOCKET_DECL bool IocpService2::WriteOperation2<Handler>::Complete(IocpService2
 	}
 	mlock.unlock();
 
-	Handler handler = this->_handler;
+	Handler handler;
+	handler.swap(this->_handler);
 	this->Clear();
 	if (notify)
 		handler(transbyte, error);
@@ -961,7 +964,8 @@ M_SOCKET_DECL bool IocpService2::ReadOperation2<Handler>::Complete(IocpService2&
 	}
 	mlock.unlock();
 
-	Handler handler = this->_handler;
+	Handler handler;
+	handler.swap(this->_handler);
 	this->Clear();
 	if (notify)
 		handler(transbyte, error);
