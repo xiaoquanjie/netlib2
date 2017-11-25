@@ -111,6 +111,9 @@
 #define M_IMPL_MUTEX(impl)\
 	(impl._core->_mutex)
 
+#define M_SWAP_HANDLER(type,handler1,handler2)\
+	handler1.swap(const_cast<type>(handler2));
+
 M_SOCKET_DECL void EpollService::Access::ConstructImpl(EpollService& service, Impl& impl, s_uint16_t type){
 	M_IMPL_INIT(impl);
 	M_IMPL_S_V4(impl);
@@ -543,9 +546,9 @@ M_SOCKET_DECL void EpollService::Access::AsyncAccept(EpollService& service, Impl
 	M_IMPL_OP(accept_impl)._type = E_ACCEPT_OP;
 
 	AcceptOperation2* aop = dynamic_cast<AcceptOperation2*>(M_IMPL_AOP(accept_impl));
-	aop->_handler = handler;
 	aop->_acpt_impl = accept_impl;
 	aop->_cli_impl = cli_impl;
+	M_SWAP_HANDLER(M_COMMON_HANDLER_TYPE(IocpService2)&, aop->_handler, handler);
 
 	if (!M_IMPL_G_BIND(accept_impl)) {
 		M_IMPL_S_BIND(accept_impl);
@@ -633,8 +636,8 @@ M_SOCKET_DECL void EpollService::Access::AsyncConnect(EpollService& service, Imp
 	M_IMPL_S_CONNECT_FLAG(impl);
 	M_IMPL_OP(impl)._type = E_CONNECT_OP;
 	ConnectOperation2* cop = dynamic_cast<ConnectOperation2*>(M_IMPL_COP(impl));
-	cop->_handler = handler;
 	cop->_impl = impl;
+	M_SWAP_HANDLER(M_COMMON_HANDLER_TYPE(EpollService)&, cop->_handler, handler);
 
 	if (!M_IMPL_G_BIND(impl)){
 		M_IMPL_S_BIND(impl);
@@ -687,8 +690,8 @@ M_SOCKET_DECL void EpollService::Access::AsyncRecvSome(EpollService& service, Im
 	ReadOperation2* rop = dynamic_cast<ReadOperation2*>(M_IMPL_ROP(impl));
 	rop->_wsabuf.buf = data;
 	rop->_wsabuf.len = size;
-	rop->_handler = hander;
 	rop->_impl = impl;
+	M_SWAP_HANDLER(M_RW_HANDLER_TYPE(EpollService)&, rop->_handler, hander);
 	do 
 	{
 		ScopedLock scoped_l(M_IMPL_MUTEX(impl));
@@ -774,8 +777,8 @@ M_SOCKET_DECL void EpollService::Access::AsyncSendSome(EpollService& service, Im
 	WriteOperation2* wop = dynamic_cast<WriteOperation2*>(M_IMPL_WOP(impl));
 	wop->_wsabuf.buf = const_cast<s_byte_t*>(data);
 	wop->_wsabuf.len = size;
-	wop->_handler = hander;
 	wop->_impl = impl;
+	M_SWAP_HANDLER(M_RW_HANDLER_TYPE(EpollService)&, wop->_handler, hander);
 	do 
 	{
 		ScopedLock scoped_l(M_IMPL_MUTEX(impl));

@@ -110,12 +110,9 @@
 #define M_IMPL2_INIT_MUTEX(impl)\
 	impl._core->_mutex.reset(new MutexLock);
 
-#define M_FOREACH_CLOSEREQ(item,reqlist)\
-	for (std::list<ImplCloseReq*>::iterator item=reqlist.begin();\
-		item!=reqlist.end(); ++item)
-#define M_FOREACH_CLOSEREQ2(item,reqlist)\
-	for (std::vector<ImplCloseReq*>::iterator item=reqlist.begin();\
-		item!=reqlist.end(); ++item)
+#define M_SWAP_HANDLER(type,handler1,handler2)\
+	handler1.swap(const_cast<type>(handler2));
+	
 
 ////////////////////////////////////////////////////////////////////////////////
 
@@ -482,9 +479,9 @@ M_SOCKET_DECL void IocpService2::Access::AsyncAccept(IocpService2& service, Impl
 		OperationType* op = dynamic_cast<OperationType*>(M_IMPL2_AOP(accept_impl)._oper);
 		g_bzero(op->_buf, sizeof(op->_buf));
 		op->_bytes   = 0;
-		op->_handler = handler;
 		op->_impl    = client_impl;
 		op->_accept_impl = accept_impl;
+		M_SWAP_HANDLER(M_COMMON_HANDLER_TYPE(IocpService2)&, op->_handler, handler);
 
 		for (;;){
 			
@@ -601,8 +598,8 @@ M_SOCKET_DECL void IocpService2::Access::AsyncConnect(IocpService2& service, Imp
 		IocpService2::OperationAlloc<OperationType>::AllocOp(M_IMPL2_COP(impl), E_CONNECT_OP);
 
 		OperationType* op = dynamic_cast<OperationType*>(M_IMPL2_COP(impl)._oper);
-		op->_handler = handler;
 		op->_impl = impl;
+		M_SWAP_HANDLER(M_COMMON_HANDLER_TYPE(IocpService2)&, op->_handler, handler);
 
 		DWORD send_bytes = 0;
 		typedef typename EndPoint::Impl::endpoint_impl_access ep_access;
@@ -698,10 +695,10 @@ M_SOCKET_DECL void IocpService2::Access::AsyncRecvSome(IocpService2& service, Im
 		IocpService2::OperationAlloc<OperationType>::AllocOp(M_IMPL2_ROP(impl), E_READ_OP);
 
 		OperationType* op = dynamic_cast<OperationType*>(M_IMPL2_ROP(impl)._oper);
-		op->_handler = hander;
 		op->_impl = impl;
 		op->_wsabuf.buf = data;
 		op->_wsabuf.len = size;
+		M_SWAP_HANDLER(M_RW_HANDLER_TYPE(IocpService2)&, op->_handler, hander);
 
 		DWORD flag = 0;
 		s_int32_t ret = g_wsarecv(M_IMPL2_FD(impl), &op->_wsabuf, 1, 0, &flag, &M_IMPL2_ROP(impl), 0);
@@ -794,10 +791,10 @@ M_SOCKET_DECL void IocpService2::Access::AsyncSendSome(IocpService2& service, Im
 		IocpService2::OperationAlloc<OperationType>::AllocOp(M_IMPL2_WOP(impl), E_WRITE_OP);
 
 		OperationType* op = dynamic_cast<OperationType*>(M_IMPL2_WOP(impl)._oper);
-		op->_handler = hander;
 		op->_impl = impl;
 		op->_wsabuf.buf = const_cast<s_byte_t*>(data);
 		op->_wsabuf.len = size;
+		M_SWAP_HANDLER(M_RW_HANDLER_TYPE(IocpService2)&, op->_handler, hander);
 
 		DWORD send_bytes = 0;
 		// If no error occurs and the send operation has completed immediately, WSASend returns zero

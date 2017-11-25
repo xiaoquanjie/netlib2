@@ -235,9 +235,15 @@ void slist_test() {
 	}
 }
 
-void test1(TO& t){}
+void test1(function_t<void()>& t){
+	function_t<void()> f;
+	f.swap(t);
+}
 
 int main() {
+
+	function_t<void()> f = slist_test;
+	test1(f);
 
 	//test1(TO());
 	//slist_test();
