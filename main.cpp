@@ -169,7 +169,7 @@ void client() {
 	cin >> k;
 	for (int j=0;j<i;j++)
 	{
-		netiolib::TcpConnectorPtr connector(new netiolib::TcpConnector(test_io, 0));
+		netiolib::TcpConnectorPtr connector(new netiolib::TcpConnector(test_io));
 		connector->SetData(k);
 		connector->AsyncConnect(/*"192.168.10.128"*/"127.0.0.1", 3001);
 		ptrlist.push_back(connector);
@@ -287,8 +287,8 @@ int main() {
 
 	//test1(TO());
 	//slist_test();
-	//netlib_test();
-	netlib_http_test();
+	netlib_test();
+	//netlib_http_test();
 	//other_test();
 	return 0;
 }

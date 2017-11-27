@@ -16,8 +16,8 @@
 
 M_NETIO_NAMESPACE_BEGIN
 
-TcpConnector::TcpConnector(NetIo& netio, MessageChecker2 checker)
-	:TcpBaseSocket(netio, checker),_data(0) {
+TcpConnector::TcpConnector(NetIo& netio)
+	:TcpStreamSocket(netio),_data(0) {
 }
 
 SocketLib::TcpConnector<SocketLib::IoService>& TcpConnector::GetSocket() {

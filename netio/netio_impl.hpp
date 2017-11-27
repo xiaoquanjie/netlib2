@@ -31,7 +31,7 @@ NetIo::~NetIo() {}
 bool NetIo::ListenOne(const SocketLib::Tcp::EndPoint& ep) {
 	try {
 		NetIoTcpAcceptorPtr acceptor(new SocketLib::TcpAcceptor<SocketLib::IoService>(_ioservice, ep, _backlog));
-		TcpSocketPtr clisock(new TcpSocket(*this, 0));
+		TcpSocketPtr clisock(new TcpSocket(*this));
 		acceptor->AsyncAccept(bind_t(&NetIo::_AcceptHandler, this, placeholder_1, clisock, acceptor), clisock->GetSocket());
 	}
 	catch (SocketLib::SocketError& error) {
@@ -67,7 +67,7 @@ bool NetIo::ListenOneHttp(const std::string& addr, SocketLib::s_uint16_t port) {
 
 void NetIo::ConnectOne(const SocketLib::Tcp::EndPoint& ep, unsigned int data) {
 	try {
-		netiolib::TcpConnectorPtr connector(new netiolib::TcpConnector(*this, 0));
+		netiolib::TcpConnectorPtr connector(new netiolib::TcpConnector(*this));
 		connector->SetData(data);
 		connector->AsyncConnect("127.0.0.1", 3001);
 		connector.reset();
@@ -120,7 +120,7 @@ void NetIo::_AcceptHandler(SocketLib::SocketError error, TcpSocketPtr& clisock, 
 	else {
 		clisock->Init();
 	}
-	TcpSocketPtr newclisock(new TcpSocket(*this, 0));
+	TcpSocketPtr newclisock(new TcpSocket(*this));
 	acceptor->AsyncAccept(bind_t(&NetIo::_AcceptHandler, this, placeholder_1, newclisock, acceptor), newclisock->GetSocket(), error);
 	if (error)
 		lasterror = error;
@@ -169,6 +169,11 @@ void NetIo::OnReceiveData(const TcpSocketPtr& clisock, SocketLib::Buffer& buffer
 void NetIo::OnReceiveData(const TcpConnectorPtr& clisock, SocketLib::Buffer& buffer) {
 }
 void NetIo::OnReceiveData(HttpSocketPtr clisock, SocketLib::Buffer& buffer) {
+	// 只是为了兼容
+}
+void NetIo::OnReceiveData(HttpSocketPtr clisock, SocketLib::Buffer& request
+	, SocketLib::Buffer& head, SocketLib::Buffer& body) {
+
 }
 
 M_NETIO_NAMESPACE_END

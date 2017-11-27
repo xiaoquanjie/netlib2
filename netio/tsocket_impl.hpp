@@ -18,26 +18,14 @@ M_NETIO_NAMESPACE_BEGIN
 
 #define M_READ_SIZE (4*1024)
 
-template<typename T, typename SocketType, typename CheckerType>
-TcpBaseSocket<T, SocketType, CheckerType>::_readerinfo_::_readerinfo_() {
-	g_memset(&curheader, 0, sizeof(curheader));
-	readbuf = new SocketLib::s_byte_t[M_READ_SIZE];
-	g_memset(readbuf, 0, M_READ_SIZE);
-}
-
-template<typename T, typename SocketType, typename CheckerType>
-TcpBaseSocket<T, SocketType, CheckerType>::_readerinfo_::~_readerinfo_() {
-	delete[]readbuf;
-}
-
-template<typename T, typename SocketType, typename CheckerType>
-TcpBaseSocket<T, SocketType, CheckerType>::_writerinfo_::_writerinfo_() {
+template<typename T, typename SocketType>
+TcpBaseSocket<T, SocketType>::_writerinfo_::_writerinfo_() {
 	writing = false;
 	msgbuffer = 0;
 }
 
-template<typename T, typename SocketType, typename CheckerType>
-TcpBaseSocket<T, SocketType, CheckerType>::_writerinfo_::~_writerinfo_() {
+template<typename T, typename SocketType>
+TcpBaseSocket<T, SocketType>::_writerinfo_::~_writerinfo_() {
 	SocketLib::Buffer* pbuffer;
 	while (buffer_pool.size()){
 		pbuffer = buffer_pool.front();
@@ -52,41 +40,41 @@ TcpBaseSocket<T, SocketType, CheckerType>::_writerinfo_::~_writerinfo_() {
 	delete msgbuffer;
 }
 
-template<typename T, typename SocketType, typename CheckerType>
-TcpBaseSocket<T, SocketType, CheckerType>::TcpBaseSocket(NetIo& netio, CheckerType checker)
-	:_netio(netio) ,_msgchecker(checker){
+template<typename T, typename SocketType>
+TcpBaseSocket<T, SocketType>::TcpBaseSocket(NetIo& netio)
+	:_netio(netio) {
 	_flag = E_STATE_STOP;
 	_socket = new SocketType(_netio.GetIoService());
 }
 
-template<typename T, typename SocketType, typename CheckerType>
-TcpBaseSocket<T, SocketType, CheckerType>::~TcpBaseSocket() {
+template<typename T, typename SocketType>
+TcpBaseSocket<T, SocketType>::~TcpBaseSocket() {
 	delete _socket;
 }
 
-template<typename T, typename SocketType, typename CheckerType>
-const SocketLib::Tcp::EndPoint& TcpBaseSocket<T, SocketType, CheckerType>::LocalEndpoint()const {
+template<typename T, typename SocketType>
+const SocketLib::Tcp::EndPoint& TcpBaseSocket<T, SocketType>::LocalEndpoint()const {
 	return _localep;
 }
 
-template<typename T, typename SocketType, typename CheckerType>
-const SocketLib::Tcp::EndPoint& TcpBaseSocket<T, SocketType, CheckerType>::RemoteEndpoint()const {
+template<typename T, typename SocketType>
+const SocketLib::Tcp::EndPoint& TcpBaseSocket<T, SocketType>::RemoteEndpoint()const {
 	return _remoteep;
 }
 
-template<typename T, typename SocketType, typename CheckerType>
-void TcpBaseSocket<T, SocketType, CheckerType>::Close() {
+template<typename T, typename SocketType>
+void TcpBaseSocket<T, SocketType>::Close() {
 	_PostClose(E_STATE_START);
 }
 
-template<typename T, typename SocketType, typename CheckerType>
-void TcpBaseSocket<T, SocketType, CheckerType>::_PostClose(unsigned int state) {
+template<typename T, typename SocketType>
+void TcpBaseSocket<T, SocketType>::_PostClose(unsigned int state) {
 	SocketLib::ScopedLock scoped_w(_writer.lock);
 	_Close(state);
 }
 
-template<typename T, typename SocketType, typename CheckerType>
-void TcpBaseSocket<T, SocketType, CheckerType>::_Close(unsigned int state) {
+template<typename T, typename SocketType>
+void TcpBaseSocket<T, SocketType>::_Close(unsigned int state) {
 	if (_flag == E_STATE_START || _writer.writing) {
 		if (state == E_STATE_START)
 			_flag = E_STATE_STOP;
@@ -101,8 +89,8 @@ void TcpBaseSocket<T, SocketType, CheckerType>::_Close(unsigned int state) {
 	}
 }
 
-template<typename T, typename SocketType, typename CheckerType>
-void TcpBaseSocket<T, SocketType, CheckerType>::Send(SocketLib::Buffer* buffer) {
+template<typename T, typename SocketType>
+void TcpBaseSocket<T, SocketType>::Send(SocketLib::Buffer* buffer) {
 	SocketLib::ScopedLock scoped_w(_writer.lock);
 	if (_flag == E_STATE_START) {
 		_writer.buffer_pool.push_back(buffer);
@@ -112,8 +100,8 @@ void TcpBaseSocket<T, SocketType, CheckerType>::Send(SocketLib::Buffer* buffer) 
 		delete buffer;
 }
 
-template<typename T, typename SocketType, typename CheckerType>
-void TcpBaseSocket<T, SocketType, CheckerType>::Send(const SocketLib::s_byte_t* data, SocketLib::s_uint32_t len) {
+template<typename T, typename SocketType>
+void TcpBaseSocket<T, SocketType>::Send(const SocketLib::s_byte_t* data, SocketLib::s_uint32_t len) {
 	if (len > 0) {
 		SocketLib::ScopedLock scoped_w(_writer.lock);
 		if (_flag != E_STATE_START)
@@ -140,8 +128,8 @@ void TcpBaseSocket<T, SocketType, CheckerType>::Send(const SocketLib::s_byte_t* 
 	}
 }
 
-template<typename T, typename SocketType, typename CheckerType>
-void TcpBaseSocket<T, SocketType, CheckerType>::_WriteHandler(SocketLib::s_uint32_t tran_byte, SocketLib::SocketError error) {
+template<typename T, typename SocketType>
+void TcpBaseSocket<T, SocketType>::_WriteHandler(SocketLib::s_uint32_t tran_byte, SocketLib::SocketError error) {
 	if (error) {
 		// 出错关闭连接
 		M_NETIO_LOGGER("write handler happend error:"M_ERROR_DESC_STR(error));
@@ -162,8 +150,56 @@ void TcpBaseSocket<T, SocketType, CheckerType>::_WriteHandler(SocketLib::s_uint3
 	}
 }
 
-template<typename T, typename SocketType, typename CheckerType>
-void TcpBaseSocket<T, SocketType, CheckerType>::_ReadHandler(SocketLib::s_uint32_t tran_byte, SocketLib::SocketError error) {
+template<typename T, typename SocketType>
+inline void TcpBaseSocket<T, SocketType>::_CloseHandler() {
+	_netio.OnDisconnected(this->shared_from_this());
+}
+
+template<typename T, typename SocketType>
+bool TcpBaseSocket<T, SocketType>::_TrySendData(bool ignore) {
+	if (!_writer.writing || ignore)
+	{
+		if ((!_writer.msgbuffer || _writer.msgbuffer->Length() == 0)
+			&& _writer.buffer_pool.size() > 0) {
+			SocketLib::Buffer* pbuffer = _writer.buffer_pool.front();
+			if (_writer.msgbuffer)
+				_writer.buffer_pool2.push_back(_writer.msgbuffer);
+			_writer.msgbuffer = pbuffer;
+			_writer.buffer_pool.pop_front();
+		}
+		if (_writer.msgbuffer && _writer.msgbuffer->Length() != 0) {
+			_writer.writing = true;
+			SocketLib::SocketError error;
+			_socket->AsyncSendSome(bind_t(&TcpBaseSocket::_WriteHandler, this->shared_from_this(), placeholder_1, placeholder_2)
+				, _writer.msgbuffer->Data(), _writer.msgbuffer->Length(),error);
+			if (error)
+				_Close(E_STATE_WRITE);
+			return (!error);
+		}
+		else {
+			_writer.writing = false;
+		}
+	}
+	return false;
+}
+
+
+/////////////////////////////////////////////////////////////////////////////////////////////
+
+template<typename T, typename SocketType>
+TcpStreamSocket<T, SocketType>::_readerinfo_::_readerinfo_() {
+	g_memset(&curheader, 0, sizeof(curheader));
+	readbuf = new SocketLib::s_byte_t[M_READ_SIZE];
+	g_memset(readbuf, 0, M_READ_SIZE);
+}
+
+template<typename T, typename SocketType>
+TcpStreamSocket<T, SocketType>::_readerinfo_::~_readerinfo_() {
+	delete[]readbuf;
+}
+
+template<typename T, typename SocketType>
+void TcpStreamSocket<T, SocketType>::_ReadHandler(SocketLib::s_uint32_t tran_byte, SocketLib::SocketError error) {
 	if (error) {
 		// 出错关闭连接
 		M_NETIO_LOGGER("read handler happend error:" << M_ERROR_DESC_STR(error));
@@ -180,34 +216,6 @@ void TcpBaseSocket<T, SocketType, CheckerType>::_ReadHandler(SocketLib::s_uint32
 			}
 			else {
 				// 数据检查出错，主动断开连接
-				_socket->Shutdown(SocketLib::E_Shutdown_RD,error);
-				_PostClose(E_STATE_START);
-			}
-		}
-		else {
-			_PostClose(E_STATE_START);
-		}
-	}
-}
-
-template<typename T, typename SocketType, typename CheckerType>
-void TcpBaseSocket<T, SocketType, CheckerType>::_ReadHttpHandler(SocketLib::s_uint32_t tran_byte, SocketLib::SocketError error) {
-	if (error) {
-		// 出错关闭连接
-		M_NETIO_LOGGER("read handler happend error:" << M_ERROR_DESC_STR(error));
-		_PostClose(E_STATE_START);
-	}
-	else if (tran_byte <= 0) {
-		// 对方关闭写
-		_PostClose(E_STATE_START);
-	}
-	else {
-		if (_flag == E_STATE_START) {
-			if (_CutHttpMsgPack(_reader.readbuf, tran_byte)) {
-				_TryRecvHttpData();
-			}
-			else {
-				// 数据检查出错，主动断开连接
 				_socket->Shutdown(SocketLib::E_Shutdown_RD, error);
 				_PostClose(E_STATE_START);
 			}
@@ -218,16 +226,11 @@ void TcpBaseSocket<T, SocketType, CheckerType>::_ReadHttpHandler(SocketLib::s_ui
 	}
 }
 
-template<typename T, typename SocketType, typename CheckerType>
-inline void TcpBaseSocket<T, SocketType, CheckerType>::_CloseHandler() {
-	_netio.OnDisconnected(this->shared_from_this());
-}
-
-template<typename T, typename SocketType, typename CheckerType>
-bool TcpBaseSocket<T, SocketType, CheckerType>::_CutMsgPack(SocketLib::s_byte_t* buf, SocketLib::s_uint32_t tran_byte) {
+template<typename T, typename SocketType>
+bool TcpStreamSocket<T, SocketType>::_CutMsgPack(SocketLib::s_byte_t* buf, SocketLib::s_uint32_t tran_byte) {
 	// 减少内存拷贝是此函数的设计关键
 	SocketLib::s_uint32_t hdrlen = (SocketLib::s_uint32_t)sizeof(MessageHeader);
-	do 
+	do
 	{
 		// 算出头部长度
 		SocketLib::s_uint32_t datalen = _reader.msgbuffer.Length();
@@ -275,67 +278,28 @@ bool TcpBaseSocket<T, SocketType, CheckerType>::_CutMsgPack(SocketLib::s_byte_t*
 			_netio.OnReceiveData(this->shared_from_this(), _reader.msgbuffer2);
 			_reader.msgbuffer2.Clear();
 		}
-
-	} 
-	while (true);
+	} while (true);
 	return true;
 }
 
-template<typename T, typename SocketType, typename CheckerType>
-bool TcpBaseSocket<T, SocketType, CheckerType>::_CutHttpMsgPack(SocketLib::s_byte_t* buf, SocketLib::s_uint32_t tran_byte) {
-	return true;
-}
-
-template<typename T, typename SocketType, typename CheckerType>
-bool TcpBaseSocket<T, SocketType, CheckerType>::_TrySendData(bool ignore) {
-	if (!_writer.writing || ignore)
-	{
-		if ((!_writer.msgbuffer || _writer.msgbuffer->Length() == 0)
-			&& _writer.buffer_pool.size() > 0) {
-			SocketLib::Buffer* pbuffer = _writer.buffer_pool.front();
-			if (_writer.msgbuffer)
-				_writer.buffer_pool2.push_back(_writer.msgbuffer);
-			_writer.msgbuffer = pbuffer;
-			_writer.buffer_pool.pop_front();
-		}
-		if (_writer.msgbuffer && _writer.msgbuffer->Length() != 0) {
-			_writer.writing = true;
-			SocketLib::SocketError error;
-			_socket->AsyncSendSome(bind_t(&TcpBaseSocket::_WriteHandler, this->shared_from_this(), placeholder_1, placeholder_2)
-				, _writer.msgbuffer->Data(), _writer.msgbuffer->Length(),error);
-			if (error)
-				_Close(E_STATE_WRITE);
-			return (!error);
-		}
-		else {
-			_writer.writing = false;
-		}
-	}
-	return false;
-}
-
-template<typename T, typename SocketType, typename CheckerType>
-void TcpBaseSocket<T, SocketType, CheckerType>::_TryRecvData() {
+template<typename T, typename SocketType>
+void TcpStreamSocket<T, SocketType>::_TryRecvData() {
 	SocketLib::SocketError error;
-	_socket->AsyncRecvSome(bind_t(&TcpBaseSocket::_ReadHandler, this->shared_from_this(), placeholder_1, placeholder_2)
+	_socket->AsyncRecvSome(bind_t(&TcpStreamSocket::_ReadHandler, this->shared_from_this(), placeholder_1, placeholder_2)
 		, _reader.readbuf, M_READ_SIZE, error);
 	if (error)
 		_PostClose(E_STATE_START);
 }
 
-template<typename T, typename SocketType, typename CheckerType>
-void TcpBaseSocket<T, SocketType, CheckerType>::_TryRecvHttpData() {
-	SocketLib::SocketError error;
-	_socket->AsyncRecvSome(bind_t(&TcpBaseSocket::_ReadHttpHandler, this->shared_from_this(), placeholder_1, placeholder_2)
-		, _reader.readbuf, M_READ_SIZE, error);
-	if (error)
-		_PostClose(E_STATE_START);
+template<typename T, typename SocketType>
+TcpStreamSocket<T, SocketType>::TcpStreamSocket(NetIo& netio)
+	:TcpBaseSocket(netio){
 }
 
-/////////////////////////////////////////////////////////////////////////////////
+/////////////////////////////////////////////////////////////////////////////////////////////
 
-TcpSocket::TcpSocket(NetIo& netio, MessageChecker checker)
-	:TcpBaseSocket(netio,checker){
+TcpSocket::TcpSocket(NetIo& netio)
+	:TcpStreamSocket(netio){
 }
 
 SocketLib::TcpSocket<SocketLib::IoService>& TcpSocket::GetSocket() {

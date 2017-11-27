@@ -47,10 +47,6 @@ typedef shard_ptr_t<HttpSocket>		   HttpSocketPtr;
 typedef shard_ptr_t<HttpConnector>	   HttpConnectorPtr;
 typedef shard_ptr_t<SocketLib::TcpAcceptor<SocketLib::IoService> > NetIoTcpAcceptorPtr;
 
-typedef function_t<bool()> EmptyChecker;
-typedef function_t<bool(TcpSocketPtr, MessageHeader&, Buffer&)> MessageChecker;
-typedef function_t<bool(TcpConnectorPtr, MessageHeader&, Buffer&)> MessageChecker2;
-
 #define lasterror tlsdata<SocketLib::SocketError,0>::data()
 
 // class netio
@@ -101,11 +97,15 @@ public:
 	// 数据包通知,这个函数里不要处理业务，防止堵塞
 	virtual void OnReceiveData(const TcpSocketPtr& clisock, SocketLib::Buffer& buffer);
 	virtual void OnReceiveData(const TcpConnectorPtr& clisock, SocketLib::Buffer& buffer);
-	virtual void OnReceiveData(HttpSocketPtr clisock, SocketLib::Buffer& buffer);
+	virtual void OnReceiveData(HttpSocketPtr clisock, SocketLib::Buffer& request
+		, SocketLib::Buffer& head, SocketLib::Buffer& body);
 
 protected:
 	void _AcceptHandler(SocketLib::SocketError error, TcpSocketPtr& clisock, NetIoTcpAcceptorPtr& acceptor);
 	void _AcceptHttpHandler(SocketLib::SocketError error, HttpSocketPtr& clisock, NetIoTcpAcceptorPtr& acceptor);
+
+private:
+	void OnReceiveData(HttpSocketPtr clisock, SocketLib::Buffer& buffer);
 
 protected:
 	NetIo(const NetIo&);
@@ -123,20 +123,10 @@ enum {
 	E_STATE_WRITE = 3,
 };
 
-template<typename T, typename SocketType,typename CheckerType>
+template<typename T, typename SocketType>
 class TcpBaseSocket : public enable_shared_from_this_t<T>
 {
 protected:
-	struct _readerinfo_ {
-		SocketLib::s_byte_t*  readbuf;
-		SocketLib::Buffer	  msgbuffer;
-		SocketLib::Buffer	  msgbuffer2;
-		MessageHeader		  curheader;
-		//SocketLib::MutexLock  lock;
-
-		_readerinfo_();
-		~_readerinfo_();
-	};
 	struct _writerinfo_ {
 		SocketLib::slist<SocketLib::Buffer*> buffer_pool;
 		SocketLib::slist<SocketLib::Buffer*> buffer_pool2;
@@ -149,7 +139,7 @@ protected:
 	};
 
 public:
-	TcpBaseSocket(NetIo& netio, CheckerType checker);
+	TcpBaseSocket(NetIo& netio);
 
 	virtual ~TcpBaseSocket();
 
@@ -167,33 +157,17 @@ public:
 protected:
 	void _WriteHandler(SocketLib::s_uint32_t tran_byte, SocketLib::SocketError error);
 
-	void _ReadHandler(SocketLib::s_uint32_t tran_byte, SocketLib::SocketError error);
-
-	void _ReadHttpHandler(SocketLib::s_uint32_t tran_byte, SocketLib::SocketError error);
-
 	inline void _CloseHandler();
 
 	void _PostClose(unsigned int state);
 
 	void _Close(unsigned int state);
 
-	// 裁减出数据包，返回false意味着数据包有错
-	bool _CutMsgPack(SocketLib::s_byte_t* buf, SocketLib::s_uint32_t tran_byte);
-
-	bool _CutHttpMsgPack(SocketLib::s_byte_t* buf, SocketLib::s_uint32_t tran_byte);
-
 	bool _TrySendData(bool ignore = false);
 
-	void _TryRecvData();
-
-	void _TryRecvHttpData();
-
 protected:
-	NetIo& _netio;
-	SocketType* _socket;
-	CheckerType _msgchecker;
-
-	_readerinfo_ _reader;
+	NetIo&		 _netio;
+	SocketType*  _socket;
 	_writerinfo_ _writer;
 
 	// endpoint
@@ -204,16 +178,41 @@ protected:
 	unsigned short _flag;
 };
 
+// for stream
+template<typename T, typename SocketType>
+class TcpStreamSocket : public TcpBaseSocket<T, SocketType>
+{
+protected:
+	struct _readerinfo_ {
+		SocketLib::s_byte_t*  readbuf;
+		SocketLib::Buffer	  msgbuffer;
+		SocketLib::Buffer	  msgbuffer2;
+		MessageHeader		  curheader;
+
+		_readerinfo_();
+		~_readerinfo_();
+	};
+
+	_readerinfo_ _reader;
+
+	void _ReadHandler(SocketLib::s_uint32_t tran_byte, SocketLib::SocketError error);
+	
+	// 裁减出数据包，返回false意味着数据包有错
+	bool _CutMsgPack(SocketLib::s_byte_t* buf, SocketLib::s_uint32_t tran_byte);
+
+	void _TryRecvData();
+
+public:
+	TcpStreamSocket(NetIo& netio);
+};
+
 // class tcpsocket
-class TcpSocket : public TcpBaseSocket<TcpSocket, SocketLib::TcpSocket<SocketLib::IoService>,
-	MessageChecker>
+class TcpSocket : 
+	public TcpStreamSocket<TcpSocket, SocketLib::TcpSocket<SocketLib::IoService> >
 {
 	friend class NetIo;
 public:
-	typedef TcpBaseSocket<TcpSocket, SocketLib::TcpSocket<SocketLib::IoService>,
-		MessageChecker> BaseSelf;
-public:
-	TcpSocket(NetIo& netio, MessageChecker checker);
+	TcpSocket(NetIo& netio);
 
 	SocketLib::TcpSocket<SocketLib::IoService>& GetSocket();
 
@@ -222,13 +221,11 @@ protected:
 };
 
 // class tcpconnector
-class TcpConnector : public TcpBaseSocket<TcpConnector, SocketLib::TcpConnector<SocketLib::IoService>,
-	MessageChecker2>
+class TcpConnector : 
+	public TcpStreamSocket<TcpConnector, SocketLib::TcpConnector<SocketLib::IoService> >
 {
-	typedef TcpBaseSocket<TcpConnector, SocketLib::TcpConnector<SocketLib::IoService>,
-		MessageChecker2> BaseSelf;
 public:
-	TcpConnector(NetIo& netio, MessageChecker2 checker);
+	TcpConnector(NetIo& netio);
 
 	SocketLib::TcpConnector<SocketLib::IoService>& GetSocket();
 
@@ -251,9 +248,36 @@ protected:
 	unsigned int _data;
 };
 
+// for http
+template<typename T, typename SocketType>
+class HttpBaseSocket : 
+	public TcpBaseSocket<T, SocketType>
+{
+protected:
+	struct _readerinfo_ {
+		SocketLib::s_byte_t*  readbuf;
+	
+		_readerinfo_();
+		~_readerinfo_();
+	};
+
+	_readerinfo_ _reader;
+
+	void _ReadHandler(SocketLib::s_uint32_t tran_byte, SocketLib::SocketError error);
+
+	// 裁减出数据包，返回false意味着数据包有错
+	bool _CutMsgPack(SocketLib::s_byte_t* buf, SocketLib::s_uint32_t tran_byte);
+
+	void _TryRecvData();
+
+public:
+	HttpBaseSocket(NetIo& netio);
+};
+
 // class httpsocket
-class HttpSocket : public TcpBaseSocket<HttpSocket, SocketLib::TcpSocket<SocketLib::IoService>,
-	EmptyChecker> {
+class HttpSocket : 
+	public HttpBaseSocket<HttpSocket, SocketLib::TcpSocket<SocketLib::IoService> > 
+{
 	friend class NetIo;
 public:
 	HttpSocket(NetIo& netio);
@@ -264,8 +288,9 @@ protected:
 	void Init();
 };
 
-class HttpConnector : public TcpBaseSocket<HttpConnector, SocketLib::TcpSocket<SocketLib::IoService>,
-	EmptyChecker> {
+class HttpConnector : 
+	public HttpBaseSocket<HttpConnector, SocketLib::TcpSocket<SocketLib::IoService> > 
+{
 
 };
 
