@@ -36,13 +36,18 @@ struct __attribute__((__packed__)) MessageHeader {
 class NetIo;
 class TcpSocket;
 class TcpConnector;
+class HttpSocket;
+class HttpConnector;
 
 typedef SocketLib::Buffer Buffer;
 typedef shard_ptr_t<SocketLib::Buffer> BufferPtr;
 typedef shard_ptr_t<TcpSocket>		   TcpSocketPtr;
 typedef shard_ptr_t<TcpConnector>	   TcpConnectorPtr;
+typedef shard_ptr_t<HttpSocket>		   HttpSocketPtr;
+typedef shard_ptr_t<HttpConnector>	   HttpConnectorPtr;
 typedef shard_ptr_t<SocketLib::TcpAcceptor<SocketLib::IoService> > NetIoTcpAcceptorPtr;
 
+typedef function_t<bool()> EmptyChecker;
 typedef function_t<bool(TcpSocketPtr, MessageHeader&, Buffer&)> MessageChecker;
 typedef function_t<bool(TcpConnectorPtr, MessageHeader&, Buffer&)> MessageChecker2;
 
@@ -53,7 +58,6 @@ class NetIo
 {
 public:
 	NetIo();
-
 	NetIo(SocketLib::s_uint32_t backlog);
 
 	virtual ~NetIo();
@@ -61,6 +65,10 @@ public:
 	// 建立一个监听
 	bool ListenOne(const SocketLib::Tcp::EndPoint& ep);
 	bool ListenOne(const std::string& addr, SocketLib::s_uint16_t port);
+
+	// 建立一个http监听
+	bool ListenOneHttp(const SocketLib::Tcp::EndPoint& ep);
+	bool ListenOneHttp(const std::string& addr, SocketLib::s_uint16_t port);
 
 	// 异步建接
 	void ConnectOne(const SocketLib::Tcp::EndPoint& ep, unsigned int data=0);
@@ -83,17 +91,21 @@ public:
 	// 连线通知,这个函数里不要处理业务，防止堵塞
 	virtual void OnConnected(const TcpSocketPtr& clisock);
 	virtual void OnConnected(const TcpConnectorPtr& clisock,SocketLib::SocketError error);
+	virtual void OnConnected(HttpSocketPtr clisock);
 
 	// 掉线通知,这个函数里不要处理业务，防止堵塞
 	virtual void OnDisconnected(const TcpSocketPtr& clisock);
 	virtual void OnDisconnected(const TcpConnectorPtr& clisock);
+	virtual void OnDisconnected(HttpSocketPtr clisock);
 
 	// 数据包通知,这个函数里不要处理业务，防止堵塞
 	virtual void OnReceiveData(const TcpSocketPtr& clisock, SocketLib::Buffer& buffer);
 	virtual void OnReceiveData(const TcpConnectorPtr& clisock, SocketLib::Buffer& buffer);
+	virtual void OnReceiveData(HttpSocketPtr clisock, SocketLib::Buffer& buffer);
 
 protected:
-	void AcceptHandler(SocketLib::SocketError error, TcpSocketPtr& clisock, NetIoTcpAcceptorPtr& acceptor);
+	void _AcceptHandler(SocketLib::SocketError error, TcpSocketPtr& clisock, NetIoTcpAcceptorPtr& acceptor);
+	void _AcceptHttpHandler(SocketLib::SocketError error, HttpSocketPtr& clisock, NetIoTcpAcceptorPtr& acceptor);
 
 protected:
 	NetIo(const NetIo&);
@@ -157,6 +169,8 @@ protected:
 
 	void _ReadHandler(SocketLib::s_uint32_t tran_byte, SocketLib::SocketError error);
 
+	void _ReadHttpHandler(SocketLib::s_uint32_t tran_byte, SocketLib::SocketError error);
+
 	inline void _CloseHandler();
 
 	void _PostClose(unsigned int state);
@@ -166,9 +180,13 @@ protected:
 	// 裁减出数据包，返回false意味着数据包有错
 	bool _CutMsgPack(SocketLib::s_byte_t* buf, SocketLib::s_uint32_t tran_byte);
 
+	bool _CutHttpMsgPack(SocketLib::s_byte_t* buf, SocketLib::s_uint32_t tran_byte);
+
 	bool _TrySendData(bool ignore = false);
 
 	void _TryRecvData();
+
+	void _TryRecvHttpData();
 
 protected:
 	NetIo& _netio;
@@ -203,6 +221,7 @@ protected:
 	void Init();
 };
 
+// class tcpconnector
 class TcpConnector : public TcpBaseSocket<TcpConnector, SocketLib::TcpConnector<SocketLib::IoService>,
 	MessageChecker2>
 {
@@ -232,8 +251,28 @@ protected:
 	unsigned int _data;
 };
 
+// class httpsocket
+class HttpSocket : public TcpBaseSocket<HttpSocket, SocketLib::TcpSocket<SocketLib::IoService>,
+	EmptyChecker> {
+	friend class NetIo;
+public:
+	HttpSocket(NetIo& netio);
+
+	SocketLib::TcpSocket<SocketLib::IoService>& GetSocket();
+
+protected:
+	void Init();
+};
+
+class HttpConnector : public TcpBaseSocket<HttpConnector, SocketLib::TcpSocket<SocketLib::IoService>,
+	EmptyChecker> {
+
+};
+
+
 M_NETIO_NAMESPACE_END
 #include "netio_impl.hpp"
 #include "tsocket_impl.hpp"
 #include "tconnector_impl.hpp"
+#include "hsocket_impl.hpp"
 #endif

@@ -195,6 +195,9 @@
     <ClInclude Include="socket\slist.hpp">
       <Filter>socket</Filter>
     </ClInclude>
+    <ClInclude Include="netio\hsocket_impl.hpp">
+      <Filter>netio</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="socket.cpp">

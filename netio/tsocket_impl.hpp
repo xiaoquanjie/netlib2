@@ -191,6 +191,34 @@ void TcpBaseSocket<T, SocketType, CheckerType>::_ReadHandler(SocketLib::s_uint32
 }
 
 template<typename T, typename SocketType, typename CheckerType>
+void TcpBaseSocket<T, SocketType, CheckerType>::_ReadHttpHandler(SocketLib::s_uint32_t tran_byte, SocketLib::SocketError error) {
+	if (error) {
+		// 出错关闭连接
+		M_NETIO_LOGGER("read handler happend error:" << M_ERROR_DESC_STR(error));
+		_PostClose(E_STATE_START);
+	}
+	else if (tran_byte <= 0) {
+		// 对方关闭写
+		_PostClose(E_STATE_START);
+	}
+	else {
+		if (_flag == E_STATE_START) {
+			if (_CutHttpMsgPack(_reader.readbuf, tran_byte)) {
+				_TryRecvHttpData();
+			}
+			else {
+				// 数据检查出错，主动断开连接
+				_socket->Shutdown(SocketLib::E_Shutdown_RD, error);
+				_PostClose(E_STATE_START);
+			}
+		}
+		else {
+			_PostClose(E_STATE_START);
+		}
+	}
+}
+
+template<typename T, typename SocketType, typename CheckerType>
 inline void TcpBaseSocket<T, SocketType, CheckerType>::_CloseHandler() {
 	_netio.OnDisconnected(this->shared_from_this());
 }
@@ -241,10 +269,6 @@ bool TcpBaseSocket<T, SocketType, CheckerType>::_CutMsgPack(SocketLib::s_byte_t*
 
 			// swap
 			_reader.msgbuffer2.Swap(_reader.msgbuffer);
-			// check
-			if (_msgchecker)
-				if (!_msgchecker(this->shared_from_this(), _reader.curheader, _reader.msgbuffer2))
-					return false;
 
 			// notify
 			_reader.curheader.size = 0;
@@ -254,6 +278,11 @@ bool TcpBaseSocket<T, SocketType, CheckerType>::_CutMsgPack(SocketLib::s_byte_t*
 
 	} 
 	while (true);
+	return true;
+}
+
+template<typename T, typename SocketType, typename CheckerType>
+bool TcpBaseSocket<T, SocketType, CheckerType>::_CutHttpMsgPack(SocketLib::s_byte_t* buf, SocketLib::s_uint32_t tran_byte) {
 	return true;
 }
 
@@ -289,6 +318,15 @@ template<typename T, typename SocketType, typename CheckerType>
 void TcpBaseSocket<T, SocketType, CheckerType>::_TryRecvData() {
 	SocketLib::SocketError error;
 	_socket->AsyncRecvSome(bind_t(&TcpBaseSocket::_ReadHandler, this->shared_from_this(), placeholder_1, placeholder_2)
+		, _reader.readbuf, M_READ_SIZE, error);
+	if (error)
+		_PostClose(E_STATE_START);
+}
+
+template<typename T, typename SocketType, typename CheckerType>
+void TcpBaseSocket<T, SocketType, CheckerType>::_TryRecvHttpData() {
+	SocketLib::SocketError error;
+	_socket->AsyncRecvSome(bind_t(&TcpBaseSocket::_ReadHttpHandler, this->shared_from_this(), placeholder_1, placeholder_2)
 		, _reader.readbuf, M_READ_SIZE, error);
 	if (error)
 		_PostClose(E_STATE_START);

@@ -156,6 +156,7 @@
     <ClInclude Include="demo\async_client_demo.h" />
     <ClInclude Include="demo\async_server_demo.h" />
     <ClInclude Include="netio\config.hpp" />
+    <ClInclude Include="netio\hsocket_impl.hpp" />
     <ClInclude Include="netio\log.hpp" />
     <ClInclude Include="netio\netio.hpp" />
     <ClInclude Include="netio\netio_impl.hpp" />

@@ -16,11 +16,13 @@
 
 M_NETIO_NAMESPACE_BEGIN
 
-NetIo::NetIo() :_backlog(20) {
+NetIo::NetIo() 
+	:_backlog(20){
 	_endian = SocketLib::detail::Util::LocalEndian();
 }
 
-NetIo::NetIo(SocketLib::s_uint32_t backlog) : _backlog(backlog) {
+NetIo::NetIo(SocketLib::s_uint32_t backlog) 
+	: _backlog(backlog) {
 	_endian = SocketLib::detail::Util::LocalEndian();
 }
 
@@ -30,7 +32,7 @@ bool NetIo::ListenOne(const SocketLib::Tcp::EndPoint& ep) {
 	try {
 		NetIoTcpAcceptorPtr acceptor(new SocketLib::TcpAcceptor<SocketLib::IoService>(_ioservice, ep, _backlog));
 		TcpSocketPtr clisock(new TcpSocket(*this, 0));
-		acceptor->AsyncAccept(bind_t(&NetIo::AcceptHandler, this, placeholder_1, clisock, acceptor), clisock->GetSocket());
+		acceptor->AsyncAccept(bind_t(&NetIo::_AcceptHandler, this, placeholder_1, clisock, acceptor), clisock->GetSocket());
 	}
 	catch (SocketLib::SocketError& error) {
 		lasterror = error;
@@ -42,6 +44,25 @@ bool NetIo::ListenOne(const SocketLib::Tcp::EndPoint& ep) {
 bool NetIo::ListenOne(const std::string& addr, SocketLib::s_uint16_t port) {
 	SocketLib::Tcp::EndPoint ep(SocketLib::AddressV4(addr), port);
 	return ListenOne(ep);
+}
+
+// 建立一个http监听
+bool NetIo::ListenOneHttp(const SocketLib::Tcp::EndPoint& ep) {
+	try {
+		NetIoTcpAcceptorPtr acceptor(new SocketLib::TcpAcceptor<SocketLib::IoService>(_ioservice, ep, _backlog));
+		HttpSocketPtr clisock(new HttpSocket(*this));
+		acceptor->AsyncAccept(bind_t(&NetIo::_AcceptHttpHandler, this, placeholder_1, clisock, acceptor), clisock->GetSocket());
+	}
+	catch (SocketLib::SocketError& error) {
+		lasterror = error;
+		return false;
+	}
+	return true;
+}
+
+bool NetIo::ListenOneHttp(const std::string& addr, SocketLib::s_uint16_t port) {
+	SocketLib::Tcp::EndPoint ep(SocketLib::AddressV4(addr), port);
+	return ListenOneHttp(ep);
 }
 
 void NetIo::ConnectOne(const SocketLib::Tcp::EndPoint& ep, unsigned int data) {
@@ -92,7 +113,7 @@ inline SocketLib::s_uint32_t NetIo::LocalEndian()const {
 	return _endian;
 }
 
-void NetIo::AcceptHandler(SocketLib::SocketError error, TcpSocketPtr& clisock, NetIoTcpAcceptorPtr& acceptor) {
+void NetIo::_AcceptHandler(SocketLib::SocketError error, TcpSocketPtr& clisock, NetIoTcpAcceptorPtr& acceptor) {
 	if (error) {
 		M_NETIO_LOGGER("accept handler happend error:" << M_NETIO_LOGGER(error));
 	}
@@ -100,7 +121,20 @@ void NetIo::AcceptHandler(SocketLib::SocketError error, TcpSocketPtr& clisock, N
 		clisock->Init();
 	}
 	TcpSocketPtr newclisock(new TcpSocket(*this, 0));
-	acceptor->AsyncAccept(bind_t(&NetIo::AcceptHandler, this, placeholder_1, newclisock, acceptor), newclisock->GetSocket(), error);
+	acceptor->AsyncAccept(bind_t(&NetIo::_AcceptHandler, this, placeholder_1, newclisock, acceptor), newclisock->GetSocket(), error);
+	if (error)
+		lasterror = error;
+}
+
+void NetIo::_AcceptHttpHandler(SocketLib::SocketError error, HttpSocketPtr& clisock, NetIoTcpAcceptorPtr& acceptor) {
+	if (error) {
+		M_NETIO_LOGGER("accept handler happend error:" << M_NETIO_LOGGER(error));
+	}
+	else {
+		clisock->Init();
+	}
+	HttpSocketPtr newclisock(new HttpSocket(*this));
+	acceptor->AsyncAccept(bind_t(&NetIo::_AcceptHttpHandler, this, placeholder_1, newclisock, acceptor), newclisock->GetSocket(), error);
 	if (error)
 		lasterror = error;
 }
@@ -115,26 +149,26 @@ void NetIo::AcceptHandler(SocketLib::SocketError error, TcpSocketPtr& clisock, N
 
 // 连线通知,这个函数里不要处理业务，防止堵塞
 void NetIo::OnConnected(const TcpSocketPtr& clisock) {
-
 }
 void NetIo::OnConnected(const TcpConnectorPtr& clisock, SocketLib::SocketError error) {
-
+}
+void NetIo::OnConnected(HttpSocketPtr clisock) {
 }
 
 // 掉线通知,这个函数里不要处理业务，防止堵塞
 void NetIo::OnDisconnected(const TcpSocketPtr& clisock) {
-
 }
 void NetIo::OnDisconnected(const TcpConnectorPtr& clisock) {
-
+}
+void NetIo::OnDisconnected(HttpSocketPtr clisock) {
 }
 
 // 数据包通知,这个函数里不要处理业务，防止堵塞
 void NetIo::OnReceiveData(const TcpSocketPtr& clisock, SocketLib::Buffer& buffer) {
-
 }
 void NetIo::OnReceiveData(const TcpConnectorPtr& clisock, SocketLib::Buffer& buffer) {
-
+}
+void NetIo::OnReceiveData(HttpSocketPtr clisock, SocketLib::Buffer& buffer) {
 }
 
 M_NETIO_NAMESPACE_END

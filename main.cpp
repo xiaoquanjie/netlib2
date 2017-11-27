@@ -73,6 +73,10 @@ public:
 			//SendData(clisock);
 		}
 	}
+	virtual void OnConnected(netiolib::HttpSocketPtr clisock) {
+		cout << "OnConnected one http : " << clisock->RemoteEndpoint().Address()
+			<< " " << clisock->RemoteEndpoint().Port() << endl;
+	}
 
 	// 掉线通知,这个函数里不要处理业务，防止堵塞
 	virtual void OnDisconnected(const netiolib::TcpSocketPtr& clisock) {
@@ -80,6 +84,10 @@ public:
 	}
 	virtual void OnDisconnected(const netiolib::TcpConnectorPtr& clisock) {
 		cout << "OnDisconnected one : " << clisock->LocalEndpoint().Address() << " " << clisock->LocalEndpoint().Port() << endl;
+	}
+	virtual void OnDisconnected(netiolib::HttpSocketPtr clisock) {
+		cout << "OnDisconnected one http : " << clisock->RemoteEndpoint().Address() << " "
+			<< clisock->RemoteEndpoint().Port() << endl;
 	}
 
 	// 数据包通知,这个函数里不要处理业务，防止堵塞
@@ -96,6 +104,9 @@ public:
 		buffer.Write('\0');
 		print_log(" : " << buffer.Data() << endl);
 		SendData(clisock);
+	}
+	virtual void OnReceiveData(netiolib::HttpSocketPtr clisock, SocketLib::Buffer& buffer) {
+
 	}
 
 	void Start(void*) {
@@ -123,6 +134,24 @@ void server() {
 	//thr.join();
 	//thr2.join();
 	//hr3.join();
+}
+
+void http_server() {
+	TestNetIo test_io;
+	for (int i = 0; i < 32; ++i) {
+		new thread(&TestNetIo::Start, &test_io, 0);
+	}
+
+	thread::sleep(200);
+	if (!test_io.ListenOneHttp("0.0.0.0", 3002)) {
+		cout << test_io.GetLastError().What() << endl;
+	}
+	else
+		cout << "listening....." << endl;
+
+	int i;
+	cin >> i;
+	test_io.Stop();
 }
 
 void client() {
@@ -156,6 +185,10 @@ void client() {
 	cin >> i;
 }
 
+void http_client() {
+
+}
+
 void netlib_test() {
 	init_gstr();
 	init_print();
@@ -166,6 +199,16 @@ void netlib_test() {
 		server();
 	else
 		client();
+}
+
+void netlib_http_test() {
+	cout << "select 1 is server,or client :" << endl;
+	int i = 0;
+	cin >> i;
+	if (i == 1)
+		http_server();
+	else
+		http_client();
 }
 
 void _other_test(void*p) {
@@ -242,12 +285,10 @@ void test1(function_t<void()>& t){
 
 int main() {
 
-	function_t<void()> f = slist_test;
-	test1(f);
-
 	//test1(TO());
 	//slist_test();
-	netlib_test();
+	//netlib_test();
+	netlib_http_test();
 	//other_test();
 	return 0;
 }
