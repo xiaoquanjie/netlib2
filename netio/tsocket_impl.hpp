@@ -203,25 +203,25 @@ void TcpStreamSocket<T, SocketType>::_ReadHandler(SocketLib::s_uint32_t tran_byt
 	if (error) {
 		// 出错关闭连接
 		M_NETIO_LOGGER("read handler happend error:" << M_ERROR_DESC_STR(error));
-		_PostClose(E_STATE_START);
+		this->_PostClose(E_STATE_START);
 	}
 	else if (tran_byte <= 0) {
 		// 对方关闭写
-		_PostClose(E_STATE_START);
+		this->_PostClose(E_STATE_START);
 	}
 	else {
-		if (_flag == E_STATE_START) {
+		if (this->_flag == E_STATE_START) {
 			if (_CutMsgPack(_reader.readbuf, tran_byte)) {
 				_TryRecvData();
 			}
 			else {
 				// 数据检查出错，主动断开连接
-				_socket->Shutdown(SocketLib::E_Shutdown_RD, error);
-				_PostClose(E_STATE_START);
+				this->_socket->Shutdown(SocketLib::E_Shutdown_RD, error);
+				this->_PostClose(E_STATE_START);
 			}
 		}
 		else {
-			_PostClose(E_STATE_START);
+			this->_PostClose(E_STATE_START);
 		}
 	}
 }
@@ -250,7 +250,7 @@ bool TcpStreamSocket<T, SocketType>::_CutMsgPack(SocketLib::s_byte_t* buf, Socke
 			}
 
 			// convert byte order
-			if (_reader.curheader.endian != _netio.LocalEndian()) {
+			if (_reader.curheader.endian != this->_netio.LocalEndian()) {
 				_reader.curheader.size = g_htons(_reader.curheader.size);
 				_reader.curheader.timestamp = g_htonl(_reader.curheader.timestamp);
 			}
@@ -275,7 +275,7 @@ bool TcpStreamSocket<T, SocketType>::_CutMsgPack(SocketLib::s_byte_t* buf, Socke
 
 			// notify
 			_reader.curheader.size = 0;
-			_netio.OnReceiveData(this->shared_from_this(), _reader.msgbuffer2);
+			this->_netio.OnReceiveData(this->shared_from_this(), _reader.msgbuffer2);
 			_reader.msgbuffer2.Clear();
 		}
 	} while (true);
@@ -285,15 +285,15 @@ bool TcpStreamSocket<T, SocketType>::_CutMsgPack(SocketLib::s_byte_t* buf, Socke
 template<typename T, typename SocketType>
 void TcpStreamSocket<T, SocketType>::_TryRecvData() {
 	SocketLib::SocketError error;
-	_socket->AsyncRecvSome(bind_t(&TcpStreamSocket::_ReadHandler, this->shared_from_this(), placeholder_1, placeholder_2)
+	this->_socket->AsyncRecvSome(bind_t(&TcpStreamSocket::_ReadHandler, this->shared_from_this(), placeholder_1, placeholder_2)
 		, _reader.readbuf, M_READ_SIZE, error);
 	if (error)
-		_PostClose(E_STATE_START);
+		this->_PostClose(E_STATE_START);
 }
 
 template<typename T, typename SocketType>
 TcpStreamSocket<T, SocketType>::TcpStreamSocket(NetIo& netio)
-	:TcpBaseSocket(netio){
+	:TcpBaseSocket<T, SocketType>(netio){
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////

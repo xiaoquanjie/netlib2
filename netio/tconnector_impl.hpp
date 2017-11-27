@@ -71,13 +71,13 @@ void TcpConnector::_ConnectHandler(const SocketLib::SocketError& error, TcpConne
 		return;
 	}
 	try {
-		_remoteep = _socket->RemoteEndPoint();
-		_localep = _socket->LocalEndPoint();
-		_flag = E_STATE_START;
+		this->_remoteep = _socket->RemoteEndPoint();
+		this->_localep = _socket->LocalEndPoint();
+		this->_flag = E_STATE_START;
 		this->_netio.OnConnected(this->shared_from_this(), error);
 		function_t<void(SocketLib::s_uint32_t, SocketLib::SocketError)> handler =
 			bind_t(&TcpConnector::_ReadHandler, this->shared_from_this(), placeholder_1, placeholder_2);
-		_socket->AsyncRecvSome(handler, _reader.readbuf, M_READ_SIZE);
+		this->_socket->AsyncRecvSome(handler, _reader.readbuf, M_READ_SIZE);
 	}
 	catch (SocketLib::SocketError& err) {
 		lasterror = err;
