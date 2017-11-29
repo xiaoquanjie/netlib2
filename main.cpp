@@ -295,10 +295,13 @@ private:
 	strpos _url;
 	strpos _ver;
 	strpos _header;
+	strpos _header2;
 	strpos _body;
 	int    _flag;
-	int	   _idx;
 	bool   _assistflag;
+	int    _header_iter;
+
+	std::vector<strpos> _header_vec;
 
 	enum {
 		E_PARSE_METHOD = 0,
@@ -389,7 +392,7 @@ protected:
 				int pos = (int)_buffer.Size();
 				_ver.end = pos - 2;
 				_flag = E_PARSE_HEAD;
-				_header.beg = pos;
+				_header2.beg = _header.beg = pos;
 				_assistflag = false;
 				return copy_len + _ParseHead(buffer + copy_len, len - copy_len);
 			}
@@ -403,9 +406,53 @@ protected:
 		return 0;
 	}
 	int _ParseHead(char* buffer, int len) {
+		if (len > 0) {
+			bool hit = false;
+			int copy_len = 0;
+			if (_assistflag) {
+				if (*buffer != '\n') {
+					_assistflag = false;
+					copy_len = _Parse2(buffer, len, hit, '\r', '\n');
+				}
+				else {
+					hit = true;
+					copy_len = 1;
+				}
+			}
+			else {
+				copy_len = _Parse2(buffer, len, hit, '\r', '\n');
+			}
+			_buffer.Write(buffer, copy_len);
+			if (hit) {
+				_assistflag = false;
+				int pos = (int)_buffer.Size();
+				_header2.end = _header.end = pos;
+				_header_vec.push_back(_header2);
+				if (_header2.beg + 2 == _header2.end) {
+					_flag = E_PARSE_BODY;
+					_body.beg = pos;
+					return copy_len + _ParseBody(buffer + copy_len, len - copy_len);
+				}
+				else {
+					_flag = E_PARSE_HEAD;
+					_header2.beg = pos;
+					_header2.end = 0;
+					return copy_len + _ParseHead(buffer + copy_len, len - copy_len);
+				}
+			}
+			if (!_assistflag) {
+				int pos = (int)_buffer.Size();
+				if (*(_buffer.Data() + pos - 1) == '\r')
+					_assistflag = true;
+			}
+			return copy_len;
+		}
 		return 0;
 	}
 	int _ParseBody(char* buffer, int len) {
+		if (len > 0) {
+
+		}
 		return 0;
 	}
 
@@ -415,10 +462,11 @@ public:
 			= _url.beg = _url.end
 			= _ver.beg = _ver.end
 			= _header.beg = _header.end
+			= _header2.beg = _header2.end
 			= _body.beg = _body.end = 0;
 		_flag = E_PARSE_METHOD;
-		_idx = 0;
 		_assistflag = false;
+		_header_iter = 0;
 	}
 
 	// 返回使用的长度值
@@ -475,32 +523,53 @@ public:
 			return std::string("");
 		return std::string(_buffer.Data() + _header.beg, _body.end - _body.beg);
 	}
-
+	std::string NextHeader() {
+		if (_header_vec.empty() || _header_iter==_header_vec.size())
+			return std::string("");
+		else {
+			int iter = _header_iter++;
+			return std::string(_buffer.Data() + _header_vec[iter].beg, _header_vec[iter].end - _header_vec[iter].beg - 2);
+		}
+	}
+	void InitHeaderIter() {
+		_header_iter = 0;
+	}
 };
 
 char* gHttpReqStr = "GET /?name=xiao&age=18 HTTP/1.1\r\n"
 "Host: 192.168.10.128:3002\r\n"
 "Connection: keep-alive\r\n"
 "Upgrade-Insecure-Requests: 1\r\n"
-"User-Agent: Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.89 Safari/537.36 OPR/49.0.2725.47\r\n"
+"User-Agent: ";
+
+char* gHttpReqStr2 = "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.89 Safari/537.36 OPR/49.0.2725.47\r\n"
 "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8\r\n"
 "Accept-Encoding: gzip, deflate\r\n"
 "Accept-Language: zh-CN,zh;q=0.9\r\n"
 "\r\n";
 
-
 int main() {
 
-	gHttpReqStr = "GET /?name=xiao&age=18 HTTP/1.1\r\n";
+	//gHttpReqStr = "GET /?name=xiao&age=18 HTTP/1.1\r\n";
 	//gHttpReqStr = "GET";
 	cout << strlen(gHttpReqStr) << endl;
 	HttpMsgessage msg;
 	cout << msg.Parse(gHttpReqStr, strlen(gHttpReqStr)) << endl;
+	cout << msg.Parse(gHttpReqStr2, strlen(gHttpReqStr2)) << endl;
 	//cout << msg.Parse(" a\n\r\nhost", strlen(" a\n\r\nhost")) << endl;
 	cout << msg.GetMethod() << endl;
 	cout << msg.GetUrl() << endl;
 	std::string h = msg.GetVersion();
-	cout << h << endl;
+	h = msg.GetHeader();
+	cout << h;
+	cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << endl;
+	msg.InitHeaderIter();
+	std::string header = msg.NextHeader();
+	while (header.size()) {
+		cout << header << endl;
+		header = msg.NextHeader();
+	}
+
 	//cout << gHttpReqStr;
 	//cout << gHttpReqStr;
 	//test1(TO());
