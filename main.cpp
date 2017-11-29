@@ -300,8 +300,9 @@ private:
 	int    _flag;
 	bool   _assistflag;
 	int    _header_iter;
-
-	std::vector<strpos> _header_vec;
+	int    _bodysize;
+	std::vector<strpos> 
+		  _header_vec;
 
 	enum {
 		E_PARSE_METHOD = 0,
@@ -430,7 +431,6 @@ protected:
 				_header_vec.push_back(_header2);
 				if (_header2.beg + 2 == _header2.end) {
 					_flag = E_PARSE_BODY;
-					_body.beg = pos;
 					return copy_len + _ParseBody(buffer + copy_len, len - copy_len);
 				}
 				else {
@@ -451,7 +451,33 @@ protected:
 	}
 	int _ParseBody(char* buffer, int len) {
 		if (len > 0) {
+			if (_bodysize == -1) {
+				// check "Content-Length:"
+				_bodysize = _CheckContentLen();
+				if (_bodysize == 0)
+					_flag = E_PARSE_OVER;
+			}
 
+		}
+		return 0;
+	}
+	int _CheckContentLen() {
+		char* constr = "Content-Length:"; // length is 15
+		for (std::vector<strpos>::iterator iter = _header_vec.begin(); iter != _header_vec.end();
+			++iter) {
+			// include '\r\n'
+			if (iter->end - iter->beg < 17)
+				continue;
+			char* pbeg = _buffer.Data() + iter->beg;
+			char* pend = _buffer.Data() + iter->end - 2;
+			char* psrc = constr;
+			while (pbeg != pend)
+				if (*(++pbeg) != *(++psrc))
+					break;
+			if (psrc == constr + 14) {
+				psrc = pbeg + 2;
+
+			}
 		}
 		return 0;
 	}
@@ -467,6 +493,7 @@ public:
 		_flag = E_PARSE_METHOD;
 		_assistflag = false;
 		_header_iter = 0;
+		_bodysize = -1;
 	}
 
 	// 返回使用的长度值
@@ -492,6 +519,9 @@ public:
 
 	int GetFlag()const {
 		return _flag;
+	}
+	const char* GetData()const {
+		return _buffer.Data();
 	}
 	// copy is slow
 	std::string GetMethod()const {
