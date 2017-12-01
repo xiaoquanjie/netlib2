@@ -168,7 +168,7 @@ void NetIo::OnReceiveData(const TcpSocketPtr& clisock, SocketLib::Buffer& buffer
 }
 void NetIo::OnReceiveData(const TcpConnectorPtr& clisock, SocketLib::Buffer& buffer) {
 }
-void NetIo::OnReceiveData(HttpSocketPtr clisock, HttpMsgessage& httpmsg) {
+void NetIo::OnReceiveData(HttpSocketPtr clisock, HttpSvrRecvMsg& httpmsg) {
 }
 
 M_NETIO_NAMESPACE_END

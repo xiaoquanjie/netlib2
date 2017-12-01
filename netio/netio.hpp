@@ -97,7 +97,7 @@ public:
 	// 数据包通知,这个函数里不要处理业务，防止堵塞
 	virtual void OnReceiveData(const TcpSocketPtr& clisock, SocketLib::Buffer& buffer);
 	virtual void OnReceiveData(const TcpConnectorPtr& clisock, SocketLib::Buffer& buffer);
-	virtual void OnReceiveData(HttpSocketPtr clisock, HttpMsgessage& httpmsg);
+	virtual void OnReceiveData(HttpSocketPtr clisock, HttpSvrRecvMsg& httpmsg);
 
 protected:
 	void _AcceptHandler(SocketLib::SocketError error, TcpSocketPtr& clisock, NetIoTcpAcceptorPtr& acceptor);
@@ -252,7 +252,7 @@ class HttpBaseSocket :
 protected:
 	struct _readerinfo_ {
 		SocketLib::s_byte_t*  readbuf;
-		HttpMsgessage httpmsg;
+		HttpSvrRecvMsg httpmsg;
 
 		_readerinfo_();
 		~_readerinfo_();

@@ -105,8 +105,14 @@ public:
 		print_log(" : " << buffer.Data() << endl);
 		SendData(clisock);
 	}
-	virtual void OnReceiveData(netiolib::HttpSocketPtr clisock, netiolib::HttpMsgessage& httpmsg) {
-		cout << httpmsg.GetRequestLine() << endl;
+	virtual void OnReceiveData(netiolib::HttpSocketPtr clisock, netiolib::HttpSvrRecvMsg& httpmsg) {
+		//cout << httpmsg.GetRequestLine() << endl;
+		netiolib::Buffer* pbuffer = new netiolib::Buffer;
+		pbuffer->Write("HTTP/1.1 200 OK\r\n");
+		pbuffer->Write("Content-Length: 11\r\n");
+		pbuffer->Write("Content-Type: text/html; charset=utf-8\r\n\r\n");
+		pbuffer->Write("xiaoquanjie");
+		clisock->Send(pbuffer);
 	}
 
 	void Start(void*) {
@@ -301,14 +307,14 @@ char* gHttpReqStr3 = "xiaoquan";
 char* gHttpReqStr4 = "jie1";
 
 void httpmsg_test() {
-	netiolib::HttpMsgessage msg;
+	netiolib::HttpSvrRecvMsg msg;
 	time_t beg_t = clock();
 	for (int i = 0; i < 10000000; ++i) {
 		msg.Parse(gHttpReqStr, strlen(gHttpReqStr));
 		msg.Parse(gHttpReqStr2, strlen(gHttpReqStr2));
 		msg.Parse(gHttpReqStr3, strlen(gHttpReqStr3));
 		msg.Parse(gHttpReqStr4, strlen(gHttpReqStr4));
-		if (msg.GetFlag() != netiolib::HttpMsgessage::E_PARSE_OVER)
+		if (msg.GetFlag() != netiolib::HttpSvrRecvMsg::E_PARSE_OVER)
 			assert(0);
 	}
 	time_t end_t = clock();

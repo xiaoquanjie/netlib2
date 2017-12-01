@@ -16,7 +16,7 @@
 
 M_NETIO_NAMESPACE_BEGIN
 
-struct HttpMsgessage {
+struct HttpSvrRecvMsg {
 public:
 	enum {
 		E_PARSE_METHOD = 0,
@@ -247,7 +247,7 @@ protected:
 
 public:
 	// length is 16
-	HttpMsgessage() :_constr("Content-Length: ") {
+	HttpSvrRecvMsg() :_constr("Content-Length: ") {
 		Clear();
 	}
 
@@ -265,7 +265,7 @@ public:
 		_bodysize = -1;
 	}
 
-	void Swap(HttpMsgessage& other) {
+	void Swap(HttpSvrRecvMsg& other) {
 		if (this != &other) {
 			other._buffer.Swap(this->_buffer);
 			other._method.Swap(this->_method);
@@ -360,6 +360,21 @@ public:
 	}
 };
 
+struct HttpSvrSendMsg {
+private:
+	SocketLib::Buffer* _pbuffer;
+
+public:
+	~HttpSvrSendMsg() {
+		delete _pbuffer;
+	}
+
+	HttpSvrSendMsg() {
+		_pbuffer = new SocketLib::Buffer;
+	}
+
+
+};
 
 M_NETIO_NAMESPACE_END
 #endif
