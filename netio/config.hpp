@@ -22,6 +22,7 @@
 #include "socket/socket.hpp"
 #include "tls.hpp"
 #include "log.hpp"
+#include "httpmsg.hpp"
 
 
 

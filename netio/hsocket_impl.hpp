@@ -56,7 +56,17 @@ void HttpBaseSocket<T, SocketType>::_ReadHandler(SocketLib::s_uint32_t tran_byte
 
 template<typename T, typename SocketType>
 bool HttpBaseSocket<T, SocketType>::_CutMsgPack(SocketLib::s_byte_t* buf, SocketLib::s_uint32_t tran_byte) {
-	
+	while (true) {
+		SocketLib::s_uint32_t copy_len = (SocketLib::s_uint32_t)_reader.httpmsg.Parse(buf, tran_byte);
+		if (copy_len == 0 || copy_len <= tran_byte) {
+			this->_netio.OnReceiveData(this->shared_from_this(), _reader.httpmsg);
+			_reader.httpmsg.Clear();
+		}
+		tran_byte -= copy_len;
+		if (tran_byte == 0)
+			break;
+		buf += copy_len;
+	}
 	return true;
 }
 

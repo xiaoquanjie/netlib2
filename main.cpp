@@ -105,8 +105,8 @@ public:
 		print_log(" : " << buffer.Data() << endl);
 		SendData(clisock);
 	}
-	virtual void OnReceiveData(netiolib::HttpSocketPtr clisock, SocketLib::Buffer& buffer) {
-
+	virtual void OnReceiveData(netiolib::HttpSocketPtr clisock, netiolib::HttpMsgessage& httpmsg) {
+		cout << httpmsg.GetRequestLine() << endl;
 	}
 
 	void Start(void*) {
@@ -283,293 +283,12 @@ void test1(function_t<void()>& t){
 	f.swap(t);
 }
 
-struct HttpMsgessage {
-private:
-	struct strpos {
-		int beg;
-		int end;
-	};
-
-	SocketLib::Buffer _buffer;
-	strpos _method;
-	strpos _url;
-	strpos _ver;
-	strpos _header;
-	strpos _header2;
-	strpos _body;
-	int    _flag;
-	bool   _assistflag;
-	int    _header_iter;
-	int    _bodysize;
-	std::vector<strpos> 
-		  _header_vec;
-
-	enum {
-		E_PARSE_METHOD = 0,
-		E_PARSE_URL,
-		E_PARSE_VER,
-		E_PARSE_HEAD,
-		E_PARSE_BODY,
-		E_PARSE_OVER,
-	};
-
-protected:
-	int _Parse1(char* buffer, int len,bool& hit,char chr) {
-		hit = false;
-		int pos = 0;
-		while (pos < len) {
-			if (*(buffer + pos) == chr) {
-				hit = true;
-				break;
-			}
-			++pos;
-		}
-		int copy_len = pos != len ? pos + 1 : len;
-		return copy_len;
-	}
-	int _Parse2(char* buffer, int len, bool& hit, char chr1, char chr2) {
-		hit = false;
-		int pos = 0;
-		while (pos + 1 < len) {
-			if (*(buffer + pos) == chr1
-				&& *(buffer + pos + 1) == chr2) {
-				hit = true;
-				break;
-			}
-			++pos;
-		}
-		int copy_len = (pos + 1 != len) ? pos + 2 : len;
-		return copy_len;
-	}
-
-	int _ParseMethod(char* buffer, int len) {
-		bool hit = false;
-		int copy_len = _Parse1(buffer, len, hit, ' ');
-		_buffer.Write(buffer, copy_len);
-		if (hit) {
-			int pos = (int)_buffer.Size();
-			_method.end = pos - 1;
-			_flag = E_PARSE_URL;
-			_url.beg = pos;
-			return copy_len + _ParseUrl(buffer + copy_len, len - copy_len);
-		}
-		return copy_len;
-	}
-	int _ParseUrl(char* buffer, int len) {
-		if (len > 0) {
-			bool hit = false;
-			int copy_len = _Parse1(buffer, len, hit, ' ');
-			_buffer.Write(buffer, copy_len);
-			if (hit) {
-				int pos = (int)_buffer.Size();
-				_url.end = pos - 1;
-				_flag = E_PARSE_VER;
-				_ver.beg = pos;
-				return copy_len + _ParseVer(buffer + copy_len, len - copy_len);
-			}
-			return copy_len;
-		}
-		return 0;
-	}
-	int _ParseVer(char* buffer, int len) {
-		if (len > 0) {
-			bool hit = false;
-			int copy_len = 0;
-			if (_assistflag) {
-				if (*buffer != '\n') {
-					_assistflag = false;
-					copy_len = _Parse2(buffer, len, hit, '\r', '\n');
-				}
-				else {
-					hit = true;
-					copy_len = 1;
-				}
-			}
-			else {
-				copy_len = _Parse2(buffer, len, hit, '\r', '\n');
-			}
-			_buffer.Write(buffer, copy_len);
-			if (hit) {
-				int pos = (int)_buffer.Size();
-				_ver.end = pos - 2;
-				_flag = E_PARSE_HEAD;
-				_header2.beg = _header.beg = pos;
-				_assistflag = false;
-				return copy_len + _ParseHead(buffer + copy_len, len - copy_len);
-			}
-			if (!_assistflag) {
-				int pos = (int)_buffer.Size();
-				if (*(_buffer.Data() + pos - 1) == '\r')
-					_assistflag = true;
-			}
-			return copy_len;
-		}
-		return 0;
-	}
-	int _ParseHead(char* buffer, int len) {
-		if (len > 0) {
-			bool hit = false;
-			int copy_len = 0;
-			if (_assistflag) {
-				if (*buffer != '\n') {
-					_assistflag = false;
-					copy_len = _Parse2(buffer, len, hit, '\r', '\n');
-				}
-				else {
-					hit = true;
-					copy_len = 1;
-				}
-			}
-			else {
-				copy_len = _Parse2(buffer, len, hit, '\r', '\n');
-			}
-			_buffer.Write(buffer, copy_len);
-			if (hit) {
-				_assistflag = false;
-				int pos = (int)_buffer.Size();
-				_header2.end = _header.end = pos;
-				_header_vec.push_back(_header2);
-				if (_header2.beg + 2 == _header2.end) {
-					_flag = E_PARSE_BODY;
-					return copy_len + _ParseBody(buffer + copy_len, len - copy_len);
-				}
-				else {
-					_flag = E_PARSE_HEAD;
-					_header2.beg = pos;
-					_header2.end = 0;
-					return copy_len + _ParseHead(buffer + copy_len, len - copy_len);
-				}
-			}
-			if (!_assistflag) {
-				int pos = (int)_buffer.Size();
-				if (*(_buffer.Data() + pos - 1) == '\r')
-					_assistflag = true;
-			}
-			return copy_len;
-		}
-		return 0;
-	}
-	int _ParseBody(char* buffer, int len) {
-		if (len > 0) {
-			if (_bodysize == -1) {
-				// check "Content-Length:"
-				_bodysize = _CheckContentLen();
-				if (_bodysize == 0)
-					_flag = E_PARSE_OVER;
-			}
-
-		}
-		return 0;
-	}
-	int _CheckContentLen() {
-		char* constr = "Content-Length:"; // length is 15
-		for (std::vector<strpos>::iterator iter = _header_vec.begin(); iter != _header_vec.end();
-			++iter) {
-			// include '\r\n'
-			if (iter->end - iter->beg < 17)
-				continue;
-			char* pbeg = _buffer.Data() + iter->beg;
-			char* pend = _buffer.Data() + iter->end - 2;
-			char* psrc = constr;
-			while (pbeg != pend)
-				if (*(++pbeg) != *(++psrc))
-					break;
-			if (psrc == constr + 14) {
-				psrc = pbeg + 2;
-
-			}
-		}
-		return 0;
-	}
-
-public:
-	HttpMsgessage() {
-		_method.beg = _method.end
-			= _url.beg = _url.end
-			= _ver.beg = _ver.end
-			= _header.beg = _header.end
-			= _header2.beg = _header2.end
-			= _body.beg = _body.end = 0;
-		_flag = E_PARSE_METHOD;
-		_assistflag = false;
-		_header_iter = 0;
-		_bodysize = -1;
-	}
-
-	// 返回使用的长度值
-	int Parse(char* buffer,int len) {
-		switch (_flag) {
-		case E_PARSE_OVER:
-			break;
-		case E_PARSE_METHOD:
-			return _ParseMethod(buffer, len);
-		case E_PARSE_URL:
-			return _ParseUrl(buffer, len);
-		case E_PARSE_VER:
-			return _ParseVer(buffer, len);
-		case E_PARSE_HEAD:
-			return _ParseHead(buffer, len);
-		case E_PARSE_BODY:
-			return _ParseBody(buffer, len);
-		default:
-			break;
-		}
-		return 0;
-	}
-
-	int GetFlag()const {
-		return _flag;
-	}
-	const char* GetData()const {
-		return _buffer.Data();
-	}
-	// copy is slow
-	std::string GetMethod()const {
-		if (_method.end == 0)
-			return std::string("");
-		return std::string(_buffer.Data() + _method.beg, _method.end - _method.beg);
-	}
-	// copy is slow
-	std::string GetUrl()const {
-		if (_url.end == 0)
-			return std::string("");
-		return std::string(_buffer.Data() + _url.beg, _url.end - _url.beg);
-	}
-	// copy is slow
-	std::string GetVersion()const {
-		if (_ver.end == 0)
-			return std::string("");
-		return std::string(_buffer.Data() + _ver.beg, _ver.end - _ver.beg);
-	}
-	// copy is slow
-	std::string GetHeader()const {
-		if (_header.end == 0)
-			return std::string("");
-		return std::string(_buffer.Data() + _header.beg, _header.end - _header.beg);
-	}
-	// copy is slow
-	std::string GetBody()const {
-		if (_body.end == 0)
-			return std::string("");
-		return std::string(_buffer.Data() + _header.beg, _body.end - _body.beg);
-	}
-	std::string NextHeader() {
-		if (_header_vec.empty() || _header_iter==_header_vec.size())
-			return std::string("");
-		else {
-			int iter = _header_iter++;
-			return std::string(_buffer.Data() + _header_vec[iter].beg, _header_vec[iter].end - _header_vec[iter].beg - 2);
-		}
-	}
-	void InitHeaderIter() {
-		_header_iter = 0;
-	}
-};
 
 char* gHttpReqStr = "GET /?name=xiao&age=18 HTTP/1.1\r\n"
 "Host: 192.168.10.128:3002\r\n"
 "Connection: keep-alive\r\n"
 "Upgrade-Insecure-Requests: 1\r\n"
+"Content-Length: 11\r\n"
 "User-Agent: ";
 
 char* gHttpReqStr2 = "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.89 Safari/537.36 OPR/49.0.2725.47\r\n"
@@ -578,34 +297,31 @@ char* gHttpReqStr2 = "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KH
 "Accept-Language: zh-CN,zh;q=0.9\r\n"
 "\r\n";
 
+char* gHttpReqStr3 = "xiaoquan";
+char* gHttpReqStr4 = "jie1";
+
+void httpmsg_test() {
+	netiolib::HttpMsgessage msg;
+	time_t beg_t = clock();
+	for (int i = 0; i < 10000000; ++i) {
+		msg.Parse(gHttpReqStr, strlen(gHttpReqStr));
+		msg.Parse(gHttpReqStr2, strlen(gHttpReqStr2));
+		msg.Parse(gHttpReqStr3, strlen(gHttpReqStr3));
+		msg.Parse(gHttpReqStr4, strlen(gHttpReqStr4));
+		if (msg.GetFlag() != netiolib::HttpMsgessage::E_PARSE_OVER)
+			assert(0);
+	}
+	time_t end_t = clock();
+	cout << "elapsed : " << ((double)(end_t-beg_t) / CLOCKS_PER_SEC) << endl;
+}
+
 int main() {
 
-	//gHttpReqStr = "GET /?name=xiao&age=18 HTTP/1.1\r\n";
-	//gHttpReqStr = "GET";
-	cout << strlen(gHttpReqStr) << endl;
-	HttpMsgessage msg;
-	cout << msg.Parse(gHttpReqStr, strlen(gHttpReqStr)) << endl;
-	cout << msg.Parse(gHttpReqStr2, strlen(gHttpReqStr2)) << endl;
-	//cout << msg.Parse(" a\n\r\nhost", strlen(" a\n\r\nhost")) << endl;
-	cout << msg.GetMethod() << endl;
-	cout << msg.GetUrl() << endl;
-	std::string h = msg.GetVersion();
-	h = msg.GetHeader();
-	cout << h;
-	cout << "~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~" << endl;
-	msg.InitHeaderIter();
-	std::string header = msg.NextHeader();
-	while (header.size()) {
-		cout << header << endl;
-		header = msg.NextHeader();
-	}
-
-	//cout << gHttpReqStr;
-	//cout << gHttpReqStr;
+	//httpmsg_test();
 	//test1(TO());
 	//slist_test();
 	//netlib_test();
-	//netlib_http_test();
+	netlib_http_test();
 	//other_test();
 
 	int pause_i;

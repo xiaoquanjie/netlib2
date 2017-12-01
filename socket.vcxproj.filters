@@ -198,6 +198,9 @@
     <ClInclude Include="netio\hsocket_impl.hpp">
       <Filter>netio</Filter>
     </ClInclude>
+    <ClInclude Include="netio\httpmsg.hpp">
+      <Filter>netio</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="socket.cpp">
