@@ -15,19 +15,19 @@
 
 M_NETIO_NAMESPACE_BEGIN
 
-template<typename T, typename SocketType>
-HttpBaseSocket<T, SocketType>::_readerinfo_::_readerinfo_() {
+template<typename T, typename SocketType, typename HttpMsgType>
+HttpBaseSocket<T, SocketType, HttpMsgType>::_readerinfo_::_readerinfo_() {
 	readbuf = new SocketLib::s_byte_t[M_READ_SIZE];
 	g_memset(readbuf, 0, M_READ_SIZE);
 }
 
-template<typename T, typename SocketType>
-HttpBaseSocket<T, SocketType>::_readerinfo_::~_readerinfo_() {
+template<typename T, typename SocketType, typename HttpMsgType>
+HttpBaseSocket<T, SocketType, HttpMsgType>::_readerinfo_::~_readerinfo_() {
 	delete[]readbuf;
 }
 
-template<typename T, typename SocketType>
-void HttpBaseSocket<T, SocketType>::_ReadHandler(SocketLib::s_uint32_t tran_byte, SocketLib::SocketError error) {
+template<typename T, typename SocketType, typename HttpMsgType>
+void HttpBaseSocket<T, SocketType, HttpMsgType>::_ReadHandler(SocketLib::s_uint32_t tran_byte, SocketLib::SocketError error) {
 	if (error) {
 		// 出错关闭连接
 		M_NETIO_LOGGER("read handler happend error:" << M_ERROR_DESC_STR(error));
@@ -54,8 +54,8 @@ void HttpBaseSocket<T, SocketType>::_ReadHandler(SocketLib::s_uint32_t tran_byte
 	}
 }
 
-template<typename T, typename SocketType>
-bool HttpBaseSocket<T, SocketType>::_CutMsgPack(SocketLib::s_byte_t* buf, SocketLib::s_uint32_t tran_byte) {
+template<typename T, typename SocketType, typename HttpMsgType>
+bool HttpBaseSocket<T, SocketType, HttpMsgType>::_CutMsgPack(SocketLib::s_byte_t* buf, SocketLib::s_uint32_t tran_byte) {
 	while (true) {
 		SocketLib::s_uint32_t copy_len = (SocketLib::s_uint32_t)_reader.httpmsg.Parse(buf, tran_byte);
 		if (copy_len == 0 || copy_len <= tran_byte) {
@@ -70,8 +70,8 @@ bool HttpBaseSocket<T, SocketType>::_CutMsgPack(SocketLib::s_byte_t* buf, Socket
 	return true;
 }
 
-template<typename T, typename SocketType>
-void HttpBaseSocket<T, SocketType>::_TryRecvData() {
+template<typename T, typename SocketType, typename HttpMsgType>
+void HttpBaseSocket<T, SocketType, HttpMsgType>::_TryRecvData() {
 	SocketLib::SocketError error;
 	this->_socket->AsyncRecvSome(bind_t(&HttpBaseSocket::_ReadHandler, this->shared_from_this(), placeholder_1, placeholder_2)
 		, _reader.readbuf, M_READ_SIZE, error);
@@ -79,8 +79,8 @@ void HttpBaseSocket<T, SocketType>::_TryRecvData() {
 		this->_PostClose(E_STATE_START);
 }
 
-template<typename T, typename SocketType>
-HttpBaseSocket<T, SocketType>::HttpBaseSocket(NetIo& netio)
+template<typename T, typename SocketType, typename HttpMsgType>
+HttpBaseSocket<T, SocketType, HttpMsgType>::HttpBaseSocket(NetIo& netio)
 	:TcpBaseSocket<T, SocketType>(netio) {
 }
 

@@ -69,7 +69,7 @@ void NetIo::ConnectOne(const SocketLib::Tcp::EndPoint& ep, unsigned int data) {
 	try {
 		netiolib::TcpConnectorPtr connector(new netiolib::TcpConnector(*this));
 		connector->SetData(data);
-		connector->AsyncConnect("127.0.0.1", 3001);
+		connector->AsyncConnect(ep);
 		connector.reset();
 	}
 	catch (SocketLib::SocketError& error) {
@@ -79,6 +79,22 @@ void NetIo::ConnectOne(const SocketLib::Tcp::EndPoint& ep, unsigned int data) {
 void NetIo::ConnectOne(const std::string& addr, SocketLib::s_uint16_t port, unsigned int data) {
 	SocketLib::Tcp::EndPoint ep(SocketLib::AddressV4(addr), port);
 	return ConnectOne(ep,data);
+}
+
+void NetIo::ConnectOneHttp(const SocketLib::Tcp::EndPoint& ep, unsigned int data) {
+	try {
+		netiolib::HttpConnectorPtr connector(new netiolib::HttpConnector(*this));
+		connector->SetData(data);
+		connector->AsyncConnect(ep);
+		connector.reset();
+	}
+	catch (SocketLib::SocketError& error) {
+		lasterror = error;
+	}
+}
+void NetIo::ConnectOneHttp(const std::string& addr, SocketLib::s_uint16_t port, unsigned int data) {
+	SocketLib::Tcp::EndPoint ep(SocketLib::AddressV4(addr), port);
+	return ConnectOneHttp(ep, data);
 }
 
 void NetIo::Run() {
@@ -154,6 +170,9 @@ void NetIo::OnConnected(const TcpConnectorPtr& clisock, SocketLib::SocketError e
 }
 void NetIo::OnConnected(HttpSocketPtr clisock) {
 }
+void NetIo::OnConnected(HttpConnectorPtr clisock, SocketLib::SocketError error) {
+}
+
 
 // 掉线通知,这个函数里不要处理业务，防止堵塞
 void NetIo::OnDisconnected(const TcpSocketPtr& clisock) {
@@ -162,6 +181,8 @@ void NetIo::OnDisconnected(const TcpConnectorPtr& clisock) {
 }
 void NetIo::OnDisconnected(HttpSocketPtr clisock) {
 }
+void NetIo::OnDisconnected(HttpConnectorPtr clisock) {
+}
 
 // 数据包通知,这个函数里不要处理业务，防止堵塞
 void NetIo::OnReceiveData(const TcpSocketPtr& clisock, SocketLib::Buffer& buffer) {
@@ -169,6 +190,8 @@ void NetIo::OnReceiveData(const TcpSocketPtr& clisock, SocketLib::Buffer& buffer
 void NetIo::OnReceiveData(const TcpConnectorPtr& clisock, SocketLib::Buffer& buffer) {
 }
 void NetIo::OnReceiveData(HttpSocketPtr clisock, HttpSvrRecvMsg& httpmsg) {
+}
+void NetIo::OnReceiveData(HttpConnectorPtr clisock, HttpCliRecvMsg& httpmsg) {
 }
 
 M_NETIO_NAMESPACE_END

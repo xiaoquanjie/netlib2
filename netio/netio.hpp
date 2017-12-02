@@ -70,6 +70,9 @@ public:
 	void ConnectOne(const SocketLib::Tcp::EndPoint& ep, unsigned int data=0);
 	void ConnectOne(const std::string& addr, SocketLib::s_uint16_t port, unsigned int data=0);
 
+	void ConnectOneHttp(const SocketLib::Tcp::EndPoint& ep, unsigned int data = 0);
+	void ConnectOneHttp(const std::string& addr, SocketLib::s_uint16_t port, unsigned int data=0);
+
 	virtual void Run();
 	virtual void Stop();
 
@@ -88,16 +91,20 @@ public:
 	virtual void OnConnected(const TcpSocketPtr& clisock);
 	virtual void OnConnected(const TcpConnectorPtr& clisock,SocketLib::SocketError error);
 	virtual void OnConnected(HttpSocketPtr clisock);
+	virtual void OnConnected(HttpConnectorPtr clisock, SocketLib::SocketError error);
 
 	// 掉线通知,这个函数里不要处理业务，防止堵塞
 	virtual void OnDisconnected(const TcpSocketPtr& clisock);
 	virtual void OnDisconnected(const TcpConnectorPtr& clisock);
 	virtual void OnDisconnected(HttpSocketPtr clisock);
+	virtual void OnDisconnected(HttpConnectorPtr clisock);
 
 	// 数据包通知,这个函数里不要处理业务，防止堵塞
 	virtual void OnReceiveData(const TcpSocketPtr& clisock, SocketLib::Buffer& buffer);
 	virtual void OnReceiveData(const TcpConnectorPtr& clisock, SocketLib::Buffer& buffer);
 	virtual void OnReceiveData(HttpSocketPtr clisock, HttpSvrRecvMsg& httpmsg);
+	virtual void OnReceiveData(HttpConnectorPtr clisock, HttpCliRecvMsg& httpmsg);
+
 
 protected:
 	void _AcceptHandler(SocketLib::SocketError error, TcpSocketPtr& clisock, NetIoTcpAcceptorPtr& acceptor);
@@ -245,14 +252,14 @@ protected:
 };
 
 // for http
-template<typename T, typename SocketType>
+template<typename T, typename SocketType,typename HttpMsgType>
 class HttpBaseSocket : 
 	public TcpBaseSocket<T, SocketType>
 {
 protected:
 	struct _readerinfo_ {
 		SocketLib::s_byte_t*  readbuf;
-		HttpSvrRecvMsg httpmsg;
+		HttpMsgType httpmsg;
 
 		_readerinfo_();
 		~_readerinfo_();
@@ -273,7 +280,7 @@ public:
 
 // class httpsocket
 class HttpSocket : 
-	public HttpBaseSocket<HttpSocket, SocketLib::TcpSocket<SocketLib::IoService> > 
+	public HttpBaseSocket<HttpSocket, SocketLib::TcpSocket<SocketLib::IoService>, HttpSvrRecvMsg>
 {
 	friend class NetIo;
 public:
@@ -292,9 +299,31 @@ protected:
 };
 
 class HttpConnector : 
-	public HttpBaseSocket<HttpConnector, SocketLib::TcpSocket<SocketLib::IoService> > 
+	public HttpBaseSocket<HttpConnector, SocketLib::TcpConnector<SocketLib::IoService>
+	,HttpCliRecvMsg> 
 {
+public:
+	HttpConnector(NetIo& netio);
 
+	SocketLib::TcpConnector<SocketLib::IoService>& GetSocket();
+
+	bool Connect(const SocketLib::Tcp::EndPoint& ep);
+
+	bool Connect(const std::string& addr, SocketLib::s_uint16_t port);
+
+	void AsyncConnect(const SocketLib::Tcp::EndPoint& ep);
+
+	void AsyncConnect(const std::string& addr, SocketLib::s_uint16_t port);
+
+	inline void SetData(unsigned int data);
+
+	inline unsigned int GetData()const;
+
+protected:
+	void _ConnectHandler(const SocketLib::SocketError& error, HttpConnectorPtr conector);
+
+protected:
+	unsigned int _data;
 };
 
 
@@ -303,4 +332,5 @@ M_NETIO_NAMESPACE_END
 #include "tsocket_impl.hpp"
 #include "tconnector_impl.hpp"
 #include "hsocket_impl.hpp"
+#include "hconnector_impl.hpp"
 #endif

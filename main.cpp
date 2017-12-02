@@ -69,13 +69,42 @@ public:
 			cout << "connect fail :" << error.What() << endl;
 		}
 		else {
-			cout << "connect success : " << clisock->LocalEndpoint().Address() << " " << clisock->LocalEndpoint().Port() << endl;
+			cout << "connect success : " << clisock->RemoteEndpoint().Address() << " " << clisock->RemoteEndpoint().Port() << endl;
 			//SendData(clisock);
 		}
 	}
 	virtual void OnConnected(netiolib::HttpSocketPtr clisock) {
 		cout << "OnConnected one http : " << clisock->RemoteEndpoint().Address()
 			<< " " << clisock->RemoteEndpoint().Port() << endl;
+	}
+	virtual void OnConnected(netiolib::HttpConnectorPtr clisock, SocketLib::SocketError error)override {
+		if (error) {
+			cout << "http connect fail :" << error.What() << endl;
+		}
+		else {
+			cout << "http connect success : " << clisock->RemoteEndpoint().Address() << " " << clisock->RemoteEndpoint().Port() << endl;
+			
+			std::string str = "GET / HTTP/1.1\r\n";
+			str += "Host: ";
+			str += clisock->LocalEndpoint().Address();
+			str += ":";
+			str += std::to_string(clisock->LocalEndpoint().Port());
+			str += "\r\n";
+			str +=
+				"Connection: keep-alive\r\n"
+				"Upgrade-Insecure-Requests: 1\r\n"
+				"User-Agent: "
+				"Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.89 Safari/537.36 OPR/49.0.2725.47\r\n"
+				"Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8\r\n"
+				"Accept-Encoding: gzip, deflate\r\n"
+				"Accept-Language: zh-CN,zh;q=0.9\r\n"
+				"\r\n";
+
+			SocketLib::Buffer* pbuffer = new SocketLib::Buffer;
+			pbuffer->Write((void*)str.c_str(),str.length());
+			clisock->Send(pbuffer);
+			cout << "send over" << endl;
+		}
 	}
 
 	// 掉线通知,这个函数里不要处理业务，防止堵塞
@@ -87,6 +116,10 @@ public:
 	}
 	virtual void OnDisconnected(netiolib::HttpSocketPtr clisock) {
 		cout << "OnDisconnected one http : " << clisock->RemoteEndpoint().Address() << " "
+			<< clisock->RemoteEndpoint().Port() << endl;
+	}
+	virtual void OnDisconnected(netiolib::HttpConnectorPtr clisock) {
+		cout << "OnDisconnected one http connector: " << clisock->RemoteEndpoint().Address() << " "
 			<< clisock->RemoteEndpoint().Port() << endl;
 	}
 
@@ -110,6 +143,11 @@ public:
 		netiolib::HttpSvrSendMsg& msg = clisock->GetSvrMsg();
 		msg.SetBody("newxiaoquanjie", 14);
 		clisock->SendHttpMsg();
+	}
+	virtual void OnReceiveData(netiolib::HttpConnectorPtr, netiolib::HttpCliRecvMsg& httmsg) {
+		cout << httmsg.GetRespondLine() << endl;
+		cout << httmsg.GetHeader() << endl;
+		cout << httmsg.GetBody() << endl;
 	}
 
 	void Start(void*) {
@@ -174,7 +212,7 @@ void client() {
 	{
 		netiolib::TcpConnectorPtr connector(new netiolib::TcpConnector(test_io));
 		connector->SetData(k);
-		connector->AsyncConnect(/*"192.168.10.128"*/"127.0.0.1", 3001);
+		connector->AsyncConnect("61.135.169.121", 80);
 		ptrlist.push_back(connector);
 	}
 
@@ -189,7 +227,23 @@ void client() {
 }
 
 void http_client() {
+	TestNetIo test_io;
+	for (int i = 0; i < 1; ++i) {
+		new thread(&TestNetIo::Start, &test_io, 0);
+	}
+	thread::sleep(200);
 
+	std::string addr = "61.135.169.121";
+	unsigned short port = 80;
+	/*cout << "please input ip: ";
+	cin >> addr;
+	cout << "please input port: ";
+	cin >> port;*/
+
+	test_io.ConnectOneHttp(addr, port);
+
+	int i;
+	cin >> i;
 }
 
 void netlib_test() {

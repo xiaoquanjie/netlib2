@@ -16,17 +16,18 @@
 
 M_NETIO_NAMESPACE_BEGIN
 
-struct HttpSvrRecvMsg {
-public:
+struct HttpBaseMsg {
 	enum {
 		E_PARSE_METHOD = 0,
 		E_PARSE_URL,
 		E_PARSE_VER,
+		E_PARSE_STATUS_CODE,
+		E_PARSE_STATUS_PHRASE,
 		E_PARSE_HEAD,
 		E_PARSE_BODY,
 		E_PARSE_OVER,
 	};
-private:
+
 	struct strpos {
 		int beg;
 		int end;
@@ -42,9 +43,6 @@ private:
 	};
 
 	SocketLib::Buffer _buffer;
-	strpos _method;
-	strpos _url;
-	strpos _ver;
 	strpos _header;
 	strpos _header2;
 	strpos _body;
@@ -55,7 +53,7 @@ private:
 	std::vector<strpos>
 		_header_vec;
 	const char* _constr;
-protected:
+
 	int _Parse1(char* buffer, int len, bool& hit, char chr) {
 		hit = false;
 		int pos = 0;
@@ -84,69 +82,47 @@ protected:
 		return copy_len;
 	}
 
-	int _ParseMethod(char* buffer, int len) {
-		bool hit = false;
-		int copy_len = _Parse1(buffer, len, hit, ' ');
-		_buffer.Write(buffer, copy_len);
-		if (hit) {
-			int pos = (int)_buffer.Size();
-			_method.end = pos - 1;
-			_flag = E_PARSE_URL;
-			_url.beg = pos;
-			return copy_len + _ParseUrl(buffer + copy_len, len - copy_len);
-		}
-		return copy_len;
+	HttpBaseMsg() :_constr("Content-Length: ") {
 	}
-	int _ParseUrl(char* buffer, int len) {
-		if (len > 0) {
-			bool hit = false;
-			int copy_len = _Parse1(buffer, len, hit, ' ');
-			_buffer.Write(buffer, copy_len);
-			if (hit) {
-				int pos = (int)_buffer.Size();
-				_url.end = pos - 1;
-				_flag = E_PARSE_VER;
-				_ver.beg = pos;
-				return copy_len + _ParseVer(buffer + copy_len, len - copy_len);
-			}
-			return copy_len;
-		}
-		return 0;
+
+	void Clear() {
+		_buffer.Clear();
+		_header.beg = _header.end
+			= _header2.beg = _header2.end
+			= _body.beg = _body.end = 0;
+		_assistflag = false;
+		_header_iter = 0;
+		_bodysize = -1;
 	}
-	int _ParseVer(char* buffer, int len) {
-		if (len > 0) {
-			bool hit = false;
-			int copy_len = 0;
-			if (_assistflag) {
-				if (*buffer != '\n') {
-					_assistflag = false;
-					copy_len = _Parse2(buffer, len, hit, '\r', '\n');
-				}
-				else {
-					hit = true;
-					copy_len = 1;
-				}
-			}
-			else {
-				copy_len = _Parse2(buffer, len, hit, '\r', '\n');
-			}
-			_buffer.Write(buffer, copy_len);
-			if (hit) {
-				int pos = (int)_buffer.Size();
-				_ver.end = pos - 2;
-				_flag = E_PARSE_HEAD;
-				_header2.beg = _header.beg = pos;
-				_assistflag = false;
-				return copy_len + _ParseHead(buffer + copy_len, len - copy_len);
-			}
-			if (!_assistflag) {
-				int pos = (int)_buffer.Size();
-				if (*(_buffer.Data() + pos - 1) == '\r')
-					_assistflag = true;
-			}
-			return copy_len;
+
+	// copy is slow
+	std::string GetHeader()const {
+		if (_header.end == 0)
+			return std::string("");
+		return std::string(_buffer.Data() + _header.beg, _header.end - _header.beg);
+	}
+	// copy is slow
+	std::string GetBody()const {
+		if (_body.end == 0)
+			return std::string("");
+		return std::string(_buffer.Data() + _body.beg, _body.end - _body.beg);
+	}
+	std::string NextHeader() {
+		if (_header_vec.empty() || _header_iter == _header_vec.size())
+			return std::string("");
+		else {
+			int iter = _header_iter++;
+			return std::string(_buffer.Data() + _header_vec[iter].beg, _header_vec[iter].end - _header_vec[iter].beg - 2);
 		}
-		return 0;
+	}
+	void InitHeaderIter() {
+		_header_iter = 0;
+	}
+	int GetFlag()const {
+		return _flag;
+	}
+	const char* GetData()const {
+		return _buffer.Data();
 	}
 	int _ParseHead(char* buffer, int len) {
 		if (len > 0) {
@@ -245,24 +221,93 @@ protected:
 		return 0;
 	}
 
+};
+
+struct HttpSvrRecvMsg : public HttpBaseMsg{
+private:
+	strpos _method;
+	strpos _url;
+	strpos _ver;
+	
+protected:
+	int _ParseMethod(char* buffer, int len) {
+		bool hit = false;
+		int copy_len = _Parse1(buffer, len, hit, ' ');
+		_buffer.Write(buffer, copy_len);
+		if (hit) {
+			int pos = (int)_buffer.Size();
+			_method.end = pos - 1;
+			_flag = E_PARSE_URL;
+			_url.beg = pos;
+			return copy_len + _ParseUrl(buffer + copy_len, len - copy_len);
+		}
+		return copy_len;
+	}
+	int _ParseUrl(char* buffer, int len) {
+		if (len > 0) {
+			bool hit = false;
+			int copy_len = _Parse1(buffer, len, hit, ' ');
+			_buffer.Write(buffer, copy_len);
+			if (hit) {
+				int pos = (int)_buffer.Size();
+				_url.end = pos - 1;
+				_flag = E_PARSE_VER;
+				_ver.beg = pos;
+				return copy_len + _ParseVer(buffer + copy_len, len - copy_len);
+			}
+			return copy_len;
+		}
+		return 0;
+	}
+	int _ParseVer(char* buffer, int len) {
+		if (len > 0) {
+			bool hit = false;
+			int copy_len = 0;
+			if (_assistflag) {
+				if (*buffer != '\n') {
+					_assistflag = false;
+					copy_len = _Parse2(buffer, len, hit, '\r', '\n');
+				}
+				else {
+					hit = true;
+					copy_len = 1;
+				}
+			}
+			else {
+				copy_len = _Parse2(buffer, len, hit, '\r', '\n');
+			}
+			_buffer.Write(buffer, copy_len);
+			if (hit) {
+				int pos = (int)_buffer.Size();
+				_ver.end = pos - 2;
+				_flag = E_PARSE_HEAD;
+				_header2.beg = _header.beg = pos;
+				_assistflag = false;
+				return copy_len + _ParseHead(buffer + copy_len, len - copy_len);
+			}
+			if (!_assistflag) {
+				int pos = (int)_buffer.Size();
+				if (*(_buffer.Data() + pos - 1) == '\r')
+					_assistflag = true;
+			}
+			return copy_len;
+		}
+		return 0;
+	}
+
 public:
 	// length is 16
-	HttpSvrRecvMsg() :_constr("Content-Length: ") {
+	HttpSvrRecvMsg():HttpBaseMsg() {
 		Clear();
 	}
 
 	void Clear() {
-		_buffer.Clear();
+		HttpBaseMsg::Clear();
 		_method.beg = _method.end
 			= _url.beg = _url.end
-			= _ver.beg = _ver.end
-			= _header.beg = _header.end
-			= _header2.beg = _header2.end
-			= _body.beg = _body.end = 0;
+			= _ver.beg = _ver.end = 0;
 		_flag = E_PARSE_METHOD;
-		_assistflag = false;
-		_header_iter = 0;
-		_bodysize = -1;
+		
 	}
 
 	void Swap(HttpSvrRecvMsg& other) {
@@ -305,12 +350,6 @@ public:
 		return 0;
 	}
 
-	int GetFlag()const {
-		return _flag;
-	}
-	const char* GetData()const {
-		return _buffer.Data();
-	}
 	// copy is slow
 	std::string GetRequestLine()const {
 		if (_ver.end == 0)
@@ -335,29 +374,7 @@ public:
 			return std::string("");
 		return std::string(_buffer.Data() + _ver.beg, _ver.end - _ver.beg);
 	}
-	// copy is slow
-	std::string GetHeader()const {
-		if (_header.end == 0)
-			return std::string("");
-		return std::string(_buffer.Data() + _header.beg, _header.end - _header.beg);
-	}
-	// copy is slow
-	std::string GetBody()const {
-		if (_body.end == 0)
-			return std::string("");
-		return std::string(_buffer.Data() + _body.beg, _body.end - _body.beg);
-	}
-	std::string NextHeader() {
-		if (_header_vec.empty() || _header_iter == _header_vec.size())
-			return std::string("");
-		else {
-			int iter = _header_iter++;
-			return std::string(_buffer.Data() + _header_vec[iter].beg, _header_vec[iter].end - _header_vec[iter].beg - 2);
-		}
-	}
-	void InitHeaderIter() {
-		_header_iter = 0;
-	}
+	
 };
 
 struct HttpSvrSendMsg {
@@ -539,6 +556,159 @@ public:
 		return false;
 	}
 };
+
+/////////////////////////////////////////////////////////////////////////////////
+
+struct HttpCliRecvMsg : public HttpBaseMsg {
+private:
+	strpos _version;
+	strpos _statuscode;
+	strpos _statusphrase;
+
+protected:
+	int _ParseVer(char* buffer, int len) {
+		bool hit = false;
+		int copy_len = _Parse1(buffer, len, hit, ' ');
+		_buffer.Write(buffer, copy_len);
+		if (hit) {
+			int pos = (int)_buffer.Size();
+			_version.end = pos - 1;
+			_flag = E_PARSE_STATUS_CODE;
+			_statuscode.beg = pos;
+			return copy_len + _ParseStatusCode(buffer + copy_len, len - copy_len);
+		}
+		return copy_len;
+	}
+	int _ParseStatusCode(char* buffer, int len) {
+		if (len > 0) {
+			bool hit = false;
+			int copy_len = _Parse1(buffer, len, hit, ' ');
+			_buffer.Write(buffer, copy_len);
+			if (hit) {
+				int pos = (int)_buffer.Size();
+				_statuscode.end = pos - 1;
+				_flag = E_PARSE_STATUS_PHRASE;
+				_statusphrase.beg = pos;
+				return copy_len + _ParseStatusPhrase(buffer + copy_len, len - copy_len);
+			}
+			return copy_len;
+		}
+		return 0;
+	}
+	int _ParseStatusPhrase(char* buffer, int len) {
+		if (len > 0) {
+			bool hit = false;
+			int copy_len = 0;
+			if (_assistflag) {
+				if (*buffer != '\n') {
+					_assistflag = false;
+					copy_len = _Parse2(buffer, len, hit, '\r', '\n');
+				}
+				else {
+					hit = true;
+					copy_len = 1;
+				}
+			}
+			else {
+				copy_len = _Parse2(buffer, len, hit, '\r', '\n');
+			}
+			_buffer.Write(buffer, copy_len);
+			if (hit) {
+				int pos = (int)_buffer.Size();
+				_statusphrase.end = pos - 2;
+				_flag = E_PARSE_HEAD;
+				_header2.beg = _header.beg = pos;
+				_assistflag = false;
+				return copy_len + _ParseHead(buffer + copy_len, len - copy_len);
+			}
+			if (!_assistflag) {
+				int pos = (int)_buffer.Size();
+				if (*(_buffer.Data() + pos - 1) == '\r')
+					_assistflag = true;
+			}
+			return copy_len;
+		}
+		return 0;
+	}
+
+public:
+	HttpCliRecvMsg() :HttpBaseMsg() {
+		Clear();
+	}
+
+	void Clear() {
+		HttpBaseMsg::Clear();
+		_version.beg = _version.end
+			= _statuscode.beg = _statuscode.end
+			= _statusphrase.beg = _statusphrase.end = 0;
+		_flag = E_PARSE_VER;
+	}
+
+	void Swap(HttpCliRecvMsg& other) {
+		if (this != &other) {
+			other._buffer.Swap(this->_buffer);
+			other._version.Swap(this->_version);
+			other._statuscode.Swap(this->_statuscode);
+			other._statusphrase.Swap(this->_statusphrase);
+			other._header.Swap(this->_header);
+			other._header2.Swap(this->_header2);
+			other._body.Swap(this->_body);
+			other._header_vec.swap(this->_header_vec);
+			strpos::_swap(other._flag, this->_flag);
+			strpos::_swap(other._header_iter, this->_header_iter);
+			strpos::_swap(other._bodysize, this->_bodysize);
+			bool _af = other._assistflag;
+			other._assistflag = this->_assistflag;
+			this->_assistflag = _af;
+		}
+	}
+
+	// 返回使用的长度值
+	int Parse(char* buffer, int len) {
+		switch (_flag) {
+		case E_PARSE_OVER:
+			break;
+		case E_PARSE_VER:
+			return _ParseVer(buffer, len);
+		case E_PARSE_STATUS_CODE:
+			return _ParseStatusCode(buffer, len);
+		case E_PARSE_STATUS_PHRASE:
+			return _ParseStatusPhrase(buffer, len);
+		case E_PARSE_HEAD:
+			return _ParseHead(buffer, len);
+		case E_PARSE_BODY:
+			return _ParseBody(buffer, len);
+		default:
+			break;
+		}
+		return 0;
+	}
+	// copy is slow
+	std::string GetRespondLine()const {
+		if (_statusphrase.end == 0)
+			return std::string("");
+		return std::string(_buffer.Data() + _version.beg, _statusphrase.end - _version.beg);
+	}
+	// copy is slow
+	std::string GetVersion()const {
+		if (_version.end == 0)
+			return std::string("");
+		return std::string(_buffer.Data() + _version.beg, _version.end - _version.beg);
+	}
+	// copy is slow
+	std::string GetStatusCode()const {
+		if (_statuscode.end == 0)
+			return std::string("");
+		return std::string(_buffer.Data() + _statuscode.beg, _statuscode.end - _statuscode.beg);
+	}
+	// copy is slow
+	std::string GetStatusPhrase()const {
+		if (_statusphrase.end == 0)
+			return std::string("");
+		return std::string(_buffer.Data() + _statusphrase.beg, _statusphrase.end - _statusphrase.beg);
+	}
+};
+
 
 M_NETIO_NAMESPACE_END
 #endif
