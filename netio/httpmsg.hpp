@@ -362,18 +362,182 @@ public:
 
 struct HttpSvrSendMsg {
 private:
-	SocketLib::Buffer* _pbuffer;
+	enum {
+		E_VER = 1 << 0,
+		E_STATUS_CODE = 1 << 1,
+		E_STATUS_PHRASE = 1 << 2,
+		E_LOCATION = 1 << 3,
+		E_CONT_CODING = 1 << 4,
+		E_CONT_TYPE = 1 << 5,
+		E_CONT_LANGUAGE = 1 << 6,
+		E_DATE = 1 << 7,
+		E_SERVER = 1 << 8,
+		E_BODY = 1 << 9,
+	};
 
 public:
+	SocketLib::Buffer* _pbuffer;
+	unsigned int _flag;
+
 	~HttpSvrSendMsg() {
 		delete _pbuffer;
 	}
-
 	HttpSvrSendMsg() {
 		_pbuffer = new SocketLib::Buffer;
+		_flag = 0;
+	}
+	SocketLib::Buffer* GetBuffer() {
+		return _pbuffer;
+	}
+	std::string ToString() {
+		return std::string(_pbuffer->Data(), _pbuffer->Size());
 	}
 
+	bool SetHttpVersion(const char* ver) {
+		if (!(_flag&E_VER)) {
+			_pbuffer->Write((void*)ver,strlen(ver));
+			_pbuffer->Write(' ');
+			_flag |= E_VER;
+			return true;
+		}
+		assert(0);
+		return false;
+	}
+	bool SetStatusCode(const char* status) {
+		if (!(_flag&E_STATUS_CODE)
+			&& _flag&E_VER) {
+			_pbuffer->Write((void*)status, strlen(status));
+			_pbuffer->Write(' ');
+			_flag |= E_STATUS_CODE;
+			return true;
+		}
+		assert(0);
+		return false;
+	}
+	bool SetStatusPhrase(const char* phrase) {
+		if (!(_flag&E_STATUS_PHRASE)
+			&& _flag&E_VER
+			&& _flag&E_STATUS_CODE) {
+			_pbuffer->Write((void*)phrase, strlen(phrase));
+			_pbuffer->Write("\r\n",2);
+			_flag |= E_STATUS_PHRASE;
+			return true;
+		}
+		assert(0);
+		return false;
+	}
+	bool SetLocation(const char* location) {
+		if (!(_flag&E_LOCATION)
+			&& _flag&E_VER
+			&& _flag&E_STATUS_CODE
+			&& _flag&E_STATUS_PHRASE) {
+			_pbuffer->Write("Location: ",10);
+			_pbuffer->Write((void*)location, strlen(location));
+			_pbuffer->Write("\r\n",2);
+			_flag |= E_LOCATION;
+			return true;
+		}
+		assert(0);
+		return false;
+	}
+	bool SetContentEncode(const char* encode) {
+		if (!(_flag&E_CONT_CODING)
+			&& _flag&E_VER
+			&& _flag&E_STATUS_CODE
+			&& _flag&E_STATUS_PHRASE) {
+			_pbuffer->Write("Content-Encoding: ",18);
+			_pbuffer->Write((void*)encode, strlen(encode));
+			_pbuffer->Write("\r\n",2);
+			_flag |= E_CONT_CODING;
+			return true;
+		}
+		assert(0);
+		return false;
+	}
+	bool SetContentType(const char* type) {
+		if (!(_flag&E_CONT_TYPE)
+			&& _flag&E_VER
+			&& _flag&E_STATUS_CODE
+			&& _flag&E_STATUS_PHRASE) {
+			_pbuffer->Write("Content-Type: ",14);
+			_pbuffer->Write((void*)type, strlen(type));
+			_pbuffer->Write("\r\n",2);
+			_flag |= E_CONT_TYPE;
+			return true;
+		}
+		assert(0);
+		return false;
+	}
+	bool SetContentLanguage(const char* language) {
+		if (!(_flag&E_CONT_LANGUAGE)
+			&& _flag&E_VER
+			&& _flag&E_STATUS_CODE
+			&& _flag&E_STATUS_PHRASE) {
+			_pbuffer->Write("Content-Language: ",18);
+			_pbuffer->Write((void*)language, strlen(language));
+			_pbuffer->Write("\r\n",2);
+			_flag |= E_CONT_LANGUAGE;
+			return true;
+		}
+		assert(0);
+		return false;
+	}
+	bool SetBody(const char* body, int len) {
+		if (!(_flag&E_BODY)) {
+			if (!(_flag&E_VER))
+				SetHttpVersion("HTTP/1.1");
+			if (!(_flag&E_STATUS_CODE))
+				SetStatusCode("200");
+			if (!(_flag&E_STATUS_PHRASE))
+				SetStatusPhrase("OK");
+			if (!(_flag&E_CONT_TYPE))
+				SetContentType("text/html;charset=utf-8");
 
+			char tmp[50];
+			snprintf(tmp, 50, "Content-Length: %d\r\n\r\n", len);
+			_pbuffer->Write((void*)tmp, strlen(tmp));
+			_pbuffer->Write((void*)body, len);
+			_flag |= E_BODY;
+			return true;
+		}
+		assert(0);
+		return false;
+
+		if (!(_flag&E_CONT_LANGUAGE)
+			&& _flag&E_VER
+			&& _flag&E_STATUS_CODE
+			&& _flag&E_STATUS_PHRASE) {
+
+		}
+	}
+	bool SetSever(const char* svr) {
+		if (!(_flag&E_SERVER)
+			&& _flag&E_VER
+			&& _flag&E_STATUS_CODE
+			&& _flag&E_STATUS_PHRASE) {
+			_pbuffer->Write("Date: ");
+			_pbuffer->Write((void*)svr, strlen(svr));
+			_pbuffer->Write("\r\n");
+			_flag |= E_SERVER;
+			return true;
+		}
+		assert(0);
+		return false;
+	}
+	bool SetDate(const char* date) {
+		if (!(_flag&E_DATE)
+			&& _flag&E_VER
+			&& _flag&E_STATUS_CODE
+			&& _flag&E_STATUS_PHRASE) {
+			_pbuffer->Write("Date: ");
+			_pbuffer->Write((void*)date, strlen(date));
+			_pbuffer->Write("\r\n");
+			_flag |= E_DATE;
+			return true;
+		}
+		assert(0);
+		return false;
+	}
 };
 
 M_NETIO_NAMESPACE_END

@@ -106,13 +106,10 @@ public:
 		SendData(clisock);
 	}
 	virtual void OnReceiveData(netiolib::HttpSocketPtr clisock, netiolib::HttpSvrRecvMsg& httpmsg) {
-		//cout << httpmsg.GetRequestLine() << endl;
-		netiolib::Buffer* pbuffer = new netiolib::Buffer;
-		pbuffer->Write("HTTP/1.1 200 OK\r\n");
-		pbuffer->Write("Content-Length: 11\r\n");
-		pbuffer->Write("Content-Type: text/html; charset=utf-8\r\n\r\n");
-		pbuffer->Write("xiaoquanjie");
-		clisock->Send(pbuffer);
+		cout << httpmsg.GetRequestLine() << endl;
+		netiolib::HttpSvrSendMsg& msg = clisock->GetSvrMsg();
+		msg.SetBody("newxiaoquanjie", 14);
+		clisock->SendHttpMsg();
 	}
 
 	void Start(void*) {

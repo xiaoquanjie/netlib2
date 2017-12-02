@@ -94,6 +94,16 @@ SocketLib::TcpSocket<SocketLib::IoService>& HttpSocket::GetSocket() {
 	return (*this->_socket);
 }
 
+HttpSvrSendMsg& HttpSocket::GetSvrMsg() {
+	return _httpmsg;
+}
+
+void HttpSocket::SendHttpMsg(){
+	Send(_httpmsg._pbuffer);
+	_httpmsg._pbuffer = new SocketLib::Buffer;
+	_httpmsg._flag = 0;
+}
+
 void HttpSocket::Init() {
 	try {
 		this->_remoteep = this->_socket->RemoteEndPoint();

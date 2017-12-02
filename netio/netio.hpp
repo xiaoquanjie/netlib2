@@ -281,8 +281,14 @@ public:
 
 	SocketLib::TcpSocket<SocketLib::IoService>& GetSocket();
 
+	HttpSvrSendMsg& GetSvrMsg();
+
+	void SendHttpMsg();
+
 protected:
 	void Init();
+
+	HttpSvrSendMsg _httpmsg;
 };
 
 class HttpConnector : 
