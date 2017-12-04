@@ -30,9 +30,14 @@ public:
 
 	M_SOCKET_DECL virtual ~BasicSocket();
 
+	// 此函数是非线程安全函数,调用要慎重。如果外部可以不调用，则最好不要调用，由析构函数自动调用
 	M_SOCKET_DECL void Close();
 	
 	M_SOCKET_DECL void Close(SocketError& error);
+
+	M_SOCKET_DECL void Close(function_t<void()> handler);
+
+	M_SOCKET_DECL void Close(function_t<void()> handler, SocketError& error);
 
 	M_SOCKET_DECL void Shutdown(EShutdownType what);
 
@@ -78,14 +83,26 @@ template <typename Protocol, typename SocketService>
 M_SOCKET_DECL void BasicSocket<Protocol, SocketService>::Close()
 {
 	SocketError error;
-	this->Close(error);
+	this->Close(0,error);
 	M_THROW_DEFAULT_SOCKET_ERROR2(error);
 }
 
 template <typename Protocol, typename SocketService>
 M_SOCKET_DECL void BasicSocket<Protocol, SocketService>::Close(SocketError& error)
 {
-	this->GetObjectService().Close(this->GetImpl(), error);
+	this->Close(0, error);
+}
+
+template <typename Protocol, typename SocketService>
+M_SOCKET_DECL void BasicSocket<Protocol, SocketService>::Close(function_t<void()> handler) {
+	SocketError error;
+	this->Close(handler, error);
+	M_THROW_DEFAULT_SOCKET_ERROR2(error);
+}
+
+template <typename Protocol, typename SocketService>
+M_SOCKET_DECL void BasicSocket<Protocol, SocketService>::Close(function_t<void()> handler, SocketError& error) {
+	this->GetObjectService().Close(this->GetImpl(), handler, error);
 }
 
 template <typename Protocol, typename SocketService>

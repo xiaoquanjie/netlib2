@@ -22,15 +22,16 @@
 #ifdef M_PLATFORM_WIN
 M_SOCKET_NAMESPACE_BEGIN
 
+#define M_IOSERVICE_MUTEX_SIZE 128
+
 class IocpService2
 {
 public:
 	class  Access;
 	struct Impl;
-	friend class Access;
+	struct ImplCloseReq;
 
-	struct IoServiceImpl
-	{
+	struct IoServiceImpl{
 		friend class Access;
 		M_SOCKET_DECL IoServiceImpl(IocpService2& service);
 		M_SOCKET_DECL IocpService2& GetService();
@@ -39,35 +40,24 @@ public:
 		IocpService2&	_service;
 		HANDLE			_handler;
 		s_uint32_t		_fdcnt;
+		MutexLock		_mutex;
+		slist<ImplCloseReq*> _closereqs;
+		slist<ImplCloseReq*> _closereqs2;
 	};
 	typedef std::vector<IoServiceImpl*> IoServiceImplVector;
 	typedef std::map<HANDLE, IoServiceImpl*> IoServiceImplMap;
 
-	struct Oper
-	{
+	struct Oper{
 		virtual bool Complete(IocpService2& service, s_uint32_t transbyte, SocketError& error) = 0;
 		virtual void Clear(){}
 		virtual ~Oper() {}
 	};
 
-	struct Operation : public wsaoverlapped_t
-	{
-		s_uint8_t _type;
-		Oper* _oper;
+	struct Operation : public wsaoverlapped_t{
 		M_SOCKET_DECL Operation();
 		M_SOCKET_DECL ~Operation();
-	};
-
-	template<typename Handler>
-	struct AcceptOperation : public Oper {
-		s_byte_t   _buf[sizeof(sockaddr_storage_t) * 2];
-		s_uint32_t _bytes;
-		Impl	   _impl;
-		Handler    _handler;
-
-		M_HANDLER_SOCKET_PTR(Handler) _socket_ptr;
-		M_SOCKET_DECL virtual bool Complete(IocpService2& service, s_uint32_t transbyte, SocketError& error);
-		M_SOCKET_DECL virtual void Clear();
+		s_uint8_t _type;
+		Oper*	  _oper;
 	};
 
 	template<typename Handler>
@@ -83,29 +73,10 @@ public:
 	};
 
 	template<typename Handler>
-	struct ConnectOperation : public Oper {
-		Handler _handler;
-		M_HANDLER_SOCKET_PTR(Handler) _socket_ptr;
-
-		M_SOCKET_DECL virtual bool Complete(IocpService2& service, s_uint32_t transbyte, SocketError& error);
-		M_SOCKET_DECL virtual void Clear();
-	};
-
-	template<typename Handler>
 	struct ConnectOperation2 : public Oper {
 		Handler _handler;
 		Impl	_impl;
 
-		M_SOCKET_DECL virtual bool Complete(IocpService2& service, s_uint32_t transbyte, SocketError& error);
-		M_SOCKET_DECL virtual void Clear();
-	};
-
-	template<typename Handler>
-	struct WriteOperation : public Oper {
-		wsabuf_t _wsabuf;
-		Handler _handler;
-
-		M_HANDLER_SOCKET_PTR(Handler) _socket_ptr;
 		M_SOCKET_DECL virtual bool Complete(IocpService2& service, s_uint32_t transbyte, SocketError& error);
 		M_SOCKET_DECL virtual void Clear();
 	};
@@ -121,16 +92,6 @@ public:
 	};
 
 	template<typename Handler>
-	struct ReadOperation : public Oper {
-		wsabuf_t _wsabuf;
-		Handler _handler;
-
-		M_HANDLER_SOCKET_PTR(Handler) _socket_ptr;
-		M_SOCKET_DECL virtual bool Complete(IocpService2& service, s_uint32_t transbyte, SocketError& error);
-		M_SOCKET_DECL virtual void Clear();
-	};
-
-	template<typename Handler>
 	struct ReadOperation2 : public Oper {
 		wsabuf_t _wsabuf;
 		Handler  _handler;
@@ -140,19 +101,16 @@ public:
 		M_SOCKET_DECL virtual void Clear();
 	};
 
-	struct OperationSet
-	{
-		Operation* _accept_op;
-		Operation* _connect_op;
-		Operation* _write_op;
-		Operation* _read_op;
+	struct OperationSet{
+		Operation _aop;
+		Operation _cop;
+		Operation _wop;
+		Operation _rop;
 	};
 
 	template<typename T>
-	struct OperationAlloc
-	{
-		M_SOCKET_DECL static void Alloc(OperationSet* opset, s_int32_t type);
-		M_SOCKET_DECL static void Free(OperationSet* opset, s_int32_t type);
+	struct OperationAlloc{
+		M_SOCKET_DECL static void AllocOp(Operation& op, s_int32_t type);
 	};
 
 	M_SOCKET_DECL IocpService2();
@@ -183,58 +141,63 @@ private:
 	mutable MutexLock	_mutex;
 };
 
-struct IocpService2::Impl
-{
+M_SOCKET_DECL IocpService2::Operation::Operation() :_oper(0),_type(E_NULL_OP){
+}
+
+M_SOCKET_DECL IocpService2::Operation::~Operation(){
+	delete _oper;
+	_oper = 0;
+}
+
+struct IocpService2::Impl{
 	friend class Access;
-	template<typename T>
-	friend struct AcceptOperation;
 	template<typename T>
 	friend struct AcceptOperation2;
 	template<typename T>
-	friend struct ConnectOperation;
-	template<typename T>
 	friend struct ConnectOperation2;
-	template<typename T>
-	friend struct WriteOperation;
 	template<typename T>
 	friend struct WriteOperation2;
 	template<typename T>
-	friend struct ReadOperation;
-	template<typename T>
 	friend struct ReadOperation2;
 
-	struct core
-	{
+	struct core{
 		HANDLE		 _iocp;
 		socket_t	 _fd;
 		s_uint16_t	 _state;
-		OperationSet _operation;
+		OperationSet _op;
+		shard_ptr_t<MutexLock> _mutex;
 	};
 
-	Impl()
-	{
-		_core = shard_ptr_t<core>(new core);
-		_core->_fd = M_INVALID_SOCKET;
-		_core->_iocp = 0;
-		_core->_state = 0;
-		_core->_operation._accept_op = 0;
-		_core->_operation._connect_op = 0;
-		_core->_operation._read_op = 0;
-		_core->_operation._write_op = 0;
+	Impl(){
+	}
+	void Init() {
+		if (!_core) {
+			_core.reset(new core);
+			_core->_fd = M_INVALID_SOCKET;
+			_core->_iocp = 0;
+			_core->_state = 0;
+		}
 	}
 
 private:
 	shard_ptr_t<core> _core;
 };
 
+struct IocpService2::ImplCloseReq {
+	Impl _impl;
+	function_t<void()> _handler;
+	void Clear() {
+		_handler = 0;
+		_impl = Impl();
+	}
+};
+
 class IocpService2::Access
 {
 public:
-	M_SOCKET_DECL static void Construct(IocpService2& service, Impl& impl, s_uint16_t type);
+	M_SOCKET_DECL static void ConstructImpl(IocpService2& service, Impl& impl, s_uint16_t type);
 
-	M_SOCKET_DECL static void Destroy(IocpService2& service, Impl& impl);
-
-	M_SOCKET_DECL static void Close(IocpService2& service, Impl& impl, SocketError& error);
+	M_SOCKET_DECL static void DestroyImpl(IocpService2& service, Impl& impl);
 
 	M_SOCKET_DECL static bool IsOpen(IocpService2& service, Impl& impl, SocketError& error);
 
@@ -250,48 +213,7 @@ public:
 	template<typename EndPoint>
 	M_SOCKET_DECL static EndPoint LocalEndPoint(EndPoint, IocpService2& service, const Impl& impl, SocketError& error);
 
-	M_SOCKET_DECL static void Shutdown(IocpService2& service, Impl& impl, EShutdownType what, SocketError& error);
-
-	template<typename ProtocolType>
-	M_SOCKET_DECL static void Open(IocpService2& service, Impl& impl, ProtocolType pt, SocketError& error);
-
-	template<typename EndPoint>
-	M_SOCKET_DECL static void Bind(IocpService2& service, Impl& impl, const EndPoint& ep, SocketError& error);
-
 	M_SOCKET_DECL static void Cancel(IocpService2& service, Impl& impl, SocketError& error);
-
-	M_SOCKET_DECL static void Listen(IocpService2& service, Impl& impl, s_int32_t flag, SocketError& error);
-
-	M_SOCKET_DECL static void Accept(IocpService2& service, Impl& impl, Impl& peer, SocketError& error);
-
-	template<typename AcceptHandler>
-	M_SOCKET_DECL static void AsyncAccept(IocpService2& service, M_HANDLER_SOCKET_PTR(AcceptHandler) accept_ptr, AcceptHandler handler, SocketError& error);
-
-	template<typename AcceptHandler>
-	M_SOCKET_DECL static void AsyncAccept(IocpService2& service, Impl& accept_impl, Impl& client_impl,AcceptHandler handler, SocketError& error);
-
-	M_SOCKET_DECL static s_int32_t RecvSome(IocpService2& service, Impl& impl, s_byte_t* data, s_uint32_t size, SocketError& error);
-
-	M_SOCKET_DECL static s_int32_t SendSome(IocpService2& service, Impl& impl, const s_byte_t* data, s_uint32_t size, SocketError& error);
-
-	template<typename ReadHandler>
-	M_SOCKET_DECL static void AsyncRecvSome(IocpService2& service, M_HANDLER_SOCKET_PTR(ReadHandler) socket_ptr, s_byte_t* data, s_uint32_t size, ReadHandler hander, SocketError& error);
-
-	M_SOCKET_DECL static void AsyncRecvSome(IocpService2& service, Impl& impl, s_byte_t* data, s_uint32_t size, M_RW_HANDLER_TYPE(IocpService2) hander, SocketError& error);
-
-	template<typename WriteHandler>
-	M_SOCKET_DECL static void AsyncSendSome(IocpService2& service, M_HANDLER_SOCKET_PTR(WriteHandler) socket_ptr, const s_byte_t* data, s_uint32_t size, WriteHandler hander, SocketError& error);
-
-	M_SOCKET_DECL static void AsyncSendSome(IocpService2& service, Impl& impl, const s_byte_t* data, s_uint32_t size, M_RW_HANDLER_TYPE(IocpService2) hander, SocketError& error);
-
-	template<typename EndPoint>
-	M_SOCKET_DECL static void Connect(IocpService2& service, Impl& impl, const EndPoint& ep, SocketError& error);
-
-	template<typename ConnectHandler, typename EndPoint>
-	M_SOCKET_DECL static void AsyncConnect(IocpService2& service, M_HANDLER_SOCKET_PTR(ConnectHandler) connect_ptr, const EndPoint& ep, ConnectHandler handler, SocketError& error);
-
-	template<typename EndPoint>
-	M_SOCKET_DECL static void AsyncConnect(IocpService2& service, Impl& impl, const EndPoint& ep, M_COMMON_HANDLER_TYPE(IocpService2) handler, SocketError& error);
 
 	M_SOCKET_DECL static void CreateIocp(IocpService2::IoServiceImpl& impl, SocketError& error);
 
@@ -307,71 +229,103 @@ public:
 
 	M_SOCKET_DECL static bool Stopped(const IocpService2& service);
 
-	M_SOCKET_DECL static IocpService2::IoServiceImpl* GetIoServiceImpl(IocpService2& service, Impl& impl);
-
 	M_SOCKET_DECL static s_uint32_t GetServiceCount(const IocpService2& service);
+
+	M_SOCKET_DECL static void Close(IocpService2& service, Impl& impl, SocketError& error);
+
+	M_SOCKET_DECL static void Close(IocpService2& service, Impl& impl, function_t<void()> handler, SocketError& error);
+
+	template<typename ProtocolType>
+	M_SOCKET_DECL static void Open(IocpService2& service, Impl& impl, const ProtocolType& pt, SocketError& error);
+
+	template<typename EndPoint>
+	M_SOCKET_DECL static void Bind(IocpService2& service, Impl& impl, const EndPoint& ep, SocketError& error);
+	
+	M_SOCKET_DECL static void Listen(IocpService2& service, Impl& impl, s_int32_t flag, SocketError& error);
+	
+	M_SOCKET_DECL static void Shutdown(IocpService2& service, Impl& impl, EShutdownType what, SocketError& error);
+	
+	M_SOCKET_DECL static void Accept(IocpService2& service, Impl& impl, Impl& peer, SocketError& error);
+	
+	M_SOCKET_DECL static void AsyncAccept(IocpService2& service, Impl& accept_impl, Impl& client_impl
+		, const M_COMMON_HANDLER_TYPE(IocpService2)& handler, SocketError& error);
+	
+	template<typename EndPoint>
+	M_SOCKET_DECL static void Connect(IocpService2& service, Impl& impl, const EndPoint& ep, SocketError& error);
+	
+	template<typename EndPoint>
+	M_SOCKET_DECL static void AsyncConnect(IocpService2& service, Impl& impl, const EndPoint& ep
+		, const M_COMMON_HANDLER_TYPE(IocpService2)& handler, SocketError& error);
+	
+	M_SOCKET_DECL static s_int32_t RecvSome(IocpService2& service, Impl& impl, s_byte_t* data, s_uint32_t size, SocketError& error);
+	
+	M_SOCKET_DECL static void AsyncRecvSome(IocpService2& service, Impl& impl, s_byte_t* data, s_uint32_t size
+		, const M_RW_HANDLER_TYPE(IocpService2)& hander, SocketError& error);
+	
+	M_SOCKET_DECL static s_int32_t SendSome(IocpService2& service, Impl& impl, const s_byte_t* data, s_uint32_t size, SocketError& error);
+	
+	M_SOCKET_DECL static void AsyncSendSome(IocpService2& service, Impl& impl, const s_byte_t* data, s_uint32_t size
+		, const M_RW_HANDLER_TYPE(IocpService2)& hander, SocketError& error);
+
+protected:
+	M_SOCKET_DECL static void _DoClose(IocpService2::IoServiceImpl* simpl
+		, slist<ImplCloseReq*>&closereqs, slist<ImplCloseReq*>&closereqs2);
+
+	M_SOCKET_DECL static IocpService2::IoServiceImpl* _GetIoServiceImpl(IocpService2& service, Impl& impl);
 };
 
 M_SOCKET_DECL IocpService2::IoServiceImpl::IoServiceImpl(IocpService2& service)
-	:_service(service),_handler(0),_fdcnt(0)
-{
+	:_service(service),_handler(0),_fdcnt(0){
 }
 
-M_SOCKET_DECL IocpService2& IocpService2::IoServiceImpl::GetService()
-{
+M_SOCKET_DECL IocpService2& IocpService2::IoServiceImpl::GetService(){
 	return _service;
 }
 
 M_SOCKET_DECL IocpService2::IocpService2()
-	:_implcnt(0),_implidx(0)
-{
+	:_implcnt(0),_implidx(0){
 }
 
-M_SOCKET_DECL IocpService2::~IocpService2()
-{
-	ScopedLock scoped(_mutex);
+M_SOCKET_DECL IocpService2::~IocpService2(){
 	SocketError error;
 	Stop(error);
-	for (IoServiceImplVector::iterator iter = _implvector.begin(); iter != _implvector.end(); ++iter)
-	{
-		IoServiceImpl& impl = (IoServiceImpl&)**iter;
+	while (ServiceCount()){
+		g_sleep(200);
+	}
+	ScopedLock scoped(_mutex);
+	for (IoServiceImplMap::iterator iter = _implmap.begin(); iter != _implmap.end(); ++iter){
+		IoServiceImpl& impl = (IoServiceImpl&)(*iter->second);
 		Access::DestroyIocp(impl);
 	}
 	_implmap.clear();
 	_implvector.clear();
 }
 
-M_SOCKET_DECL void IocpService2::Run()
-{
+M_SOCKET_DECL void IocpService2::Run(){
 	SocketError error;
 	this->Run(error);
 	M_THROW_DEFAULT_SOCKET_ERROR2(error);
 }
 
-M_SOCKET_DECL void IocpService2::Run(SocketError& error)
-{
+M_SOCKET_DECL void IocpService2::Run(SocketError& error){
 	Access::Run(*this, error);
 }
 
-M_SOCKET_DECL void IocpService2::Stop()
-{
+M_SOCKET_DECL void IocpService2::Stop(){
 	SocketError error;
 	this->Stop(error);
 	M_THROW_DEFAULT_SOCKET_ERROR2(error);
 }
 
-M_SOCKET_DECL void IocpService2::Stop(SocketError& error)
-{
+M_SOCKET_DECL void IocpService2::Stop(SocketError& error){
 	Access::Stop(*this, error);
 }
 
-M_SOCKET_DECL bool IocpService2::Stopped()const
-{
+M_SOCKET_DECL bool IocpService2::Stopped()const{
 	return Access::Stopped(*this);
 }
 
-M_SOCKET_DECL s_int32_t IocpService2::ServiceCount()const
-{
+M_SOCKET_DECL s_int32_t IocpService2::ServiceCount()const{
 	return Access::GetServiceCount(*this);
 }
 

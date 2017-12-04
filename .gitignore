@@ -10,3 +10,6 @@
 /cachefile.h
 /output
 /.vs/socket/v14/.suo
+/Release/socket.tlog
+/Release
+*.vspx

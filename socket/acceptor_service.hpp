@@ -34,10 +34,7 @@ public:
 	M_SOCKET_DECL void Accept(Impl& impl, Impl& peer, SocketError& error);
 
 	template<typename AcceptHandler>
-	M_SOCKET_DECL void AsyncAccept(M_HANDLER_SOCKET_PTR(AcceptHandler) accept_ptr, AcceptHandler handler, SocketError& error);
-
-	template<typename AcceptHandler>
-	M_SOCKET_DECL void AsyncAccept(Impl& impl_acceptor, Impl& impl_sock, AcceptHandler handler, SocketError& error);
+	M_SOCKET_DECL void AsyncAccept(Impl& impl_acceptor, Impl& impl_sock, const AcceptHandler& handler, SocketError& error);
 };
 
 template<typename Protocol, typename IoServiceType>
@@ -60,14 +57,8 @@ M_SOCKET_DECL void TcpAcceptorService<Protocol, IoServiceType>::Accept(Impl& imp
 
 template<typename Protocol, typename IoServiceType>
 template<typename AcceptHandler>
-M_SOCKET_DECL void TcpAcceptorService<Protocol, IoServiceType>::AsyncAccept(M_HANDLER_SOCKET_PTR(AcceptHandler) accept_ptr, AcceptHandler handler, SocketError& error)
-{
-	Access::AsyncAccept(this->_ioservice, accept_ptr, handler, error);
-}
-
-template<typename Protocol, typename IoServiceType>
-template<typename AcceptHandler>
-M_SOCKET_DECL void TcpAcceptorService<Protocol, IoServiceType>::AsyncAccept(Impl& impl_acceptor, Impl& impl_sock, AcceptHandler handler, SocketError& error)
+M_SOCKET_DECL void TcpAcceptorService<Protocol, IoServiceType>::AsyncAccept(Impl& impl_acceptor, Impl& impl_sock
+	, const AcceptHandler& handler, SocketError& error)
 {
 	Access::AsyncAccept(this->_ioservice, impl_acceptor, impl_sock, handler, error);
 }

@@ -21,6 +21,7 @@ M_SOCKET_NAMESPACE_BEGIN
 #define g_free			 free
 #define g_memcpy		 memcpy
 #define g_memcmp		 memcmp
+#define g_memset		 memset
 
 // global function about socket 
 #define g_socket		::socket
@@ -82,6 +83,7 @@ M_SOCKET_NAMESPACE_BEGIN
 #define g_cancelio			::CancelIo
 #define	g_postqueuedcompletionstatus	::PostQueuedCompletionStatus
 #define g_getqueuedcompletionstatus		::GetQueuedCompletionStatus
+#define g_sleep				::Sleep
 #endif
 
 #ifndef M_PLATFORM_WIN
@@ -93,6 +95,7 @@ M_SOCKET_NAMESPACE_BEGIN
 #define g_closeudperr(fd)
 #define g_openudperr(fd)
 #define g_fcntl				fcntl
+#define g_sleep				sleep
 #endif
 
 #ifndef M_PLATFORM_WIN

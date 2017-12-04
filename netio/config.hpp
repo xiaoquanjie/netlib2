@@ -17,7 +17,12 @@
 #define M_NETIO_NAMESPACE_BEGIN namespace netiolib{
 #define M_NETIO_NAMESPACE_END	}
 
-#include "../socket/socket.hpp"
+#include <list>
+#include <time.h>
+#include "socket/socket.hpp"
+#include "tls.hpp"
+#include "log.hpp"
+#include "httpmsg.hpp"
 
 
 

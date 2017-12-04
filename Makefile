@@ -1,5 +1,5 @@
-ALL_DIR_SRC 	= ./ ./msgpack ./demo
-INCLUDES 	= -Imsgpack -Isocket
+ALL_DIR_SRC 	= ./ ./demo
+INCLUDES 	= -Isocket -Inetio -I./
 CPPFLAGS	= -pthread -gdwarf-2
 
 all : project

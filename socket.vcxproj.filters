@@ -177,7 +177,31 @@
     <ClInclude Include="netio\netio.hpp">
       <Filter>netio</Filter>
     </ClInclude>
-    <ClInclude Include="netio\tcp_socket.hpp">
+    <ClInclude Include="netio\netio_impl.hpp">
+      <Filter>netio</Filter>
+    </ClInclude>
+    <ClInclude Include="netio\tsocket_impl.hpp">
+      <Filter>netio</Filter>
+    </ClInclude>
+    <ClInclude Include="netio\tls.hpp">
+      <Filter>netio</Filter>
+    </ClInclude>
+    <ClInclude Include="netio\log.hpp">
+      <Filter>netio</Filter>
+    </ClInclude>
+    <ClInclude Include="netio\tconnector_impl.hpp">
+      <Filter>netio</Filter>
+    </ClInclude>
+    <ClInclude Include="socket\slist.hpp">
+      <Filter>socket</Filter>
+    </ClInclude>
+    <ClInclude Include="netio\hsocket_impl.hpp">
+      <Filter>netio</Filter>
+    </ClInclude>
+    <ClInclude Include="netio\httpmsg.hpp">
+      <Filter>netio</Filter>
+    </ClInclude>
+    <ClInclude Include="netio\hconnector_impl.hpp">
       <Filter>netio</Filter>
     </ClInclude>
   </ItemGroup>
@@ -193,6 +217,9 @@
     </ClCompile>
     <ClCompile Include="demo\async_client_demo.cpp">
       <Filter>源文件\demo</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
+      <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
