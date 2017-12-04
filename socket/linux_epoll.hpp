@@ -119,6 +119,7 @@ struct EpollService::Impl {
 		OperationSet _op;
 		MutexLock    _mutex;
 	};
+	template<int N>
 	void Init();
 private:
 	shard_ptr_t<core> _core;
@@ -159,6 +160,7 @@ struct EpollService::ReadOperation2 : public EpollService::Oper {
 			 _handler;
 };
 
+template<int N>
 void EpollService::Impl::Init() {
 	if (!_core) {
 		_core.reset(new core);

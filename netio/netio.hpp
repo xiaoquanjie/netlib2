@@ -49,14 +49,13 @@ typedef shard_ptr_t<SocketLib::TcpAcceptor<SocketLib::IoService> > NetIoTcpAccep
 
 #define lasterror tlsdata<SocketLib::SocketError,0>::data()
 
-// class netio
-class NetIo 
-{
+template<typename NetIoType>
+class BaseNetIo {
 public:
-	NetIo();
-	NetIo(SocketLib::s_uint32_t backlog);
+	BaseNetIo();
+	BaseNetIo(SocketLib::s_uint32_t backlog);
 
-	virtual ~NetIo();
+	virtual ~BaseNetIo();
 
 	// 建立一个监听
 	bool ListenOne(const SocketLib::Tcp::EndPoint& ep);
@@ -67,11 +66,11 @@ public:
 	bool ListenOneHttp(const std::string& addr, SocketLib::s_uint16_t port);
 
 	// 异步建接
-	void ConnectOne(const SocketLib::Tcp::EndPoint& ep, unsigned int data=0);
-	void ConnectOne(const std::string& addr, SocketLib::s_uint16_t port, unsigned int data=0);
+	void ConnectOne(const SocketLib::Tcp::EndPoint& ep, unsigned int data = 0);
+	void ConnectOne(const std::string& addr, SocketLib::s_uint16_t port, unsigned int data = 0);
 
 	void ConnectOneHttp(const SocketLib::Tcp::EndPoint& ep, unsigned int data = 0);
-	void ConnectOneHttp(const std::string& addr, SocketLib::s_uint16_t port, unsigned int data=0);
+	void ConnectOneHttp(const std::string& addr, SocketLib::s_uint16_t port, unsigned int data = 0);
 
 	virtual void Run();
 	virtual void Stop();
@@ -82,14 +81,14 @@ public:
 	inline SocketLib::s_uint32_t LocalEndian()const;
 
 	/*
-	 *以下三个函数定义为虚函数，以便根据实际业务的模式来做具体模式的消息包分发处理。
-	 *保证同一个socket，以下三个函数的调用遵循OnConnected -> OnReceiveData -> OnDisconnected的顺序。
-	 *保证同一个socket，以下后两个函数的调用都在同一个线程中
-	 */
+	*以下三个函数定义为虚函数，以便根据实际业务的模式来做具体模式的消息包分发处理。
+	*保证同一个socket，以下三个函数的调用遵循OnConnected -> OnReceiveData -> OnDisconnected的顺序。
+	*保证同一个socket，以下后两个函数的调用都在同一个线程中
+	*/
 
 	// 连线通知,这个函数里不要处理业务，防止堵塞
 	virtual void OnConnected(const TcpSocketPtr& clisock);
-	virtual void OnConnected(const TcpConnectorPtr& clisock,SocketLib::SocketError error);
+	virtual void OnConnected(const TcpConnectorPtr& clisock, SocketLib::SocketError error);
 	virtual void OnConnected(HttpSocketPtr clisock);
 	virtual void OnConnected(HttpConnectorPtr clisock, SocketLib::SocketError error);
 
@@ -111,13 +110,25 @@ protected:
 	void _AcceptHttpHandler(SocketLib::SocketError error, HttpSocketPtr& clisock, NetIoTcpAcceptorPtr& acceptor);
 
 protected:
-	NetIo(const NetIo&);
-	NetIo& operator=(const NetIo&);
-
-private:
 	SocketLib::IoService   _ioservice;
 	SocketLib::s_uint32_t  _backlog;
 	SocketLib::s_uint32_t  _endian;
+};
+
+// class netio
+class NetIo : public BaseNetIo<NetIo>
+{
+public:
+	NetIo() :
+		BaseNetIo() {
+	}
+	NetIo(SocketLib::s_uint32_t backlog)
+		:BaseNetIo(backlog) {
+	}
+
+protected:
+	NetIo(const NetIo&);
+	NetIo& operator=(const NetIo&);
 };
 
 enum {
@@ -142,7 +153,7 @@ protected:
 	};
 
 public:
-	TcpBaseSocket(NetIo& netio);
+	TcpBaseSocket(BaseNetIo<NetIo>& netio);
 
 	virtual ~TcpBaseSocket();
 
@@ -169,7 +180,7 @@ protected:
 	bool _TrySendData(bool ignore = false);
 
 protected:
-	NetIo&		 _netio;
+	BaseNetIo<NetIo>& _netio;
 	SocketType*  _socket;
 	_writerinfo_ _writer;
 
@@ -206,29 +217,45 @@ protected:
 	void _TryRecvData();
 
 public:
-	TcpStreamSocket(NetIo& netio);
+	TcpStreamSocket(BaseNetIo<NetIo>& netio);
 };
 
 // class tcpsocket
 class TcpSocket : 
 	public TcpStreamSocket<TcpSocket, SocketLib::TcpSocket<SocketLib::IoService> >
 {
-	friend class NetIo;
+	friend class BaseNetIo<NetIo>;
+	
 public:
-	TcpSocket(NetIo& netio);
+	TcpSocket(BaseNetIo<NetIo>& netio)
+		:TcpStreamSocket(netio) {
+	}
 
-	SocketLib::TcpSocket<SocketLib::IoService>& GetSocket();
+	SocketLib::TcpSocket<SocketLib::IoService>& GetSocket() {
+		return (*this->_socket);
+	}
 
 protected:
-	void Init();
+	void Init() {
+		try {
+			_remoteep = _socket->RemoteEndPoint();
+			_localep = _socket->LocalEndPoint();
+			_flag = E_STATE_START;
+			_netio.OnConnected(this->shared_from_this());
+			this->_TryRecvData();
+		}
+		catch (const SocketLib::SocketError& e) {
+			lasterror = e;
+		}
+	}
 };
 
-// class tcpconnector
-class TcpConnector : 
-	public TcpStreamSocket<TcpConnector, SocketLib::TcpConnector<SocketLib::IoService> >
+template<typename ConnectorType>
+class BaseTcpConnector :
+	public TcpStreamSocket<ConnectorType, SocketLib::TcpConnector<SocketLib::IoService> >
 {
 public:
-	TcpConnector(NetIo& netio);
+	BaseTcpConnector(BaseNetIo<NetIo>& netio);
 
 	SocketLib::TcpConnector<SocketLib::IoService>& GetSocket();
 
@@ -249,6 +276,15 @@ protected:
 
 protected:
 	unsigned int _data;
+};
+
+// class tcpconnector
+class TcpConnector : public BaseTcpConnector<TcpConnector>
+{
+public:
+	TcpConnector(BaseNetIo<NetIo>& netio)
+		:BaseTcpConnector(netio) {
+	}
 };
 
 // for http
@@ -275,35 +311,56 @@ protected:
 	void _TryRecvData();
 
 public:
-	HttpBaseSocket(NetIo& netio);
+	HttpBaseSocket(BaseNetIo<NetIo>& netio);
 };
 
 // class httpsocket
 class HttpSocket : 
 	public HttpBaseSocket<HttpSocket, SocketLib::TcpSocket<SocketLib::IoService>, HttpSvrRecvMsg>
 {
-	friend class NetIo;
+	friend class BaseNetIo<NetIo>;
 public:
-	HttpSocket(NetIo& netio);
+	HttpSocket(BaseNetIo<NetIo>& netio)
+		:HttpBaseSocket(netio) {
+	}
 
-	SocketLib::TcpSocket<SocketLib::IoService>& GetSocket();
+	SocketLib::TcpSocket<SocketLib::IoService>& GetSocket() {
+		return (*this->_socket);
+	}
 
-	HttpSvrSendMsg& GetSvrMsg();
+	HttpSvrSendMsg& GetSvrMsg() {
+		return _httpmsg;
+	}
 
-	void SendHttpMsg();
+	void SendHttpMsg() {
+		Send(_httpmsg._pbuffer);
+		_httpmsg._pbuffer = new SocketLib::Buffer;
+		_httpmsg._flag = 0;
+	}
 
 protected:
-	void Init();
+	void Init() {
+		try {
+			this->_remoteep = this->_socket->RemoteEndPoint();
+			this->_localep = this->_socket->LocalEndPoint();
+			this->_flag = E_STATE_START;
+			this->_netio.OnConnected(this->shared_from_this());
+			this->_TryRecvData();
+		}
+		catch (const SocketLib::SocketError& e) {
+			lasterror = e;
+		}
+	}
 
 	HttpSvrSendMsg _httpmsg;
 };
 
-class HttpConnector : 
-	public HttpBaseSocket<HttpConnector, SocketLib::TcpConnector<SocketLib::IoService>
-	,HttpCliRecvMsg> 
-{
+template<typename ConnectorType>
+class BaseHttpConnector :
+	public HttpBaseSocket<ConnectorType, SocketLib::TcpConnector<SocketLib::IoService>
+	, HttpCliRecvMsg> {
 public:
-	HttpConnector(NetIo& netio);
+	BaseHttpConnector(BaseNetIo<NetIo>& netio);
 
 	SocketLib::TcpConnector<SocketLib::IoService>& GetSocket();
 
@@ -324,6 +381,15 @@ protected:
 
 protected:
 	unsigned int _data;
+};
+
+class HttpConnector : public BaseHttpConnector<HttpConnector>
+{
+public:
+	HttpConnector(BaseNetIo<NetIo>& netio)
+		:BaseHttpConnector(netio) {
+
+	}
 };
 
 

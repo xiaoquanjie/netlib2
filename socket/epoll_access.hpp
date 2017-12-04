@@ -107,7 +107,7 @@
 	impl._core->_op._wop._oper
 
 #define M_IMPL_INIT(impl)\
-	impl.Init()
+	impl.Init<0>()
 #define M_IMPL_MUTEX(impl)\
 	(impl._core->_mutex)
 

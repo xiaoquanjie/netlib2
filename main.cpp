@@ -118,7 +118,7 @@ public:
 		SendData(clisock);
 	}
 	virtual void OnReceiveData(netiolib::HttpSocketPtr clisock, netiolib::HttpSvrRecvMsg& httpmsg) {
-		cout << httpmsg.GetRequestLine() << endl;
+		//cout << httpmsg.GetRequestLine() << endl;
 		netiolib::HttpSvrSendMsg& msg = clisock->GetSvrMsg();
 		msg.SetBody("newxiaoquanjie", 14);
 		clisock->SendHttpMsg();
@@ -158,7 +158,7 @@ void server() {
 
 void http_server() {
 	TestNetIo test_io;
-	for (int i = 0; i < 32; ++i) {
+	for (int i = 0; i < 64; ++i) {
 		new thread(&TestNetIo::Start, &test_io, 0);
 	}
 
@@ -191,7 +191,7 @@ void client() {
 	{
 		netiolib::TcpConnectorPtr connector(new netiolib::TcpConnector(test_io));
 		connector->SetData(k);
-		connector->AsyncConnect("61.135.169.121", 80);
+		connector->AsyncConnect("127.0.0.1", 3001);
 		ptrlist.push_back(connector);
 	}
 

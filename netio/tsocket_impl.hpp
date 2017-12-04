@@ -41,7 +41,7 @@ TcpBaseSocket<T, SocketType>::_writerinfo_::~_writerinfo_() {
 }
 
 template<typename T, typename SocketType>
-TcpBaseSocket<T, SocketType>::TcpBaseSocket(NetIo& netio)
+TcpBaseSocket<T, SocketType>::TcpBaseSocket(BaseNetIo<NetIo>& netio)
 	:_netio(netio) {
 	_flag = E_STATE_STOP;
 	_socket = new SocketType(_netio.GetIoService());
@@ -292,31 +292,8 @@ void TcpStreamSocket<T, SocketType>::_TryRecvData() {
 }
 
 template<typename T, typename SocketType>
-TcpStreamSocket<T, SocketType>::TcpStreamSocket(NetIo& netio)
+TcpStreamSocket<T, SocketType>::TcpStreamSocket(BaseNetIo<NetIo>& netio)
 	:TcpBaseSocket<T, SocketType>(netio){
-}
-
-/////////////////////////////////////////////////////////////////////////////////////////////
-
-TcpSocket::TcpSocket(NetIo& netio)
-	:TcpStreamSocket(netio){
-}
-
-SocketLib::TcpSocket<SocketLib::IoService>& TcpSocket::GetSocket() {
-	return (*this->_socket);
-}
-
-void TcpSocket::Init() {
-	try {
-		_remoteep = _socket->RemoteEndPoint();
-		_localep = _socket->LocalEndPoint();
-		_flag = E_STATE_START;
-		_netio.OnConnected(this->shared_from_this());
-		this->_TryRecvData();
-	}
-	catch (const SocketLib::SocketError& e) {
-		lasterror = e;
-	}
 }
 
 

@@ -80,41 +80,8 @@ void HttpBaseSocket<T, SocketType, HttpMsgType>::_TryRecvData() {
 }
 
 template<typename T, typename SocketType, typename HttpMsgType>
-HttpBaseSocket<T, SocketType, HttpMsgType>::HttpBaseSocket(NetIo& netio)
+HttpBaseSocket<T, SocketType, HttpMsgType>::HttpBaseSocket(BaseNetIo<NetIo>& netio)
 	:TcpBaseSocket<T, SocketType>(netio) {
-}
-
-///////////////////////////////////////////////////////////////////////////////////////////////
-
-HttpSocket::HttpSocket(NetIo& netio)
-	:HttpBaseSocket(netio) {
-}
-
-SocketLib::TcpSocket<SocketLib::IoService>& HttpSocket::GetSocket() {
-	return (*this->_socket);
-}
-
-HttpSvrSendMsg& HttpSocket::GetSvrMsg() {
-	return _httpmsg;
-}
-
-void HttpSocket::SendHttpMsg(){
-	Send(_httpmsg._pbuffer);
-	_httpmsg._pbuffer = new SocketLib::Buffer;
-	_httpmsg._flag = 0;
-}
-
-void HttpSocket::Init() {
-	try {
-		this->_remoteep = this->_socket->RemoteEndPoint();
-		this->_localep = this->_socket->LocalEndPoint();
-		this->_flag = E_STATE_START;
-		this->_netio.OnConnected(this->shared_from_this());
-		this->_TryRecvData();
-	}
-	catch (const SocketLib::SocketError& e) {
-		lasterror = e;
-	}
 }
 
 
