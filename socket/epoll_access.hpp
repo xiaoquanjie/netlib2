@@ -232,8 +232,8 @@ M_SOCKET_DECL void EpollService::Access::ExecOp(IoServiceImpl& serviceimpl
 	}
 	if (!flag)
 	{
-		M_DEBUG_PRINT("type: " << opset->_type);
-		assert(0);
+		//M_DEBUG_PRINT("type: " << opset->_type);
+		//assert(0);
 	}
 }
 
