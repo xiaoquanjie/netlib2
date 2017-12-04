@@ -39,7 +39,7 @@ public:
 
 	M_SOCKET_DECL s_uint32_t Length()const;
 
-	M_SOCKET_DECL void Write(void* data, s_uint32_t len);
+	M_SOCKET_DECL void Write(const void* data, s_uint32_t len);
 
 	template<typename T>
 	M_SOCKET_DECL void Write(T const& value);
@@ -129,7 +129,7 @@ M_SOCKET_DECL s_uint32_t Buffer::Length()const{
 	return (_data._pos - _data._offset);
 }
 
-M_SOCKET_DECL void Buffer::Write(void* data, s_uint32_t len)
+M_SOCKET_DECL void Buffer::Write(const void* data, s_uint32_t len)
 {
 	if (_data._pos + len > _data._size)
 	{

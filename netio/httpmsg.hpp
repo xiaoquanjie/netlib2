@@ -14,6 +14,7 @@
 #ifndef M_NETIO_HTTPMSG_INCLUDE
 #define M_NETIO_HTTPMSG_INCLUDE
 
+#include <stdio.h>
 M_NETIO_NAMESPACE_BEGIN
 
 struct HttpBaseMsg {
@@ -54,7 +55,7 @@ struct HttpBaseMsg {
 		_header_vec;
 	const char* _constr;
 
-	int _Parse1(char* buffer, int len, bool& hit, char chr) {
+	int _Parse1(const char* buffer, int len, bool& hit, char chr) {
 		hit = false;
 		int pos = 0;
 		while (pos < len) {
@@ -67,7 +68,7 @@ struct HttpBaseMsg {
 		int copy_len = pos != len ? pos + 1 : len;
 		return copy_len;
 	}
-	int _Parse2(char* buffer, int len, bool& hit, char chr1, char chr2) {
+	int _Parse2(const char* buffer, int len, bool& hit, char chr1, char chr2) {
 		hit = false;
 		int pos = 0;
 		while (pos + 1 < len) {
@@ -124,7 +125,7 @@ struct HttpBaseMsg {
 	const char* GetData()const {
 		return _buffer.Data();
 	}
-	int _ParseHead(char* buffer, int len) {
+	int _ParseHead(const char* buffer, int len) {
 		if (len > 0) {
 			bool hit = false;
 			int copy_len = 0;
@@ -167,7 +168,7 @@ struct HttpBaseMsg {
 		}
 		return 0;
 	}
-	int _ParseBody(char* buffer, int len) {
+	int _ParseBody(const char* buffer, int len) {
 		if (len > 0) {
 			if (_bodysize == -1) {
 				// check "Content-Length:"
@@ -230,7 +231,7 @@ private:
 	strpos _ver;
 	
 protected:
-	int _ParseMethod(char* buffer, int len) {
+	int _ParseMethod(const char* buffer, int len) {
 		bool hit = false;
 		int copy_len = _Parse1(buffer, len, hit, ' ');
 		_buffer.Write(buffer, copy_len);
@@ -243,7 +244,7 @@ protected:
 		}
 		return copy_len;
 	}
-	int _ParseUrl(char* buffer, int len) {
+	int _ParseUrl(const char* buffer, int len) {
 		if (len > 0) {
 			bool hit = false;
 			int copy_len = _Parse1(buffer, len, hit, ' ');
@@ -259,7 +260,7 @@ protected:
 		}
 		return 0;
 	}
-	int _ParseVer(char* buffer, int len) {
+	int _ParseVer(const char* buffer, int len) {
 		if (len > 0) {
 			bool hit = false;
 			int copy_len = 0;
@@ -330,7 +331,7 @@ public:
 	}
 
 	// 返回使用的长度值
-	int Parse(char* buffer, int len) {
+	int Parse(const char* buffer, int len) {
 		switch (_flag) {
 		case E_PARSE_OVER:
 			break;
@@ -436,7 +437,7 @@ public:
 			&& _flag&E_VER
 			&& _flag&E_STATUS_CODE) {
 			_pbuffer->Write((void*)phrase, strlen(phrase));
-			_pbuffer->Write("\r\n",2);
+			_pbuffer->Write((void*)"\r\n",2);
 			_flag |= E_STATUS_PHRASE;
 			return true;
 		}
@@ -448,9 +449,9 @@ public:
 			&& _flag&E_VER
 			&& _flag&E_STATUS_CODE
 			&& _flag&E_STATUS_PHRASE) {
-			_pbuffer->Write("Location: ",10);
+			_pbuffer->Write((void*)"Location: ",10);
 			_pbuffer->Write((void*)location, strlen(location));
-			_pbuffer->Write("\r\n",2);
+			_pbuffer->Write((void*)"\r\n",2);
 			_flag |= E_LOCATION;
 			return true;
 		}
@@ -462,9 +463,9 @@ public:
 			&& _flag&E_VER
 			&& _flag&E_STATUS_CODE
 			&& _flag&E_STATUS_PHRASE) {
-			_pbuffer->Write("Content-Encoding: ",18);
+			_pbuffer->Write((void*)"Content-Encoding: ",18);
 			_pbuffer->Write((void*)encode, strlen(encode));
-			_pbuffer->Write("\r\n",2);
+			_pbuffer->Write((void*)"\r\n",2);
 			_flag |= E_CONT_CODING;
 			return true;
 		}
@@ -476,9 +477,9 @@ public:
 			&& _flag&E_VER
 			&& _flag&E_STATUS_CODE
 			&& _flag&E_STATUS_PHRASE) {
-			_pbuffer->Write("Content-Type: ",14);
+			_pbuffer->Write((void*)"Content-Type: ",14);
 			_pbuffer->Write((void*)type, strlen(type));
-			_pbuffer->Write("\r\n",2);
+			_pbuffer->Write((void*)"\r\n",2);
 			_flag |= E_CONT_TYPE;
 			return true;
 		}
@@ -490,9 +491,9 @@ public:
 			&& _flag&E_VER
 			&& _flag&E_STATUS_CODE
 			&& _flag&E_STATUS_PHRASE) {
-			_pbuffer->Write("Content-Language: ",18);
+			_pbuffer->Write((void*)"Content-Language: ",18);
 			_pbuffer->Write((void*)language, strlen(language));
-			_pbuffer->Write("\r\n",2);
+			_pbuffer->Write((void*)"\r\n",2);
 			_flag |= E_CONT_LANGUAGE;
 			return true;
 		}
@@ -532,9 +533,9 @@ public:
 			&& _flag&E_VER
 			&& _flag&E_STATUS_CODE
 			&& _flag&E_STATUS_PHRASE) {
-			_pbuffer->Write("Date: ");
+			_pbuffer->Write((void*)"Server: ");
 			_pbuffer->Write((void*)svr, strlen(svr));
-			_pbuffer->Write("\r\n");
+			_pbuffer->Write((void*)"\r\n");
 			_flag |= E_SERVER;
 			return true;
 		}
@@ -546,9 +547,9 @@ public:
 			&& _flag&E_VER
 			&& _flag&E_STATUS_CODE
 			&& _flag&E_STATUS_PHRASE) {
-			_pbuffer->Write("Date: ");
+			_pbuffer->Write((void*)"Date: ");
 			_pbuffer->Write((void*)date, strlen(date));
-			_pbuffer->Write("\r\n");
+			_pbuffer->Write((void*)"\r\n");
 			_flag |= E_DATE;
 			return true;
 		}
@@ -566,7 +567,7 @@ private:
 	strpos _statusphrase;
 
 protected:
-	int _ParseVer(char* buffer, int len) {
+	int _ParseVer(const char* buffer, int len) {
 		bool hit = false;
 		int copy_len = _Parse1(buffer, len, hit, ' ');
 		_buffer.Write(buffer, copy_len);
@@ -579,7 +580,7 @@ protected:
 		}
 		return copy_len;
 	}
-	int _ParseStatusCode(char* buffer, int len) {
+	int _ParseStatusCode(const char* buffer, int len) {
 		if (len > 0) {
 			bool hit = false;
 			int copy_len = _Parse1(buffer, len, hit, ' ');
@@ -595,7 +596,7 @@ protected:
 		}
 		return 0;
 	}
-	int _ParseStatusPhrase(char* buffer, int len) {
+	int _ParseStatusPhrase(const char* buffer, int len) {
 		if (len > 0) {
 			bool hit = false;
 			int copy_len = 0;

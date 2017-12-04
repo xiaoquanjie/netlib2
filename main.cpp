@@ -77,33 +77,12 @@ public:
 		cout << "OnConnected one http : " << clisock->RemoteEndpoint().Address()
 			<< " " << clisock->RemoteEndpoint().Port() << endl;
 	}
-	virtual void OnConnected(netiolib::HttpConnectorPtr clisock, SocketLib::SocketError error)override {
+	virtual void OnConnected(netiolib::HttpConnectorPtr clisock, SocketLib::SocketError error) {
 		if (error) {
 			cout << "http connect fail :" << error.What() << endl;
 		}
 		else {
 			cout << "http connect success : " << clisock->RemoteEndpoint().Address() << " " << clisock->RemoteEndpoint().Port() << endl;
-			
-			std::string str = "GET / HTTP/1.1\r\n";
-			str += "Host: ";
-			str += clisock->LocalEndpoint().Address();
-			str += ":";
-			str += std::to_string(clisock->LocalEndpoint().Port());
-			str += "\r\n";
-			str +=
-				"Connection: keep-alive\r\n"
-				"Upgrade-Insecure-Requests: 1\r\n"
-				"User-Agent: "
-				"Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.89 Safari/537.36 OPR/49.0.2725.47\r\n"
-				"Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8\r\n"
-				"Accept-Encoding: gzip, deflate\r\n"
-				"Accept-Language: zh-CN,zh;q=0.9\r\n"
-				"\r\n";
-
-			SocketLib::Buffer* pbuffer = new SocketLib::Buffer;
-			pbuffer->Write((void*)str.c_str(),str.length());
-			clisock->Send(pbuffer);
-			cout << "send over" << endl;
 		}
 	}
 
@@ -341,21 +320,21 @@ void test1(function_t<void()>& t){
 }
 
 
-char* gHttpReqStr = "GET /?name=xiao&age=18 HTTP/1.1\r\n"
+const char* gHttpReqStr = "GET /?name=xiao&age=18 HTTP/1.1\r\n"
 "Host: 192.168.10.128:3002\r\n"
 "Connection: keep-alive\r\n"
 "Upgrade-Insecure-Requests: 1\r\n"
 "Content-Length: 11\r\n"
 "User-Agent: ";
 
-char* gHttpReqStr2 = "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.89 Safari/537.36 OPR/49.0.2725.47\r\n"
+const char* gHttpReqStr2 = "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/62.0.3202.89 Safari/537.36 OPR/49.0.2725.47\r\n"
 "Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8\r\n"
 "Accept-Encoding: gzip, deflate\r\n"
 "Accept-Language: zh-CN,zh;q=0.9\r\n"
 "\r\n";
 
-char* gHttpReqStr3 = "xiaoquan";
-char* gHttpReqStr4 = "jie1";
+const char* gHttpReqStr3 = "xiaoquan";
+const char* gHttpReqStr4 = "jie1";
 
 void httpmsg_test() {
 	netiolib::HttpSvrRecvMsg msg;
