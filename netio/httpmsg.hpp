@@ -84,6 +84,7 @@ struct HttpBaseMsg {
 	}
 
 	HttpBaseMsg() :_constr("Content-Length: ") {
+		_header_vec.reserve(30);
 	}
 
 	void Clear() {
@@ -94,6 +95,7 @@ struct HttpBaseMsg {
 		_assistflag = false;
 		_header_iter = 0;
 		_bodysize = -1;
+		_header_vec.clear();
 	}
 
 	// copy is slow
@@ -511,9 +513,11 @@ public:
 			if (!(_flag&E_CONT_TYPE))
 				SetContentType("text/html;charset=utf-8");
 
-			char tmp[50];
-			snprintf(tmp, 50, "Content-Length: %d\r\n\r\n", len);
-			_pbuffer->Write((void*)tmp, strlen(tmp));
+			char tmp[20];
+			_pbuffer->Write((void*)"Content-Length: ",16);
+			snprintf(tmp, 20, "%d", len);
+			_pbuffer->Write(tmp, strlen(tmp));
+			_pbuffer->Write((void*)"\r\n\r\n", 4);
 			_pbuffer->Write((void*)body, len);
 			_flag |= E_BODY;
 			return true;

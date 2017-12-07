@@ -351,6 +351,10 @@ void httpmsg_test() {
 	cout << "elapsed : " << ((double)(end_t-beg_t) / CLOCKS_PER_SEC) << endl;
 }
 
+struct msg  {
+	SocketLib::Buffer a;
+};
+
 int main() {
 
 	//httpmsg_test();
