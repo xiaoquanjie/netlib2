@@ -14,7 +14,7 @@
 #ifndef M_PROTOCOL_INCLUDE
 #define M_PROTOCOL_INCLUDE
 
-#include "endpoint.hpp"
+#include "socket/endpoint.hpp"
 M_SOCKET_NAMESPACE_BEGIN
 
 class Tcp

@@ -1,7 +1,7 @@
 #ifndef M_BUFFER_INCLUDE
 #define M_BUFFER_INCLUDE
 
-#include "config.hpp"
+#include "socket/config.hpp"
 M_SOCKET_NAMESPACE_BEGIN
 #define M_BUFFER_DEFAILT_SIZE 1024
 

@@ -14,9 +14,9 @@
 #ifndef M_BASIC_SOCKET_INCLUDE
 #define M_BASIC_SOCKET_INCLUDE
 
-#include "io_object.hpp"
-#include "socket_service.hpp"
-#include "option.hpp"
+#include "socket/io_object.hpp"
+#include "socket/socket_service.hpp"
+#include "socket/option.hpp"
 M_SOCKET_NAMESPACE_BEGIN
 
 template <typename Protocol, typename SocketService>

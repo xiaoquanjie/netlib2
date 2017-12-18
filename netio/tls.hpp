@@ -14,7 +14,7 @@
 #ifndef M_NETIO_TLS_INCLUDE
 #define M_NETIO_TLS_INCLUDE
 
-#include "config.hpp"
+#include "netio/config.hpp"
 M_NETIO_NAMESPACE_BEGIN
 
 #ifdef M_PLATFORM_WIN

@@ -14,7 +14,7 @@
 #ifndef M_SOCKET_STREAM_INCLUDE
 #define M_SOCKET_STREAM_INCLUDE
 
-#include "basic_socket.hpp"
+#include "socket/basic_socket.hpp"
 M_SOCKET_NAMESPACE_BEGIN
 
 template <typename Protocol, typename SocketService>

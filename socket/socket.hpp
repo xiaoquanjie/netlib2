@@ -14,16 +14,16 @@
 #ifndef SOCKET_HPP
 #define SOCKET_HPP
 
-#include "config.hpp"
-#include "pro_hdr.hpp"
-#include "hdr_helper.hpp"
-#include "address.hpp"
-#include "endpoint.hpp"
-#include "protocol.hpp"
-#include "socket_tcp.hpp"
-#include "socket_acceptor.hpp"
-#include "socket_connector.hpp"
-#include "service.hpp"
-#include "buffer.hpp"
+#include "socket/config.hpp"
+#include "socket/pro_hdr.hpp"
+#include "socket/hdr_helper.hpp"
+#include "socket/address.hpp"
+#include "socket/endpoint.hpp"
+#include "socket/protocol.hpp"
+#include "socket/socket_tcp.hpp"
+#include "socket/socket_acceptor.hpp"
+#include "socket/socket_connector.hpp"
+#include "socket/service.hpp"
+#include "socket/buffer.hpp"
 
 #endif

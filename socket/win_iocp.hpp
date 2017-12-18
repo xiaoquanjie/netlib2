@@ -14,7 +14,7 @@
 #ifndef M_WIN_IOCP_INCLUDE
 #define M_WIN_IOCP_INCLUDE
 
-#include "config.hpp"
+#include "socket/config.hpp"
 #ifdef M_PLATFORM_WIN
 M_SOCKET_NAMESPACE_BEGIN
 
@@ -263,8 +263,8 @@ M_SOCKET_DECL s_int32_t IocpService::ServiceCount()const
 	return 1;
 }
 
-#include "winsock_init.hpp"
-#include "win_access.hpp"
+#include "socket/winsock_init.hpp"
+#include "socket/win_access.hpp"
 M_SOCKET_NAMESPACE_END
 #endif
 #endif

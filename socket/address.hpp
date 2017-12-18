@@ -14,7 +14,7 @@
 #ifndef M_ADDRESS_INCLUDE
 #define M_ADDRESS_INCLUDE
 
-#include "config.hpp"
+#include "socket/config.hpp"
 M_SOCKET_NAMESPACE_BEGIN
 
 struct in4_addr_type

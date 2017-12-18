@@ -240,11 +240,11 @@
 
 #endif // M_CONFIG_INCLUDE
 
-#include "win_config.hpp"
-#include "linux_config.hpp"
-#include "type.hpp"
-#include "gfunction.hpp"
-#include "error.hpp"
-#include "mutexlock.hpp"
-#include "lock_dispatcher.hpp"
-#include "slist.hpp"
+#include "socket/win_config.hpp"
+#include "socket/linux_config.hpp"
+#include "socket/type.hpp"
+#include "socket/gfunction.hpp"
+#include "socket/error.hpp"
+#include "socket/mutexlock.hpp"
+#include "socket/lock_dispatcher.hpp"
+#include "socket/slist.hpp"

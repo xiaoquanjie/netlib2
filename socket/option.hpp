@@ -14,7 +14,7 @@
 #ifndef M_SOCKET_OPT_INCLUDE
 #define M_SOCKET_OPT_INCLUDE
 
-#include "config.hpp"
+#include "socket/config.hpp"
 M_SOCKET_NAMESPACE_BEGIN
 
 namespace detail

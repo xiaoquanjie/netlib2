@@ -14,7 +14,7 @@
 #ifndef M_PROTOCOL_HDR_INCLIDE
 #define M_PROTOCOL_HDR_INCLIDE
 
-#include "config.hpp"
+#include "socket/config.hpp"
 M_SOCKET_NAMESPACE_BEGIN
 
 

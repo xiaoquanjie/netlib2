@@ -14,10 +14,10 @@
 #ifndef M_SOCKET_TCP_INCLUDE
 #define M_SOCKET_TCP_INCLUDE
 
-#include "config.hpp"
-#include "socket_stream.hpp"
-#include "protocol.hpp"
-#include "stream_service.hpp"
+#include "socket/config.hpp"
+#include "socket/socket_stream.hpp"
+#include "socket/protocol.hpp"
+#include "socket/stream_service.hpp"
 M_SOCKET_NAMESPACE_BEGIN
 
 template<typename IoServiceType>

@@ -14,7 +14,7 @@
 #ifndef M_NETIO_LOG_INCLUDE
 #define M_NETIO_LOG_INCLUDE
 
-#include "config.hpp"
+#include "netio/config.hpp"
 M_NETIO_NAMESPACE_BEGIN
 
 static void set_netio_loginterface();

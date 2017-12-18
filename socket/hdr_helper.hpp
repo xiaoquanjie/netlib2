@@ -14,7 +14,7 @@
 #ifndef M_HDR_HELPER_INCLUDE
 #define M_HDR_HELPER_INCLUDE
 
-#include "pro_hdr.hpp"
+#include "socket/pro_hdr.hpp"
 M_SOCKET_NAMESPACE_BEGIN
 
 class HdrHelper

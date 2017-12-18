@@ -14,8 +14,8 @@
 #ifndef M_ENDPOINT_INCLUDE
 #define M_ENDPOINT_INCLUDE
 
-#include "config.hpp"
-#include "util.hpp"
+#include "socket/config.hpp"
+#include "socket/util.hpp"
 M_SOCKET_NAMESPACE_BEGIN
 
 template<typename ProtocolType>

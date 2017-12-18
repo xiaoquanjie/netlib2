@@ -14,7 +14,7 @@
 #ifndef M_EPOLL_ACCESS_INCLUDE
 #define M_EPOLL_ACCESS_INCLUDE
 
-#include "config.hpp"
+#include "socket/config.hpp"
 #ifndef M_PLATFORM_WIN
 
 // ipv4 or ipv6 bit(0)

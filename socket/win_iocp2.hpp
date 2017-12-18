@@ -15,7 +15,7 @@
 #ifndef M_WIN_IOCP2_INCLUDE
 #define M_WIN_IOCP2_INCLUDE
 
-#include "config.hpp"
+#include "socket/config.hpp"
 #include <map>
 #include <vector>
 #include <algorithm>
@@ -329,8 +329,8 @@ M_SOCKET_DECL s_int32_t IocpService2::ServiceCount()const{
 	return Access::GetServiceCount(*this);
 }
 
-#include "winsock_init.hpp"
-#include "iocp_access.hpp"
+#include "socket/winsock_init.hpp"
+#include "socket/iocp_access.hpp"
 M_SOCKET_NAMESPACE_END
 #endif
 #endif

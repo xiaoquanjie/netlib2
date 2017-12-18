@@ -14,7 +14,7 @@
 #ifndef M_NETIO_NETIO_INCLUDE
 #define M_NETIO_NETIO_INCLUDE
 
-#include "config.hpp"
+#include "netio/config.hpp"
 M_NETIO_NAMESPACE_BEGIN
 
 #ifdef M_PLATFORM_WIN
@@ -394,9 +394,9 @@ public:
 
 
 M_NETIO_NAMESPACE_END
-#include "netio_impl.hpp"
-#include "tsocket_impl.hpp"
-#include "tconnector_impl.hpp"
-#include "hsocket_impl.hpp"
-#include "hconnector_impl.hpp"
+#include "netio/netio_impl.hpp"
+#include "netio/tsocket_impl.hpp"
+#include "netio/tconnector_impl.hpp"
+#include "netio/hsocket_impl.hpp"
+#include "netio/hconnector_impl.hpp"
 #endif

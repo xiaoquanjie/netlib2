@@ -14,9 +14,9 @@
 #ifndef M_SOCKET_CONNECTOR_INCLUDE
 #define M_SOCKET_CONNECTOR_INCLUDE
 
-#include "socket_stream.hpp"
-#include "protocol.hpp"
-#include "connector_service.hpp"
+#include "socket/socket_stream.hpp"
+#include "socket/protocol.hpp"
+#include "socket/connector_service.hpp"
 M_SOCKET_NAMESPACE_BEGIN
 
 template<typename IoServiceType>

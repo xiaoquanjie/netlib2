@@ -14,7 +14,7 @@
 #ifndef M_LINUX_EPOLL_INCLUDE
 #define M_LINUX_EPOLL_INCLUDE
 
-#include "config.hpp"
+#include "socket/config.hpp"
 #include <map>
 #include <vector>
 #include <algorithm>
@@ -325,8 +325,8 @@ M_SOCKET_DECL s_int32_t EpollService::ServiceCount()const{
 	return Access::GetServiceCount(*this);
 }
 
-#include "linuxsock_init.hpp"
-#include "epoll_access.hpp"
+#include "socket/linuxsock_init.hpp"
+#include "socket/epoll_access.hpp"
 M_SOCKET_NAMESPACE_END
 #endif
 #endif

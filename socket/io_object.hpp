@@ -14,7 +14,7 @@
 #ifndef M_IO_OBJECT_INCLUDE
 #define M_IO_OBJECT_INCLUDE
 
-#include "config.hpp"
+#include "socket/config.hpp"
 M_SOCKET_NAMESPACE_BEGIN
 
 template<typename IoObjectService>

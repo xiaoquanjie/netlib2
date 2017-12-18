@@ -14,9 +14,9 @@
 #ifndef M_SOCKET_ACCEPTOR_INCLUDE
 #define M_SOCKET_ACCEPTOR_INCLUDE
 
-#include "basic_socket.hpp"
-#include "protocol.hpp"
-#include "acceptor_service.hpp"
+#include "socket/basic_socket.hpp"
+#include "socket/protocol.hpp"
+#include "socket/acceptor_service.hpp"
 M_SOCKET_NAMESPACE_BEGIN
 
 template<typename IoServiceType>
