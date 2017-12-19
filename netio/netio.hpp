@@ -132,7 +132,7 @@ protected:
 };
 
 enum {
-	E_STATE_STOP =  0,
+	E_STATE_STOP = 0,
 	E_STATE_START = 1,
 	E_STATE_WRITE = 3,
 };
@@ -210,7 +210,7 @@ protected:
 	_readerinfo_ _reader;
 
 	void _ReadHandler(SocketLib::s_uint32_t tran_byte, SocketLib::SocketError error);
-	
+
 	// 裁减出数据包，返回false意味着数据包有错
 	bool _CutMsgPack(SocketLib::s_byte_t* buf, SocketLib::s_uint32_t tran_byte);
 
@@ -221,11 +221,11 @@ public:
 };
 
 // class tcpsocket
-class TcpSocket : 
+class TcpSocket :
 	public TcpStreamSocket<TcpSocket, SocketLib::TcpSocket<SocketLib::IoService> >
 {
 	friend class BaseNetIo<NetIo>;
-	
+
 public:
 	TcpSocket(BaseNetIo<NetIo>& netio)
 		:TcpStreamSocket(netio) {
@@ -288,8 +288,8 @@ public:
 };
 
 // for http
-template<typename T, typename SocketType,typename HttpMsgType>
-class HttpBaseSocket : 
+template<typename T, typename SocketType, typename HttpMsgType>
+class HttpBaseSocket :
 	public TcpBaseSocket<T, SocketType>
 {
 protected:
@@ -315,7 +315,7 @@ public:
 };
 
 // class httpsocket
-class HttpSocket : 
+class HttpSocket :
 	public HttpBaseSocket<HttpSocket, SocketLib::TcpSocket<SocketLib::IoService>, HttpSvrRecvMsg>
 {
 	friend class BaseNetIo<NetIo>;
@@ -334,7 +334,6 @@ public:
 
 	void SendHttpMsg() {
 		Send(_httpmsg._pbuffer);
-		_httpmsg._pbuffer = new SocketLib::Buffer;
 		_httpmsg._flag = 0;
 	}
 

@@ -93,7 +93,16 @@ template<typename T, typename SocketType>
 void TcpBaseSocket<T, SocketType>::Send(SocketLib::Buffer* buffer) {
 	SocketLib::ScopedLock scoped_w(_writer.lock);
 	if (_flag == E_STATE_START) {
-		_writer.buffer_pool.push_back(buffer);
+		SocketLib::Buffer* pBuffer;
+		if (_writer.buffer_pool2.size()) {
+			pBuffer = _writer.buffer_pool2.front();
+			_writer.buffer_pool2.pop_front();
+		}
+		else
+			pBuffer = new SocketLib::Buffer();
+
+		pBuffer->Swap(*buffer);
+		_writer.buffer_pool.push_back(pBuffer);
 		_TrySendData();
 	}
 	else

@@ -158,7 +158,7 @@ void server() {
 
 void http_server() {
 	TestNetIo test_io;
-	for (int i = 0; i < 64; ++i) {
+	for (int i = 0; i < 32; ++i) {
 		new thread(&TestNetIo::Start, &test_io, 0);
 	}
 
