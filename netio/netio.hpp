@@ -142,8 +142,8 @@ class TcpBaseSocket : public enable_shared_from_this_t<T>
 {
 protected:
 	struct _writerinfo_ {
-		SocketLib::slist<SocketLib::Buffer*> buffer_pool;
-		SocketLib::slist<SocketLib::Buffer*> buffer_pool2;
+		base::slist<SocketLib::Buffer*> buffer_pool;
+		base::svector<SocketLib::Buffer*> buffer_pool2;
 		SocketLib::Buffer*   msgbuffer;
 		SocketLib::MutexLock lock;
 		bool writing;

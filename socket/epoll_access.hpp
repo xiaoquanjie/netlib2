@@ -254,7 +254,7 @@ M_SOCKET_DECL void EpollService::Access::Run(EpollService& service, SocketError&
 
 	const int max_events = 128;
 	epoll_event_t events[max_events];
-	slist<ImplCloseReq*> closereqs, closereqs2;
+	base::slist<ImplCloseReq*> closereqs, closereqs2;
 	for (;;){
 		_DoClose(simpl, closereqs, closereqs2);
 		g_setlasterr(0);
@@ -336,7 +336,7 @@ M_SOCKET_DECL EpollService::IoServiceImpl* EpollService::Access::_GetIoServiceIm
 }
 
 M_SOCKET_DECL void EpollService::Access::_DoClose(IoServiceImpl* simpl
-	, slist<ImplCloseReq*>&closereqs, slist<ImplCloseReq*>&closereqs2) {
+	, base::slist<ImplCloseReq*>&closereqs, base::slist<ImplCloseReq*>&closereqs2) {
 	if (simpl->_closereqs.size()) {
 		simpl->_mutex.lock();
 		closereqs.swap(simpl->_closereqs);

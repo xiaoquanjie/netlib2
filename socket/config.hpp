@@ -247,4 +247,5 @@
 #include "socket/error.hpp"
 #include "socket/mutexlock.hpp"
 #include "socket/lock_dispatcher.hpp"
-#include "socket/slist.hpp"
+#include "base/slist.hpp"
+#include "base/svector.hpp"

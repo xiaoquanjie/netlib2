@@ -72,7 +72,7 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <LinkIncremental>true</LinkIncremental>
     <OutDir>output\</OutDir>
-    <IncludePath>$(IncludePath)</IncludePath>
+    <IncludePath>./;$(IncludePath)</IncludePath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <LinkIncremental>true</LinkIncremental>
@@ -153,6 +153,9 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="base\config.hpp" />
+    <ClInclude Include="base\slist.hpp" />
+    <ClInclude Include="base\svector.hpp" />
     <ClInclude Include="demo\async_client_demo.h" />
     <ClInclude Include="demo\async_server_demo.h" />
     <ClInclude Include="netio\config.hpp" />
@@ -187,7 +190,6 @@
     <ClInclude Include="socket\protocol.hpp" />
     <ClInclude Include="socket\pro_hdr.hpp" />
     <ClInclude Include="socket\service.hpp" />
-    <ClInclude Include="socket\slist.hpp" />
     <ClInclude Include="socket\socket.hpp" />
     <ClInclude Include="socket\socket_acceptor.hpp" />
     <ClInclude Include="socket\socket_connector.hpp" />

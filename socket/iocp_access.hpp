@@ -239,7 +239,7 @@ M_SOCKET_DECL void IocpService2::Access::Run(IocpService2& service, SocketError&
 	overlapped_t* overlapped = 0;
 
 	//std::list<ImplCloseReq*> closereqs;
-	slist<ImplCloseReq*> closereqs,closereqs2;
+	base::slist<ImplCloseReq*> closereqs,closereqs2;
 	for (;;){
 		_DoClose(simpl,closereqs,closereqs2);
 		trans_bytes = 0;
@@ -815,7 +815,7 @@ M_SOCKET_DECL void IocpService2::Access::AsyncSendSome(IocpService2& service, Im
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 M_SOCKET_DECL void IocpService2::Access::_DoClose(IocpService2::IoServiceImpl* simpl, 
-	slist<ImplCloseReq*>&closereqs, slist<ImplCloseReq*>&closereqs2) {
+	base::slist<ImplCloseReq*>&closereqs, base::slist<ImplCloseReq*>&closereqs2) {
 	if (simpl->_closereqs.size()) {
 		simpl->_mutex.lock();
 		closereqs.swap(simpl->_closereqs);

@@ -301,7 +301,7 @@ public:
 
 void slist_test() {
 	TO* p = new TO;
-	SocketLib::slist<int> sli, sli2;
+	base::slist<int> sli, sli2;
 	sli.push_back(1);
 	sli.push_back(2);
 	sli2.join(sli);

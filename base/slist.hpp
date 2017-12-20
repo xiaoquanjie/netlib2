@@ -1,12 +1,8 @@
-#ifndef M_SOCKETLIB_SLIST_INCLUDE
-#define M_SOCKETLIB_SLIST_INCLUDE
+#ifndef M_BASE_SLIST_INCLUDE
+#define M_BASE_SLIST_INCLUDE
 
-M_SOCKET_NAMESPACE_BEGIN
-
-#define M_SLIST_CHECK(sli)\
-	//if ((sli)._head==0)\
-	//	assert((sli)._tail==0 && (sli)._count==0);
-
+#include "base/config.hpp"
+M_BASE_NAMESPACE_BEGIN
 
 template<class T>
 class slist
@@ -46,9 +42,6 @@ public:
 		h = other._tail;
 		other._tail = this->_tail;
 		this->_tail = h;
-
-		M_SLIST_CHECK(*this);
-		M_SLIST_CHECK(other);
 	}
 
 	inline void join(slist<T>& other);
@@ -90,7 +83,6 @@ inline void slist<T>::push_back(const T& t) {
 	if (!_head)
 		_head = _tail;
 	++_count;
-	M_SLIST_CHECK(*this);
 }
 
 template<class T>
@@ -107,7 +99,6 @@ inline void slist<T>::pop_front() {
 			_tail = pnode;
 		_head = pnode;
 		_count--;
-		M_SLIST_CHECK(*this);
 	}
 }
 
@@ -133,7 +124,6 @@ inline void slist<T>::clear()
 	}
 	_head = NULL;
 	_count = 0;
-	M_SLIST_CHECK(*this);
 }
 
 template<class T>
@@ -151,9 +141,7 @@ inline void slist<T>::join(slist<T>& other) {
 	other._head = other._tail = 0;
 	this->_count += other._count;
 	other._count = 0;
-	M_SLIST_CHECK(*this);
-	M_SLIST_CHECK(other);
 }
 
-M_SOCKET_NAMESPACE_END
+M_BASE_NAMESPACE_END
 #endif

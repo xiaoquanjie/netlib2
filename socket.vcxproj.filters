@@ -25,6 +25,9 @@
     <Filter Include="netio">
       <UniqueIdentifier>{622dc570-efad-4f2f-b957-cdea83f54c82}</UniqueIdentifier>
     </Filter>
+    <Filter Include="base">
+      <UniqueIdentifier>{bbcadd4c-7120-41e7-a5a9-970328fd2df3}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -192,9 +195,6 @@
     <ClInclude Include="netio\tconnector_impl.hpp">
       <Filter>netio</Filter>
     </ClInclude>
-    <ClInclude Include="socket\slist.hpp">
-      <Filter>socket</Filter>
-    </ClInclude>
     <ClInclude Include="netio\hsocket_impl.hpp">
       <Filter>netio</Filter>
     </ClInclude>
@@ -203,6 +203,15 @@
     </ClInclude>
     <ClInclude Include="netio\hconnector_impl.hpp">
       <Filter>netio</Filter>
+    </ClInclude>
+    <ClInclude Include="base\config.hpp">
+      <Filter>base</Filter>
+    </ClInclude>
+    <ClInclude Include="base\slist.hpp">
+      <Filter>base</Filter>
+    </ClInclude>
+    <ClInclude Include="base\svector.hpp">
+      <Filter>base</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

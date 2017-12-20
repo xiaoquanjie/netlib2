@@ -33,8 +33,8 @@ TcpBaseSocket<T, SocketType>::_writerinfo_::~_writerinfo_() {
 		delete pbuffer;
 	}
 	while (buffer_pool2.size()) {
-		pbuffer = buffer_pool2.front();
-		buffer_pool2.pop_front();
+		pbuffer = buffer_pool2.back();
+		buffer_pool2.pop_back();
 		delete pbuffer;
 	}
 	delete msgbuffer;
@@ -95,8 +95,8 @@ void TcpBaseSocket<T, SocketType>::Send(SocketLib::Buffer* buffer) {
 	if (_flag == E_STATE_START) {
 		SocketLib::Buffer* pBuffer;
 		if (_writer.buffer_pool2.size()) {
-			pBuffer = _writer.buffer_pool2.front();
-			_writer.buffer_pool2.pop_front();
+			pBuffer = _writer.buffer_pool2.back();
+			_writer.buffer_pool2.pop_back();
 		}
 		else
 			pBuffer = new SocketLib::Buffer();
@@ -123,8 +123,8 @@ void TcpBaseSocket<T, SocketType>::Send(const SocketLib::s_byte_t* data, SocketL
 
 		SocketLib::Buffer* buffer;
 		if (_writer.buffer_pool2.size()) {
-			buffer = _writer.buffer_pool2.front();
-			_writer.buffer_pool2.pop_front();
+			buffer = _writer.buffer_pool2.back();
+			_writer.buffer_pool2.pop_back();
 		}
 		else
 			buffer = new SocketLib::Buffer();
@@ -172,8 +172,10 @@ bool TcpBaseSocket<T, SocketType>::_TrySendData(bool ignore) {
 			&& _writer.buffer_pool.size() > 0) {
 			SocketLib::Buffer* pbuffer = _writer.buffer_pool.front();
 			if (_writer.msgbuffer) {
-				if (_writer.buffer_pool2.size() < 10)
+				if (_writer.buffer_pool2.size() < 10) {
+					_writer.msgbuffer->Clear();
 					_writer.buffer_pool2.push_back(_writer.msgbuffer);
+				}
 				else
 					delete _writer.msgbuffer;
 			}
