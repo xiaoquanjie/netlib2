@@ -168,6 +168,8 @@ public:
 
 	void Send(const SocketLib::s_byte_t* data, SocketLib::s_uint32_t len);
 
+	bool IsConnected()const;
+
 protected:
 	void _WriteHandler(SocketLib::s_uint32_t tran_byte, SocketLib::SocketError error);
 

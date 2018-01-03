@@ -138,6 +138,11 @@ void TcpBaseSocket<T, SocketType>::Send(const SocketLib::s_byte_t* data, SocketL
 }
 
 template<typename T, typename SocketType>
+bool TcpBaseSocket<T, SocketType>::IsConnected()const {
+	return (_flag == E_STATE_START);
+}
+
+template<typename T, typename SocketType>
 void TcpBaseSocket<T, SocketType>::_WriteHandler(SocketLib::s_uint32_t tran_byte, SocketLib::SocketError error) {
 	if (error) {
 		// 出错关闭连接
