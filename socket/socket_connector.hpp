@@ -30,9 +30,9 @@ public:
 
 	M_SOCKET_DECL TcpConnector(IoServiceType& ioservice);
 
-	M_SOCKET_DECL void Connect(const EndPoint& ep);
+	M_SOCKET_DECL void Connect(const EndPoint& ep, s_uint32_t timeo_sec = -1);
 
-	M_SOCKET_DECL void Connect(const EndPoint& ep, SocketError& error);
+	M_SOCKET_DECL void Connect(const EndPoint& ep, SocketError& error, s_uint32_t timeo_sec = -1);
 		
 	/*ConnectHandler: void(SocketError)*/
 	M_SOCKET_DECL void AsyncConnect(const M_COMMON_HANDLER_TYPE(IoServiceType)& handler, const EndPoint& ep);
@@ -61,23 +61,23 @@ M_SOCKET_DECL TcpConnector<IoServiceType>::TcpConnector(IoServiceType& ioservice
 }
 
 template<typename IoServiceType>
-M_SOCKET_DECL void TcpConnector<IoServiceType>::Connect(const EndPoint& ep)
+M_SOCKET_DECL void TcpConnector<IoServiceType>::Connect(const EndPoint& ep, s_uint32_t timeo_sec)
 {
 	SocketError error;
-	this->Connect(ep, error);
+	this->Connect(ep, error,timeo_sec);
 	M_THROW_DEFAULT_SOCKET_ERROR2(error);
 }
 
 template<typename IoServiceType>
-M_SOCKET_DECL void TcpConnector<IoServiceType>::Connect(const EndPoint& ep, SocketError& error)
+M_SOCKET_DECL void TcpConnector<IoServiceType>::Connect(const EndPoint& ep, SocketError& error, s_uint32_t timeo_sec)
 {
-	if (!this->IsOpen())
-	{
+	if (!this->IsOpen()){
 		Tcp pt = ep.Protocol();
 		this->GetObjectService().Open(this->GetImpl(), pt, error);
-		M_THROW_DEFAULT_SOCKET_ERROR2(error);
+		if (error)
+			return;
 	}
-	this->GetObjectService().Connect(this->GetImpl(), ep, error);
+	this->GetObjectService().Connect(this->GetImpl(), ep, error, timeo_sec);
 }
 
 template<typename IoServiceType>
@@ -95,7 +95,8 @@ M_SOCKET_DECL void TcpConnector<IoServiceType>::AsyncConnect(const M_COMMON_HAND
 	{
 		Tcp pt = ep.Protocol();
 		this->GetObjectService().Open(this->GetImpl(), pt, error);
-		M_THROW_DEFAULT_SOCKET_ERROR2(error);
+		if (error)
+			return;
 	}
 	this->GetObjectService().AsyncConnect(this->GetImpl(), handler, ep, error);
 }

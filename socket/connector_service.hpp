@@ -27,7 +27,7 @@ public:
 
 	M_SOCKET_DECL TcpConnectorService(IoServiceType& ioservice);
 
-	M_SOCKET_DECL void Connect(Impl& impl, const EndPoint& ep, SocketError& error);
+	M_SOCKET_DECL void Connect(Impl& impl, const EndPoint& ep, SocketError& error, s_uint32_t timeo_sec);
 
 	M_SOCKET_DECL void AsyncConnect(Impl& impl, const M_COMMON_HANDLER_TYPE(IoServiceType)& handler, const EndPoint& ep, SocketError& error);
 };
@@ -39,9 +39,9 @@ M_SOCKET_DECL TcpConnectorService<Protocol, IoServiceType>::TcpConnectorService(
 }
 
 template<typename Protocol, typename IoServiceType>
-M_SOCKET_DECL void TcpConnectorService<Protocol, IoServiceType>::Connect(Impl& impl, const EndPoint& ep, SocketError& error)
+M_SOCKET_DECL void TcpConnectorService<Protocol, IoServiceType>::Connect(Impl& impl, const EndPoint& ep, SocketError& error, s_uint32_t timeo_sec)
 {
-	Access::Connect(this->_ioservice, impl, ep, error);
+	Access::Connect(this->_ioservice, impl, ep, error, timeo_sec);
 }
 
 template<typename Protocol, typename IoServiceType>

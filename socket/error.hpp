@@ -37,6 +37,7 @@
 #define M_ERR_BAD_DESCRIPTOR		(M_ERR_BASE_NAG_NUM+16) // bad descriptor
 #define M_ERR_NOT_SERVICE			(M_ERR_BASE_NAG_NUM+17) // not service exist
 #define M_ERR_IS_NONBLOCK			(M_ERR_BASE_NAG_NUM+18) // can't convert to block from nonblock
+#define M_ERR_TIMEOUT				(M_ERR_BASE_NAG_NUM+19) // 超时
 
 M_SOCKET_NAMESPACE_BEGIN
 namespace detail
@@ -65,7 +66,8 @@ namespace detail
 		{15,"write fail"},
 		{16,"bad descriptor"},
 		{17,"not service exist"},
-		{18,"can't convert to block from nonblock"}
+		{18,"can't convert to block from nonblock"},
+		{19,"operation time out"}
 	};
 }
 
