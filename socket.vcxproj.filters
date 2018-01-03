@@ -129,9 +129,6 @@
     <ClInclude Include="socket\winsock_init.hpp">
       <Filter>socket</Filter>
     </ClInclude>
-    <ClInclude Include="thread.hpp">
-      <Filter>源文件</Filter>
-    </ClInclude>
     <ClInclude Include="socket\mutexlock.hpp">
       <Filter>socket</Filter>
     </ClInclude>
@@ -186,9 +183,6 @@
     <ClInclude Include="netio\tsocket_impl.hpp">
       <Filter>netio</Filter>
     </ClInclude>
-    <ClInclude Include="netio\tls.hpp">
-      <Filter>netio</Filter>
-    </ClInclude>
     <ClInclude Include="netio\log.hpp">
       <Filter>netio</Filter>
     </ClInclude>
@@ -213,12 +207,18 @@
     <ClInclude Include="base\svector.hpp">
       <Filter>base</Filter>
     </ClInclude>
+    <ClInclude Include="base\circular_queue.hpp">
+      <Filter>base</Filter>
+    </ClInclude>
+    <ClInclude Include="base\thread.hpp">
+      <Filter>base</Filter>
+    </ClInclude>
+    <ClInclude Include="base\tls.hpp">
+      <Filter>base</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="socket.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
-    <ClCompile Include="thread.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="demo\async_server_demo.cpp">

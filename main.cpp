@@ -1,6 +1,6 @@
 #include "netio/netio.hpp"
 #include <iostream>
-#include "thread.hpp"
+#include "base/thread.hpp"
 
 using namespace std;
 
@@ -138,10 +138,10 @@ public:
 void server() {
 	TestNetIo test_io;
 	for (int i = 0; i < 32; ++i) {
-		new thread(&TestNetIo::Start, &test_io, 0);
+		new base::thread(&TestNetIo::Start, &test_io, 0);
 	}
 	
-	thread::sleep(200);
+	base::thread::sleep(200);
 	if (!test_io.ListenOne("0.0.0.0", 3001)) {
 		cout << test_io.GetLastError().What() << endl;
 	}
@@ -159,10 +159,10 @@ void server() {
 void http_server() {
 	TestNetIo test_io;
 	for (int i = 0; i < 32; ++i) {
-		new thread(&TestNetIo::Start, &test_io, 0);
+		new base::thread(&TestNetIo::Start, &test_io, 0);
 	}
 
-	thread::sleep(200);
+	base::thread::sleep(200);
 	if (!test_io.ListenOneHttp("0.0.0.0", 3002)) {
 		cout << test_io.GetLastError().What() << endl;
 	}
@@ -177,7 +177,7 @@ void http_server() {
 void client() {
 	TestNetIo test_io;
 	for (int i = 0; i < 32; ++i) {
-		new thread(&TestNetIo::Start, &test_io, 0);
+		new base::thread(&TestNetIo::Start, &test_io, 0);
 	}
 	
 	std::vector<netiolib::TcpConnectorPtr> ptrlist;
@@ -208,9 +208,9 @@ void client() {
 void http_client() {
 	TestNetIo test_io;
 	for (int i = 0; i < 1; ++i) {
-		new thread(&TestNetIo::Start, &test_io, 0);
+		new base::thread(&TestNetIo::Start, &test_io, 0);
 	}
-	thread::sleep(200);
+	base::thread::sleep(200);
 
 	std::string addr = "61.135.169.121";
 	unsigned short port = 80;
@@ -252,7 +252,7 @@ void _other_test(void*p) {
 	try {
 	}
 	catch (SocketLib::SocketError& error) {
-		cout << thread::ctid() << "  " << error.What() << endl;
+		cout << base::thread::ctid() << "  " << error.What() << endl;
 	}
 }
 void other_test() {
@@ -286,8 +286,8 @@ void other_test() {
 		cout << buf << endl;
 	}
 	
-	thread th1(_other_test, p);
-	thread th2(_other_test, p);
+	base::thread th1(_other_test, p);
+	base::thread th2(_other_test, p);
 	th1.join();
 	th2.join();
 }

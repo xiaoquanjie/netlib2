@@ -11,11 +11,12 @@
 // °æ±¾£ºV1.0.0
 //----------------------------------------------------------------*/
 
-#ifndef M_NETIO_TLS_INCLUDE
-#define M_NETIO_TLS_INCLUDE
+#ifndef M_BASE_TLS_INCLUDE
+#define M_BASE_TLS_INCLUDE
 
-#include "netio/config.hpp"
-M_NETIO_NAMESPACE_BEGIN
+#include "base/config.hpp"
+#include <assert.h>
+M_BASE_NAMESPACE_BEGIN
 
 #ifdef M_PLATFORM_WIN
 #include <windows.h>
@@ -96,5 +97,5 @@ private:
 template<typename T, int N>
 typename tlsdata<T, N>::_init_ tlsdata<T, N>::_data;
 
-M_NETIO_NAMESPACE_END
+M_BASE_NAMESPACE_END
 #endif

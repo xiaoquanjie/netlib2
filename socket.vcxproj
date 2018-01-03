@@ -153,9 +153,12 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="base\circular_queue.hpp" />
     <ClInclude Include="base\config.hpp" />
     <ClInclude Include="base\slist.hpp" />
     <ClInclude Include="base\svector.hpp" />
+    <ClInclude Include="base\thread.hpp" />
+    <ClInclude Include="base\tls.hpp" />
     <ClInclude Include="demo\async_client_demo.h" />
     <ClInclude Include="demo\async_server_demo.h" />
     <ClInclude Include="netio\config.hpp" />
@@ -166,7 +169,6 @@
     <ClInclude Include="netio\netio.hpp" />
     <ClInclude Include="netio\netio_impl.hpp" />
     <ClInclude Include="netio\tconnector_impl.hpp" />
-    <ClInclude Include="netio\tls.hpp" />
     <ClInclude Include="netio\tsocket_impl.hpp" />
     <ClInclude Include="socket\acceptor_service.hpp" />
     <ClInclude Include="socket\address.hpp" />
@@ -212,14 +214,12 @@
     <ClInclude Include="sync_call\sync_client.hpp" />
     <ClInclude Include="sync_call\sync_server.hpp" />
     <ClInclude Include="targetver.h" />
-    <ClInclude Include="thread.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="demo\async_client_demo.cpp" />
     <ClCompile Include="demo\async_server_demo.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="socket.cpp" />
-    <ClCompile Include="thread.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

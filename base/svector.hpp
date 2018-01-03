@@ -2,6 +2,7 @@
 #define M_BASE_SVECTOR_INCLUDE
 
 #include "base/config.hpp"
+#include <stdlib.h>
 M_BASE_NAMESPACE_BEGIN
 
 template<typename T>
@@ -25,6 +26,7 @@ public:
 
 	~svector() {
 		clear();
+		free(_head);
 	}
 
 	bool empty()const {
