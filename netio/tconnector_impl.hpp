@@ -28,9 +28,9 @@ SocketLib::TcpConnector<SocketLib::IoService>& BaseTcpConnector<ConnectorType>::
 }
 
 template<typename ConnectorType>
-bool BaseTcpConnector<ConnectorType>::Connect(const SocketLib::Tcp::EndPoint& ep) {
+bool BaseTcpConnector<ConnectorType>::Connect(const SocketLib::Tcp::EndPoint& ep, SocketLib::s_uint32_t timeo_sec) {
 	try {
-		this->_socket->Connect(ep);
+		this->_socket->Connect(ep,timeo_sec);
 		return true;
 	}
 	catch (SocketLib::SocketError& error) {
@@ -40,9 +40,9 @@ bool BaseTcpConnector<ConnectorType>::Connect(const SocketLib::Tcp::EndPoint& ep
 }
 
 template<typename ConnectorType>
-bool BaseTcpConnector<ConnectorType>::Connect(const std::string& addr, SocketLib::s_uint16_t port) {
+bool BaseTcpConnector<ConnectorType>::Connect(const std::string& addr, SocketLib::s_uint16_t port, SocketLib::s_uint32_t timeo_sec) {
 	SocketLib::Tcp::EndPoint ep(SocketLib::AddressV4(addr), port);
-	return Connect(ep);
+	return Connect(ep,timeo_sec);
 }
 
 template<typename ConnectorType>

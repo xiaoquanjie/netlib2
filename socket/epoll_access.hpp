@@ -562,7 +562,7 @@ M_SOCKET_DECL void EpollService::Access::AsyncAccept(EpollService& service, Impl
 }
 
 template<typename EndPoint>
-M_SOCKET_DECL void EpollService::Access::Connect(EpollService& service, EpollService::Impl& impl, const EndPoint& ep, SocketError& error)
+M_SOCKET_DECL void EpollService::Access::Connect(EpollService& service, EpollService::Impl& impl, const EndPoint& ep, SocketError& error, s_uint32_t timeo_sec)
 {
 	MutexLock& mlock = M_IMPL_MUTEX(impl);
 	do 
@@ -580,21 +580,37 @@ M_SOCKET_DECL void EpollService::Access::Connect(EpollService& service, EpollSer
 			error = SocketError(M_ERR_ENDPOINT_INVALID);
 			break;
 		}
-		if (M_IMPL_G_NONBLOCK(impl)) {
-			error = SocketError(M_ERR_IS_NONBLOCK);
-			break;
+		if (timeo_sec != -1) {
+			if (M_IMPL_G_BLOCK(impl)) {
+				detail::Util::SetNonBlock(M_IMPL_FD(impl));
+			}
+		}
+		else {
+			if (M_IMPL_G_NONBLOCK(impl)) {
+				error = SocketError(M_ERR_IS_NONBLOCK);
+				break;
+			}
 		}
 		M_IMPL_S_CONNECT_FLAG(impl);
 		mlock.unlock();
 
 		typedef typename EndPoint::Impl::endpoint_impl_access ep_access;
 		s_int32_t ret = g_connect(M_IMPL_FD(impl), ep_access::SockAddr(ep), ep_access::SockAddrLen(ep));
-		
+		if (ret == -1 && timeo_sec != -1) {
+			if (M_ERR_LAST == M_EINPROGRESS) {
+				ret = Select(impl, false, timeo_sec, error);
+				if (ret != 0)
+					Close(service, impl, error);
+			}
+		}
+
+		if (ret != 0 && !error)
+			M_DEFAULT_SOCKET_ERROR(ret != 0, error);
+
 		mlock.lock();
+		detail::Util::SetBlock(M_IMPL_FD(impl));
 		M_IMPL_C_CONNECT_FLAG(impl);
 		mlock.unlock();
-
-		M_DEFAULT_SOCKET_ERROR(ret != 0, error);
 		return;
 	} 
 	while (false);
@@ -822,6 +838,43 @@ M_SOCKET_DECL void EpollService::Access::AsyncSendSome(EpollService& service, Im
 	} 
 	while (false);
 	wop->Clear();
+}
+
+M_SOCKET_DECL s_int32_t EpollService::Access::Select(Impl& impl, bool rd_or_wr, s_uint32_t timeo_sec, SocketError& error) {
+	// -1 == time out,0 == ok,other == error
+	socket_t fd = M_IMPL_FD(impl);
+	timeval tm;
+	tm.tv_sec = timeo_sec;
+	tm.tv_usec = 0;
+	fd_set set;
+	FD_ZERO(&set);
+	FD_SET(fd, &set);
+	int ret = 0;
+	if (rd_or_wr) {
+		ret = select(fd, &set, NULL, NULL, &tm);
+	}
+	else {
+		ret = select(fd, NULL, &set, NULL, &tm);
+	}
+	if (ret == 0) {
+		error = SocketError(M_ERR_TIMEOUT);
+		return -1;
+	}
+	else if (ret == -1) {
+		M_DEFAULT_SOCKET_ERROR2(error);
+		return -2;
+	}
+
+	int code_len = sizeof(int);
+	int code = 0;
+	g_getsockopt(fd, M_SOL_SOCKET, M_SO_ERROR, (char*)&code, (socklen_t *)&code_len);
+	if (code == 0) {
+		return 0;
+	}
+	else {
+		error = SocketError(code);
+		return -2;
+	}
 }
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////////

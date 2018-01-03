@@ -23,55 +23,46 @@ namespace detail
 	class Boolean
 	{
 	public:
-		Boolean() : _Value(0)
-		{}
+		Boolean() : _Value(0){
+		}
 
-		explicit Boolean(bool v) : _Value(v ? 1 : 0)
-		{}
+		explicit Boolean(bool v) : _Value(v ? 1 : 0){
+		}
 
-		Boolean& operator=(bool v)
-		{
+		Boolean& operator=(bool v){
 			_Value = v ? 1 : 0;
 			return *this;
 		}
 
-		bool Value() const
-		{
+		bool Value() const{
 			return !!_Value;
 		}
 
-		operator bool() const
-		{
+		operator bool() const{
 			return !!_Value;
 		}
 
-		bool operator!() const
-		{
+		bool operator!() const{
 			return !_Value;
 		}
 
-		int Level() const
-		{
+		int Level() const{
 			return LevelType;
 		}
 
-		int Name() const
-		{
+		int Name() const{
 			return NameType;
 		}
 
-		int* Data()
-		{
+		int* Data(){
 			return &_Value;
 		}
 
-		const int* Data() const
-		{
+		const int* Data() const{
 			return &_Value;
 		}
 
-		socklen_t Size() const
-		{
+		socklen_t Size() const{
 			return (socklen_t)sizeof(_Value);
 		}
 
@@ -83,45 +74,38 @@ namespace detail
 	class Integer
 	{
 	public:
-		Integer(): _Value(0)
-		{}
+		Integer(): _Value(0){
+		}
 
-		explicit Integer(int v): _Value(v)
-		{}
+		explicit Integer(int v): _Value(v){
+		}
 
-		Integer& operator=(int v)
-		{
+		Integer& operator=(int v){
 			_Value = v;
 			return *this;
 		}
 
-		int Value() const
-		{
+		int Value() const{
 			return _Value;
 		}
 
-		int Level() const
-		{
+		int Level() const{
 			return LevelType;
 		}
 
-		int Name() const
-		{
+		int Name() const{
 			return NameType;
 		}
 
-		int* Data()
-		{
+		int* Data(){
 			return &_Value;
 		}
 
-		const int* Data() const
-		{
+		const int* Data() const{
 			return &_Value;
 		}
 
-		socklen_t Size() const
-		{
+		socklen_t Size() const{
 			return (socklen_t)sizeof(_Value);
 		}
 
@@ -133,30 +117,25 @@ namespace detail
 	class Linger
 	{
 	public:
-		Linger()
-		{
+		Linger(){
 			_Value.l_onoff = 0;
 			_Value.l_linger = 0;
 		}
 
-		Linger(bool e, int t)
-		{
+		Linger(bool e, int t){
 			Enabled(e);
 			TimeOut(t);
 		}
 
-		void Enabled(bool value)
-		{
+		void Enabled(bool value){
 			_Value.l_onoff = value ? 1 : 0;
 		}
 
-		bool Enabled() const
-		{
+		bool Enabled() const{
 			return _Value.l_onoff != 0;
 		}
 
-		void TimeOut(s_int32_t value)
-		{
+		void TimeOut(s_int32_t value){
 #if defined(M_PLATFORM_WIN)
 			_Value.l_linger = static_cast<s_uint16_t>(value);
 #else
@@ -164,38 +143,70 @@ namespace detail
 #endif
 		}
 
-		s_int32_t TimeOut()const
-		{
+		s_int32_t TimeOut()const{
 			return static_cast<s_int32_t>(_Value.l_linger);
 		}
 
-		int Level() const
-		{
+		int Level() const{
 			return LevelType;
 		}
 
-		int Name() const
-		{
+		int Name() const{
 			return NameType;
 		}
 
-		linger_t* Data()
-		{
+		linger_t* Data(){
 			return &_Value;
 		}
 
-		const linger_t* Data() const
-		{
+		const linger_t* Data() const{
 			return &_Value;
 		}
 
-		socklen_t Size() const
-		{
+		socklen_t Size() const{
 			return (socklen_t)sizeof(_Value);
 		}
 
 	private:
 		linger_t _Value;
+	};
+
+	template<int LevelType, int NameType>
+	class TimeVal
+	{
+	public:
+		TimeVal() {
+			_Value.tv_sec = 0;
+			_Value.tv_usec = 0;
+		}
+
+		TimeVal(s_uint32_t sec, s_uint32_t usec) {
+			_Value.tv_sec = sec;
+			_Value.tv_usec = usec;
+		}
+
+		int Level()const {
+			return LevelType;
+		}
+
+		int Name()const {
+			return NameType;
+		}
+
+		timeval* Data() {
+			return &_Value;
+		}
+
+		const timeval* Data()const {
+			return &_Value;
+		}
+
+		socklen_t Size() const {
+			return (socklen_t)sizeof(_Value);
+		}
+
+	private:
+		timeval _Value;
 	};
 } 
 
@@ -252,6 +263,14 @@ struct Opts
 
 #ifdef M_SO_ERROR
 	typedef detail::Integer<M_SOL_SOCKET, M_SO_ERROR> SoError;
+#endif
+
+#ifdef M_SO_RCVTIMEO 
+	typedef detail::TimeVal<M_SOL_SOCKET, M_SO_RCVTIMEO> RcvTimeOut;
+#endif
+
+#ifdef M_SO_SNDTIMEO
+	typedef detail::TimeVal<M_SOL_SOCKET, M_SO_SNDTIMEO> SndTimeOut;
 #endif
 };
 

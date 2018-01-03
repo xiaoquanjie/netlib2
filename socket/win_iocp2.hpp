@@ -251,7 +251,7 @@ public:
 		, const M_COMMON_HANDLER_TYPE(IocpService2)& handler, SocketError& error);
 	
 	template<typename EndPoint>
-	M_SOCKET_DECL static void Connect(IocpService2& service, Impl& impl, const EndPoint& ep, SocketError& error);
+	M_SOCKET_DECL static void Connect(IocpService2& service, Impl& impl, const EndPoint& ep, SocketError& error, s_uint32_t timeo_sec);
 	
 	template<typename EndPoint>
 	M_SOCKET_DECL static void AsyncConnect(IocpService2& service, Impl& impl, const EndPoint& ep
@@ -266,6 +266,9 @@ public:
 	
 	M_SOCKET_DECL static void AsyncSendSome(IocpService2& service, Impl& impl, const s_byte_t* data, s_uint32_t size
 		, const M_RW_HANDLER_TYPE(IocpService2)& hander, SocketError& error);
+
+	// -1 == time out,0 == ok,other == error
+	M_SOCKET_DECL static s_int32_t Select(Impl& impl, bool rd_or_wr, s_uint32_t timeo_sec, SocketError& error);
 
 protected:
 	M_SOCKET_DECL static void _DoClose(IocpService2::IoServiceImpl* simpl

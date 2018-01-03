@@ -351,9 +351,18 @@ void httpmsg_test() {
 	cout << "elapsed : " << ((double)(end_t-beg_t) / CLOCKS_PER_SEC) << endl;
 }
 
-struct msg  {
-	SocketLib::Buffer a;
-};
+void sync_test() {
+	TestNetIo test_io;
+	netiolib::TcpConnector connector(test_io);
+	SocketLib::Opts::SndTimeOut timeo(5, 0);
+	//connector.GetSocket().SetOption(timeo);
+	if (connector.Connect("127.0.0.1", 5001)) {
+		cout << "connector success" << endl;
+	}
+	else {
+		cout << test_io.GetLastError().What() << endl;
+	}
+}
 
 int main() {
 
@@ -361,8 +370,9 @@ int main() {
 	//test1(TO());
 	//slist_test();
 	//netlib_test();
-	netlib_http_test();
+	//netlib_http_test();
 	//other_test();
+	sync_test();
 
 	int pause_i;
 	cin >> pause_i;
