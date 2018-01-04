@@ -27,11 +27,12 @@ public:
 	}
 	virtual void OnTwoWayDealer(const int msg_type, netiolib::Buffer& request, netiolib::Buffer& reply) {
 		if (msg_type == 1) {
-			std::string info;
-			request.Read(info);
+			int i = 0;
+			request.Read(i);
+			//std::cout << i << std::endl;
 			//std::cout << "client request:" << info << std::endl;
-			info = "server knows " + info;
-			reply.Write(info);
+			//info = "server knows " + info;
+			reply.Write(i);
 		}
 		else {
 			std::cout << "error msg_type=" << msg_type << std::endl;
@@ -64,6 +65,9 @@ void synccall_client() {
 	for (int i = 0; i < 1024; ++i)
 		info.append("a");
 	
+	int idx = 0;
+	int req_total = 0;
+	int rep_total = 0;
 	{
 		M_DISPLAYTIME();
 		while (true) {
@@ -72,21 +76,23 @@ void synccall_client() {
 				break;
 
 			request.Clear();
-			request.Write(info);
+			req_total += ++idx;
+			request.Write(idx);
 			SocketLib::Buffer* reply;
 			int ret = client.SyncCall(1, request.Data(), request.Length(), reply);
 			if (ret != 0) {
 				std::cout << "happend error" << std::endl;
 				break;
 			}
-			info.clear();
-			reply->Read(info);
-			info.clear();
-			//std::cout << "server reply:" << info << std::endl;
+			
+			int reply_idx = 0;
+			reply->Read(reply_idx);
+			rep_total += reply_idx;
 			++i;
 			if (i >= 100000)
 				break;
 		}
 	}
+	std::cout << rep_total << " " << rep_total << std::endl;
 }
 
