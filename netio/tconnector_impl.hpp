@@ -94,5 +94,158 @@ void BaseTcpConnector<ConnectorType>::_ConnectHandler(const SocketLib::SocketErr
 	}
 }
 
+////////////////////////////////////////////////////////////////////////////////////////
+
+inline SyncTcpConnector::SyncTcpConnector() {
+	_socket = new SocketLib::TcpConnector<SocketLib::IoService>(_ioservice);
+	_flag = E_STATE_STOP;
+	_readbuf = (SocketLib::s_byte_t*)g_malloc(M_READ_SIZE);
+	g_memset(_readbuf, 0, M_READ_SIZE);
+	_readsize = 0;
+}
+
+inline SyncTcpConnector::~SyncTcpConnector() {
+	g_free(_readbuf);
+}
+
+inline bool SyncTcpConnector::Connect(const SocketLib::Tcp::EndPoint& ep, SocketLib::s_uint32_t timeo_sec) {
+	try {
+		this->_socket->Connect(ep, timeo_sec);
+		_flag = E_STATE_START;
+		return true;
+	}
+	catch (SocketLib::SocketError&) {
+		return false;
+	}
+}
+
+inline bool SyncTcpConnector::Connect(const std::string& addr, SocketLib::s_uint16_t port, SocketLib::s_uint32_t timeo_sec) {
+	SocketLib::Tcp::EndPoint ep(SocketLib::AddressV4(addr), port);
+	return Connect(ep, timeo_sec);
+}
+
+inline const SocketLib::Tcp::EndPoint& SyncTcpConnector::LocalEndpoint()const {
+	return _localep;
+}
+
+inline const SocketLib::Tcp::EndPoint& SyncTcpConnector::RemoteEndpoint()const {
+	return _remoteep;
+}
+
+// 调用这个函数不意味着连接立即断开，会等所有的未处理的数据处理完就会断开
+inline void SyncTcpConnector::Close() {
+	SocketLib::SocketError error;
+	_socket->Close(error);
+	_flag = E_STATE_STOP;
+}
+
+inline bool SyncTcpConnector::Send(const SocketLib::s_byte_t* data, SocketLib::s_uint32_t len) {
+	if (_flag != E_STATE_START)
+		return  false;
+	if (len > 0) {
+		_sndbuffer.Clear();
+		MessageHeader hdr;
+		hdr.endian = _LocalEndian();
+		hdr.size = len;
+		hdr.timestamp = (unsigned int)time(0);
+		_sndbuffer.Write(hdr);
+		_sndbuffer.Write((void*)data, len);
+		SocketLib::SocketError error;
+		do 
+		{
+			SocketLib::s_uint32_t snd_cnt = _socket->SendSome(_sndbuffer.Data(), _sndbuffer.Length(), error);
+			if (error) {
+				Close();
+				return false;
+			}
+			_sndbuffer.RemoveData(snd_cnt);
+			if (_sndbuffer.Length() == 0)
+				break;
+		} while (true);		
+	}
+	return true;
+}
+
+inline bool SyncTcpConnector::IsConnected()const {
+	return (_flag == E_STATE_START);
+}
+
+inline SocketLib::Buffer* SyncTcpConnector::Recv() {
+	if (_flag != E_STATE_START)
+		return 0;
+	_rcvbuffer.Clear();
+	SocketLib::Buffer* reply = _CutMsgPack(_readbuf, _readsize);
+	if (!reply) {
+		SocketLib::SocketError error;
+		do {
+			_readsize = _socket->RecvSome(_readbuf, M_READ_SIZE, error);
+			if (error) {
+				Close();
+				return 0;
+			}
+			reply = _CutMsgPack(_readbuf, _readsize);
+			if (reply)
+				break;
+		} while (true);
+	}
+	return reply;
+}
+
+inline SocketLib::s_uint32_t SyncTcpConnector::_LocalEndian()const {
+	static SocketLib::s_uint32_t endian = SocketLib::detail::Util::LocalEndian();
+	return endian;
+}
+
+inline SocketLib::Buffer* SyncTcpConnector::_CutMsgPack(SocketLib::s_byte_t* buf, SocketLib::s_uint32_t& tran_byte) {
+	// 减少内存拷贝是此函数的设计关键
+	SocketLib::s_uint32_t hdrlen = (SocketLib::s_uint32_t)sizeof(MessageHeader);
+	do
+	{
+		// 算出头部长度
+		SocketLib::s_uint32_t datalen = _rcvbuffer.Length();
+		if (_curheader.size == 0) {
+			if (tran_byte + datalen < hdrlen) {
+				_rcvbuffer.Write(buf, tran_byte);
+				return 0;
+			}
+			else if (datalen >= hdrlen) {
+				_rcvbuffer.Read(_curheader);
+			}
+			else {
+				_rcvbuffer.Write(buf, hdrlen - datalen);
+				buf += (hdrlen - datalen);
+				tran_byte -= (hdrlen - datalen);
+				_rcvbuffer.Read(_curheader);
+			}
+
+			// convert byte order
+			if (_curheader.endian != _LocalEndian()) {
+				_curheader.size = g_htons(_curheader.size);
+				_curheader.timestamp = g_htonl(_curheader.timestamp);
+			}
+			// check
+			if (_curheader.size > (0xFFFF - hdrlen))
+				return 0;
+		}
+
+		// copy body data
+		datalen = _rcvbuffer.Length();
+		if (tran_byte + datalen < _curheader.size) {
+			_rcvbuffer.Write(buf, tran_byte);
+			return 0;
+		}
+		else {
+			_rcvbuffer.Write(buf, _curheader.size - datalen);
+			buf += (_curheader.size - datalen);
+			tran_byte -= (_curheader.size - datalen);
+
+			// swap
+			_curheader.size = 0;
+			return &_rcvbuffer;
+		}
+	} while (true);
+	return 0;
+}
+
 M_NETIO_NAMESPACE_END
 #endif

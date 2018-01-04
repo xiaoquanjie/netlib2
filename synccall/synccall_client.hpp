@@ -2,7 +2,6 @@
 #define M_SYNCCALL_CLIENT_INCLUDE
 
 #include "synccall/config.hpp"
-#include "coroutine/coroutine.hpp"
 M_SYNCCALL_NAMESPACE_BEGIN
 
 class SyncCallIo;
@@ -20,13 +19,7 @@ public:
 			}
 			_FillRequest(999, msg_type, msg, len);
 			_connector->Send(_request.Data(), _request.Length());
-			int co_id = coroutine::Coroutine::curid();
-			if (co_id == -1) {
-				// in normal
-			}
-			else {
-				coroutine::Coroutine::yield();
-			}
+			
 			return 0;
 		}
 		else {

@@ -1,6 +1,7 @@
 #include "netio/netio.hpp"
 #include <iostream>
 #include "base/thread.hpp"
+#include "synccall/synccall.hpp"
 
 using namespace std;
 
