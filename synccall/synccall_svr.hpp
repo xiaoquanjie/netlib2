@@ -80,21 +80,6 @@ public:
 		}
 	}
 
-	SyncCallClient* CreateClient(const std::string& ip,unsigned short port,unsigned int timeout) {
-		SyncCallClient* client = new SyncCallClient;
-		client->_ip = ip;
-		client->_port = port;
-		client->_timeo = timeout;
-		client->_io = &_io;
-		client->_connector.reset(new netiolib::TcpConnector(_io));
-		if (client->_connector->Connect(ip, port, timeout))
-			return client;
-		else {
-			delete client;
-			return 0;
-		}
-	}
-
 	void Start(unsigned int thread_cnt) {
 		if (_threads.empty()) {
 			for (unsigned int idx = 0; idx < thread_cnt; ++idx) {
@@ -148,7 +133,7 @@ protected:
 			unsigned int pack_idx = 0;
 			buffer.Read(pack_idx);
 			// don't ask why the way_the is 666 or 999
-			if (way_type == 666) {
+			if (way_type == M_ONEWAY_TYPE) {
 				netiolib::Buffer* reply = new netiolib::Buffer;
 				reply->Write(way_type);
 				reply->Write(msg_type);
@@ -156,7 +141,7 @@ protected:
 				iter->second->OnOneWayDealer(msg_type, buffer);
 				clisock->Send(reply);
 			}
-			else if (way_type == 999) {
+			else if (way_type == M_TWOWAY_TYPE) {
 				netiolib::Buffer* reply = new netiolib::Buffer;
 				reply->Write(way_type);
 				reply->Write(msg_type);

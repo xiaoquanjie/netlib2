@@ -142,7 +142,8 @@ inline void SyncTcpConnector::Close() {
 inline bool SyncTcpConnector::Send(const SocketLib::s_byte_t* data, SocketLib::s_uint32_t len) {
 	if (_flag != E_STATE_START)
 		return  false;
-	if (len > 0) {
+	SocketLib::s_uint32_t hdrlen = (SocketLib::s_uint32_t)sizeof(MessageHeader);
+	if (len > 0 && len <= (0xFFFF - hdrlen)) {
 		_sndbuffer.Clear();
 		MessageHeader hdr;
 		hdr.endian = _LocalEndian();
@@ -162,8 +163,9 @@ inline bool SyncTcpConnector::Send(const SocketLib::s_byte_t* data, SocketLib::s
 			if (_sndbuffer.Length() == 0)
 				break;
 		} while (true);		
+		return true;
 	}
-	return true;
+	return false;
 }
 
 inline bool SyncTcpConnector::IsConnected()const {

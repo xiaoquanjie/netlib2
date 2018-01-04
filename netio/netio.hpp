@@ -38,6 +38,7 @@ class TcpSocket;
 class TcpConnector;
 class HttpSocket;
 class HttpConnector;
+class SyncTcpConnector;
 
 typedef SocketLib::Buffer Buffer;
 typedef shard_ptr_t<SocketLib::Buffer> BufferPtr;
@@ -46,6 +47,7 @@ typedef shard_ptr_t<TcpConnector>	   TcpConnectorPtr;
 typedef shard_ptr_t<HttpSocket>		   HttpSocketPtr;
 typedef shard_ptr_t<HttpConnector>	   HttpConnectorPtr;
 typedef shard_ptr_t<SocketLib::TcpAcceptor<SocketLib::IoService> > NetIoTcpAcceptorPtr;
+typedef shard_ptr_t<SyncTcpConnector>  SyncTcpConnectorPtr;
 
 #define lasterror base::tlsdata<SocketLib::SocketError,0>::data()
 
