@@ -1,5 +1,7 @@
 #include "synccall/synccall.hpp"
 
+void print_clock(bool beg);
+
 class RpcHandler : public synccall::IServerHandler {
 public:
 	virtual void OnOneWayDealer(const int msg_type, netiolib::Buffer& request) {
@@ -9,7 +11,7 @@ public:
 		if (msg_type == 1) {
 			std::string info;
 			request.Read(info);
-			std::cout << "client request:" << info << std::endl;
+			//std::cout << "client request:" << info << std::endl;
 			info = "server knows " + info;
 			reply.Write(info);
 		}
@@ -35,10 +37,15 @@ void synccall_client() {
 		return;
 	}
 
+	int i = 0;
 	SocketLib::Buffer request;
+	std::string info = "this is a test!!!!";
+	for (int i = 0; i < 1024; ++i)
+		info.append("a");
+	print_clock(true);
 	while (true) {
-		std::string info;
-		std::cin >> info;
+		
+		//std::cin >> info;
 		if (info=="stop")
 			break;
 
@@ -52,7 +59,12 @@ void synccall_client() {
 		}
 		info.clear();
 		reply->Read(info);
-		std::cout << "server reply:" << info << std::endl;
+		info.clear();
+		//std::cout << "server reply:" << info << std::endl;
+		++i;
+		if (i>=100000)
+			break;
 	}
+	print_clock(false);
 }
 
