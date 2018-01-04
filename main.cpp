@@ -352,28 +352,28 @@ void httpmsg_test() {
 	cout << "elapsed : " << ((double)(end_t-beg_t) / CLOCKS_PER_SEC) << endl;
 }
 
-void sync_test() {
-	TestNetIo test_io;
-	netiolib::TcpConnector connector(test_io);
-	SocketLib::Opts::SndTimeOut timeo(5, 0);
-	//connector.GetSocket().SetOption(timeo);
-	if (connector.Connect("127.0.0.1", 5001)) {
-		cout << "connector success" << endl;
-	}
-	else {
-		cout << test_io.GetLastError().What() << endl;
-	}
+void synccall_server();
+void synccall_client();
+void synccall_test() {
+	int i;
+	cout << "select 1 is server or client:";
+	cin >> i;
+	if (i == 1)
+		synccall_server();
+	else
+		synccall_client();
 }
 
-int main() {
 
+int main() {
+	
 	//httpmsg_test();
 	//test1(TO());
 	//slist_test();
 	//netlib_test();
 	//netlib_http_test();
 	//other_test();
-	sync_test();
+	synccall_test();
 
 	int pause_i;
 	cin >> pause_i;

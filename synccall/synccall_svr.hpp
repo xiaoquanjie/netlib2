@@ -57,6 +57,11 @@ class SyncCallSvr : public ISyncCallSvr {
 	typedef std::map<base::s_uint64_t, IServerHandler*> SvrHandlerMap;
 
 public:
+	struct scinfo {
+		base::s_uint64_t id;
+		netiolib::Buffer buffer;
+	};
+
 	SyncCallSvr() :_io(this) {
 	}
 
@@ -67,6 +72,12 @@ public:
 			delete (*iter);
 		}
 		_threads.clear();
+
+		for (SvrHandlerMap::iterator iter = _svrhandler_map.begin();
+			iter != _svrhandler_map.end(); ++iter) {
+			delete iter->second;
+		}
+		_svrhandler_map.clear();
 	}
 
 	bool RegisterHandler(const std::string& ip, unsigned short port, IServerHandler* handler) {
@@ -103,27 +114,27 @@ protected:
 	void OnConnected(const netiolib::TcpSocketPtr& clisock) {
 		std::string ip = clisock->LocalEndpoint().Address();
 		base::s_uint16_t port = clisock->LocalEndpoint().Port();
-		base::s_uint64_t* id = new base::s_uint64_t;
-		*id = UniqueId(ip, port);
-		clisock->GetSocket().SetData(id);
+		scinfo* pscinfo = new scinfo;
+		pscinfo->id = UniqueId(ip, port);
+		clisock->GetSocket().SetData(pscinfo);
 	}
 	void OnConnected(const netiolib::TcpConnectorPtr& clisock, SocketLib::SocketError error) {
 		
 	}
 
 	void OnDisconnected(const netiolib::TcpSocketPtr& clisock) {
-		base::s_uint64_t* id = (base::s_uint64_t*)clisock->GetSocket().GetData();
-		delete id;
+		scinfo* pscinfo = (scinfo*)clisock->GetSocket().GetData();
+		delete pscinfo;
 	}
 	void OnDisconnected(const netiolib::TcpConnectorPtr& clisock) {
 	}
 
 	void OnReceiveData(const netiolib::TcpSocketPtr& clisock, netiolib::Buffer& buffer) {
-		base::s_uint64_t* id = (base::s_uint64_t*)clisock->GetSocket().GetData();
-		if (id) {
-			SvrHandlerMap::iterator iter = _svrhandler_map.find(*id);
+		scinfo* pscinfo = (scinfo*)clisock->GetSocket().GetData();
+		if (pscinfo) {
+			SvrHandlerMap::iterator iter = _svrhandler_map.find(pscinfo->id);
 			if (iter == _svrhandler_map.end()) {
-				printf("handler is not exist,id(%lld)\n", *id);
+				printf("handler is not exist,id(%lld)\n", pscinfo->id);
 				return;
 			}
 			unsigned int way_type = 0;
@@ -132,22 +143,21 @@ protected:
 			buffer.Read(msg_type);
 			unsigned int pack_idx = 0;
 			buffer.Read(pack_idx);
+			pscinfo->buffer.Clear();
 			// don't ask why the way_the is 666 or 999
 			if (way_type == M_ONEWAY_TYPE) {
-				netiolib::Buffer* reply = new netiolib::Buffer;
-				reply->Write(way_type);
-				reply->Write(msg_type);
-				reply->Write(pack_idx);
+				pscinfo->buffer.Write(way_type);
+				pscinfo->buffer.Write(msg_type);
+				pscinfo->buffer.Write(pack_idx);
 				iter->second->OnOneWayDealer(msg_type, buffer);
-				clisock->Send(reply);
+				clisock->Send(pscinfo->buffer.Data(), pscinfo->buffer.Length());
 			}
 			else if (way_type == M_TWOWAY_TYPE) {
-				netiolib::Buffer* reply = new netiolib::Buffer;
-				reply->Write(way_type);
-				reply->Write(msg_type);
-				reply->Write(pack_idx);
-				iter->second->OnTwoWayDealer(msg_type, buffer, *reply);
-				clisock->Send(reply);
+				pscinfo->buffer.Write(way_type);
+				pscinfo->buffer.Write(msg_type);
+				pscinfo->buffer.Write(pack_idx);
+				iter->second->OnTwoWayDealer(msg_type, buffer, pscinfo->buffer);
+				clisock->Send(pscinfo->buffer.Data(), pscinfo->buffer.Length());
 			}
 			else {
 				printf("error way_type(%d)\n", way_type);

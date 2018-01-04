@@ -215,9 +215,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="socket.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="demo\async_server_demo.cpp">
       <Filter>源文件\demo</Filter>
     </ClCompile>
@@ -225,6 +222,9 @@
       <Filter>源文件\demo</Filter>
     </ClCompile>
     <ClCompile Include="main.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="synccall_test.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

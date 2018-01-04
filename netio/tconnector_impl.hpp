@@ -102,6 +102,7 @@ inline SyncTcpConnector::SyncTcpConnector() {
 	_readbuf = (SocketLib::s_byte_t*)g_malloc(M_READ_SIZE);
 	g_memset(_readbuf, 0, M_READ_SIZE);
 	_readsize = 0;
+	g_memset(&_curheader, 0, sizeof(_curheader));
 }
 
 inline SyncTcpConnector::~SyncTcpConnector() {
@@ -176,7 +177,9 @@ inline SocketLib::Buffer* SyncTcpConnector::Recv() {
 	if (_flag != E_STATE_START)
 		return 0;
 	_rcvbuffer.Clear();
-	SocketLib::Buffer* reply = _CutMsgPack(_readbuf, _readsize);
+	SocketLib::Buffer* reply = 0;
+	if (_readsize>0)
+		reply = _CutMsgPack(_readbuf, _readsize);
 	if (!reply) {
 		SocketLib::SocketError error;
 		do {

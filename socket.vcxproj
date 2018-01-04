@@ -218,7 +218,7 @@
     <ClCompile Include="demo\async_client_demo.cpp" />
     <ClCompile Include="demo\async_server_demo.cpp" />
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="socket.cpp" />
+    <ClCompile Include="synccall_test.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

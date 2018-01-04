@@ -9,6 +9,12 @@ class SyncCallIo;
 class SyncCallClient {
 	friend class SyncCallSvr;
 public:
+	SyncCallClient() {
+		_port = 0;
+		_timeo = -1;
+		_packidx = 0;
+	}
+
 	bool Connect(const std::string& ip, unsigned short port, unsigned int timeout) {
 		if (_connector) {
 			return false;
@@ -115,12 +121,6 @@ protected:
 		else {
 			return false;
 		}
-	}
-
-	SyncCallClient() {
-		_port = 0;
-		_timeo = -1;
-		_packidx = 0;
 	}
 
 	SyncCallClient(const SyncCallClient&);
