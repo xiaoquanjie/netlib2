@@ -207,12 +207,11 @@
     <ClInclude Include="socket\win_iocp.hpp" />
     <ClInclude Include="socket\win_iocp2.hpp" />
     <ClInclude Include="stdafx.h" />
-    <ClInclude Include="sync_call\config.hpp" />
-    <ClInclude Include="sync_call\ioservice.hpp" />
-    <ClInclude Include="sync_call\server_handler.hpp" />
-    <ClInclude Include="sync_call\sync_call.hpp" />
-    <ClInclude Include="sync_call\sync_client.hpp" />
-    <ClInclude Include="sync_call\sync_server.hpp" />
+    <ClInclude Include="synccall\config.hpp" />
+    <ClInclude Include="synccall\server_handler.hpp" />
+    <ClInclude Include="synccall\synccall.hpp" />
+    <ClInclude Include="synccall\synccall_client.hpp" />
+    <ClInclude Include="synccall\synccall_svr.hpp" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
