@@ -11,6 +11,7 @@
 #define M_ONEWAY_TYPE (666)
 #define M_TWOWAY_TYPE (999)
 
-#define M_OPEN_DEBUG_LOG 1
+// for debug
+//#define M_OPEN_DEBUG_LOG 1
 
 #endif

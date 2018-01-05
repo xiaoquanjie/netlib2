@@ -133,6 +133,11 @@ void BaseNetIo<NetIoType>::Stop() {
 }
 
 template<typename NetIoType>
+size_t BaseNetIo<NetIoType>::ServiceCount() {
+	return _ioservice.ServiceCount();
+}
+
+template<typename NetIoType>
 inline SocketLib::SocketError BaseNetIo<NetIoType>::GetLastError()const {
 	return lasterror;
 }

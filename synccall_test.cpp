@@ -31,7 +31,7 @@ public:
 		if (msg_type == 1) {
 			int i = 0;
 			request.Read(i);
-			std::cout << i << std::endl;
+			//std::cout << i << std::endl;
 			//std::cout << "client request:" << info << std::endl;
 			//info = "server knows " + info;
 			reply.Write(i);
@@ -94,7 +94,7 @@ void synccall_client() {
 			reply->Read(reply_idx);
 			rep_total += reply_idx;
 			++i;
-			if (i >= 10/*0000*/)
+			if (i >= 100000)
 				break;
 		}
 	}

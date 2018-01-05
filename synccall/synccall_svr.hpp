@@ -101,7 +101,8 @@ public:
 				_threads.push_back(pthread);
 			}
 		}
-		base::thread::sleep(1000);
+		while (_io.ServiceCount() != _threads.size())
+			;
 	}
 
 	void Stop() {

@@ -76,6 +76,7 @@ public:
 
 	virtual void Run();
 	virtual void Stop();
+	size_t  ServiceCount();
 
 	// 获取最后的异常
 	inline SocketLib::SocketError GetLastError()const;
