@@ -1,7 +1,5 @@
 #include "synccall/synccall.hpp"
 
-void print_clock(bool beg);
-
 struct CDisplayTime
 {
 	clock_t     miStartTime;
@@ -43,7 +41,7 @@ public:
 };
 
 void synccall_server(){
-	synccall::SyncCallSvr server;
+	synccall::ScServer server;
 	server.Start(4);
 	server.RegisterHandler("0.0.0.0", 4001, new RpcHandler);
 	int i = 0;
@@ -62,7 +60,7 @@ void synccall_client() {
 	std::cout << "input ip:";
 	std::cin >> ip;
 
-	synccall::SyncCallClient client;
+	synccall::ScClient client;
 	//if (!client.Connect("172.16.81.247", 4001,-1)) {
 	if (!client.Connect(ip, 4001, -1)) {
 		std::cout << "connect fail" << std::endl;
@@ -99,5 +97,6 @@ void synccall_client() {
 		}
 	}
 	std::cout << req_total << " " << rep_total << std::endl;
+	std::cin >> i;
 }
 
