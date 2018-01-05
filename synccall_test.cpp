@@ -7,11 +7,12 @@ struct CDisplayTime
 	clock_t     miStartTime;
 	const char* mpName;
 	CDisplayTime(const char* pName) :mpName(pName){
-		miStartTime = clock();
+		miStartTime = time(0);//clock();
 	}
 	~CDisplayTime(){
 		if (mpName){
-			std::cout << mpName << " elapsed=" << ((double)(clock() - miStartTime) / CLOCKS_PER_SEC) << std::endl;
+			//std::cout << mpName << " elapsed=" << ((double)(clock() - miStartTime) / CLOCKS_PER_SEC) << std::endl;
+			std::cout << mpName << " elapsed=" << ((double)(time(0) - miStartTime)) << std::endl;
 		}
 	}
 };
@@ -23,13 +24,14 @@ struct CDisplayTime
 class RpcHandler : public synccall::IServerHandler {
 public:
 	virtual void OnOneWayDealer(const int msg_type, netiolib::Buffer& request) {
+		std::cout << "error" << std::endl;
 
 	}
 	virtual void OnTwoWayDealer(const int msg_type, netiolib::Buffer& request, netiolib::Buffer& reply) {
 		if (msg_type == 1) {
 			int i = 0;
 			request.Read(i);
-			//std::cout << i << std::endl;
+			std::cout << i << std::endl;
 			//std::cout << "client request:" << info << std::endl;
 			//info = "server knows " + info;
 			reply.Write(i);
@@ -43,8 +45,7 @@ public:
 void synccall_server(){
 	synccall::SyncCallSvr server;
 	server.Start(4);
-	//server.RegisterHandler("172.16.81.247", 4001, new RpcHandler);
-	server.RegisterHandler("127.0.0.1", 4001, new RpcHandler);
+	server.RegisterHandler("0.0.0.0", 4001, new RpcHandler);
 	int i = 0;
 	std::cin >> i;
 	server.Stop();
@@ -57,9 +58,13 @@ void synccall_client() {
 	for (int i = 0; i < 1024; ++i)
 		info.append("a");
 
+	std::string ip;
+	std::cout << "input ip:";
+	std::cin >> ip;
+
 	synccall::SyncCallClient client;
 	//if (!client.Connect("172.16.81.247", 4001,-1)) {
-	if (!client.Connect("127.0.0.1", 4001, -1)) {
+	if (!client.Connect(ip, 4001, -1)) {
 		std::cout << "connect fail" << std::endl;
 		return;
 	}
@@ -89,7 +94,7 @@ void synccall_client() {
 			reply->Read(reply_idx);
 			rep_total += reply_idx;
 			++i;
-			if (i >= 100000)
+			if (i >= 10/*0000*/)
 				break;
 		}
 	}

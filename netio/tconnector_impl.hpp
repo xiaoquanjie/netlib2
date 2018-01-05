@@ -184,7 +184,7 @@ inline SocketLib::Buffer* SyncTcpConnector::Recv() {
 		SocketLib::SocketError error;
 		do {
 			_readsize = _socket->RecvSome(_readbuf, M_READ_SIZE, error);
-			if (error) {
+			if (_readsize == 0 || error) {
 				Close();
 				return 0;
 			}

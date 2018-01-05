@@ -8,6 +8,12 @@
 #include <stdlib.h>
 M_SYNCCALL_NAMESPACE_BEGIN
 
+#ifdef M_OPEN_DEBUG_LOG
+#define M_PRINT_DEBUG_LOG(info) printf(info)
+#else  
+#define M_PRINT_DEBUG_LOG(info)
+#endif
+
 class SyncCallClient;
 class SyncCallSvr;
 
@@ -109,6 +115,7 @@ protected:
 	}
 
 	void OnConnected(const netiolib::TcpSocketPtr& clisock) {
+		M_PRINT_DEBUG_LOG("onconnected......\n");
 		std::string ip = clisock->LocalEndpoint().Address();
 		base::s_uint16_t port = clisock->LocalEndpoint().Port();
 		scinfo* pscinfo = new scinfo;
@@ -120,6 +127,7 @@ protected:
 	}
 
 	void OnDisconnected(const netiolib::TcpSocketPtr& clisock) {
+		M_PRINT_DEBUG_LOG("ondisconnected......\n");
 		scinfo* pscinfo = (scinfo*)clisock->GetSocket().GetData();
 		delete pscinfo;
 	}
@@ -127,8 +135,10 @@ protected:
 	}
 
 	void OnReceiveData(const netiolib::TcpSocketPtr& clisock, netiolib::Buffer& buffer) {
+		M_PRINT_DEBUG_LOG("onreceivedata......\n");
 		scinfo* pscinfo = (scinfo*)clisock->GetSocket().GetData();
 		if (!pscinfo) {
+			printf("pscinfo is null\n");
 			return;
 		}
 		if (_handlers[pscinfo->id]) {

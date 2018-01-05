@@ -13,10 +13,16 @@ public:
 		_port = 0;
 		_timeo = -1;
 		_packidx = 0;
+		_socket = 0;
+	}
+
+	~SyncCallClient() {
+		Close();
+		delete _socket;
 	}
 
 	bool Connect(const std::string& ip, unsigned short port, unsigned int timeout) {
-		if (_connector) {
+		if (_socket) {
 			return false;
 		}
 		else {
@@ -30,19 +36,19 @@ public:
 	// 0==ok, -1==time out,-2==connect invalid ,-3 == other error
 	int SyncCall(int msg_type, const char* msg, SocketLib::s_uint32_t len, netiolib::Buffer*& preply) {
 		preply = 0;
-		if (!_connector) {
+		if (!_socket) {
 			return -2;
 		}
-		if (!_connector->IsConnected()) {
+		if (!_socket->IsConnected()) {
 			if (!_Reconnect())
 				return -2;
 		}
 		_FillRequest(999, msg_type, msg, len);
-		if (!_connector->Send(_request.Data(), _request.Length())) {
+		if (!_socket->Send(_request.Data(), _request.Length())) {
 			Close();
 			return -3;
 		}
-		SocketLib::Buffer* reply = _connector->Recv();
+		SocketLib::Buffer* reply = _socket->Recv();
 		if (_CheckReply(reply)) {
 			preply = reply;
 			return 0; // ok
@@ -55,19 +61,19 @@ public:
 
 	// 0==ok, -1==time out,-2==connect invalid, -3 == other error
 	int SyncCall(int msg_type, const char* msg,SocketLib::s_uint32_t len) {
-		if (!_connector) {
+		if (!_socket) {
 			return -2;
 		}
-		if (!_connector->IsConnected()) {
+		if (!_socket->IsConnected()) {
 			if (!_Reconnect())
 				return -2;
 		}
 		_FillRequest(M_ONEWAY_TYPE, msg_type, msg, len);
-		if (!_connector->Send(_request.Data(), _request.Length())) {
+		if (!_socket->Send(_request.Data(), _request.Length())) {
 			Close();
 			return -3;
 		}
-		SocketLib::Buffer* reply = _connector->Recv();
+		SocketLib::Buffer* reply = _socket->Recv();
 		if (_CheckReply(reply)) {
 			return 0; // ok
 		}
@@ -78,21 +84,22 @@ public:
 	}
 
 	bool IsConnected()const {
-		if (_connector)
-			return _connector->IsConnected();
+		if (_socket)
+			return _socket->IsConnected();
 		return false;
 	}
 
 	void Close() {
-		if (_connector) {
-			_connector->Close();
+		if (_socket) {
+			_socket->Close();
 		}
 	}
 
 protected:
 	bool _Reconnect() {
-		_connector.reset(new netiolib::SyncTcpConnector);
-		if (_connector->Connect(_ip, _port, _timeo)) {
+		delete _socket;
+		_socket = new netiolib::SyncTcpConnector;
+		if (_socket->Connect(_ip, _port, _timeo)) {
 			return true;
 		}
 		return false;
@@ -132,7 +139,7 @@ private:
 	unsigned int _timeo;
 	unsigned int _packidx;
 	netiolib::Buffer _request;
-	netiolib::SyncTcpConnectorPtr _connector;
+	netiolib::SyncTcpConnector* _socket;
 };
 
 M_SYNCCALL_NAMESPACE_END
