@@ -89,22 +89,22 @@ public:
 	*/
 
 	// 连线通知,这个函数里不要处理业务，防止堵塞
-	virtual void OnConnected(const TcpSocketPtr& clisock);
-	virtual void OnConnected(const TcpConnectorPtr& clisock, SocketLib::SocketError error);
-	virtual void OnConnected(HttpSocketPtr clisock);
-	virtual void OnConnected(HttpConnectorPtr clisock, SocketLib::SocketError error);
+	virtual void OnConnected(TcpSocketPtr& clisock);
+	virtual void OnConnected(TcpConnectorPtr& clisock, SocketLib::SocketError error);
+	virtual void OnConnected(HttpSocketPtr& clisock);
+	virtual void OnConnected(HttpConnectorPtr& clisock, SocketLib::SocketError error);
 
 	// 掉线通知,这个函数里不要处理业务，防止堵塞
-	virtual void OnDisconnected(const TcpSocketPtr& clisock);
-	virtual void OnDisconnected(const TcpConnectorPtr& clisock);
-	virtual void OnDisconnected(HttpSocketPtr clisock);
-	virtual void OnDisconnected(HttpConnectorPtr clisock);
+	virtual void OnDisconnected(TcpSocketPtr& clisock);
+	virtual void OnDisconnected(TcpConnectorPtr& clisock);
+	virtual void OnDisconnected(HttpSocketPtr& clisock);
+	virtual void OnDisconnected(HttpConnectorPtr& clisock);
 
 	// 数据包通知,这个函数里不要处理业务，防止堵塞
-	virtual void OnReceiveData(const TcpSocketPtr& clisock, SocketLib::Buffer& buffer);
-	virtual void OnReceiveData(const TcpConnectorPtr& clisock, SocketLib::Buffer& buffer);
-	virtual void OnReceiveData(HttpSocketPtr clisock, HttpSvrRecvMsg& httpmsg);
-	virtual void OnReceiveData(HttpConnectorPtr clisock, HttpCliRecvMsg& httpmsg);
+	virtual void OnReceiveData(TcpSocketPtr& clisock, SocketLib::Buffer& buffer);
+	virtual void OnReceiveData(TcpConnectorPtr& clisock, SocketLib::Buffer& buffer);
+	virtual void OnReceiveData(HttpSocketPtr& clisock, HttpSvrRecvMsg& httpmsg);
+	virtual void OnReceiveData(HttpConnectorPtr& clisock, HttpCliRecvMsg& httpmsg);
 
 
 protected:
@@ -245,7 +245,8 @@ protected:
 			_remoteep = _socket->RemoteEndPoint();
 			_localep = _socket->LocalEndPoint();
 			_flag = E_STATE_START;
-			_netio.OnConnected(this->shared_from_this());
+			shard_ptr_t<TcpSocket> ref = this->shared_from_this();
+			_netio.OnConnected(ref);
 			this->_TryRecvData();
 		}
 		catch (const SocketLib::SocketError& e) {
@@ -347,7 +348,8 @@ protected:
 			this->_remoteep = this->_socket->RemoteEndPoint();
 			this->_localep = this->_socket->LocalEndPoint();
 			this->_flag = E_STATE_START;
-			this->_netio.OnConnected(this->shared_from_this());
+			shard_ptr_t<HttpSocket> ref = this->shared_from_this();
+			this->_netio.OnConnected(ref);
 			this->_TryRecvData();
 		}
 		catch (const SocketLib::SocketError& e) {

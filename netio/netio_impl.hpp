@@ -185,45 +185,45 @@ void BaseNetIo<NetIoType>::_AcceptHttpHandler(SocketLib::SocketError error, Http
 
 // 连线通知,这个函数里不要处理业务，防止堵塞
 template<typename NetIoType>
-void BaseNetIo<NetIoType>::OnConnected(const TcpSocketPtr& clisock) {
+void BaseNetIo<NetIoType>::OnConnected(TcpSocketPtr& clisock) {
 }
 template<typename NetIoType>
-void BaseNetIo<NetIoType>::OnConnected(const TcpConnectorPtr& clisock, SocketLib::SocketError error) {
+void BaseNetIo<NetIoType>::OnConnected(TcpConnectorPtr& clisock, SocketLib::SocketError error) {
 }
 template<typename NetIoType>
-void BaseNetIo<NetIoType>::OnConnected(HttpSocketPtr clisock) {
+void BaseNetIo<NetIoType>::OnConnected(HttpSocketPtr& clisock) {
 }
 template<typename NetIoType>
-void BaseNetIo<NetIoType>::OnConnected(HttpConnectorPtr clisock, SocketLib::SocketError error) {
+void BaseNetIo<NetIoType>::OnConnected(HttpConnectorPtr& clisock, SocketLib::SocketError error) {
 }
 
 
 // 掉线通知,这个函数里不要处理业务，防止堵塞
 template<typename NetIoType>
-void BaseNetIo<NetIoType>::OnDisconnected(const TcpSocketPtr& clisock) {
+void BaseNetIo<NetIoType>::OnDisconnected(TcpSocketPtr& clisock) {
 }
 template<typename NetIoType>
-void BaseNetIo<NetIoType>::OnDisconnected(const TcpConnectorPtr& clisock) {
+void BaseNetIo<NetIoType>::OnDisconnected(TcpConnectorPtr& clisock) {
 }
 template<typename NetIoType>
-void BaseNetIo<NetIoType>::OnDisconnected(HttpSocketPtr clisock) {
+void BaseNetIo<NetIoType>::OnDisconnected(HttpSocketPtr& clisock) {
 }
 template<typename NetIoType>
-void BaseNetIo<NetIoType>::OnDisconnected(HttpConnectorPtr clisock) {
+void BaseNetIo<NetIoType>::OnDisconnected(HttpConnectorPtr& clisock) {
 }
 
 // 数据包通知,这个函数里不要处理业务，防止堵塞
 template<typename NetIoType>
-void BaseNetIo<NetIoType>::OnReceiveData(const TcpSocketPtr& clisock, SocketLib::Buffer& buffer) {
+void BaseNetIo<NetIoType>::OnReceiveData(TcpSocketPtr& clisock, SocketLib::Buffer& buffer) {
 }
 template<typename NetIoType>
-void BaseNetIo<NetIoType>::OnReceiveData(const TcpConnectorPtr& clisock, SocketLib::Buffer& buffer) {
+void BaseNetIo<NetIoType>::OnReceiveData(TcpConnectorPtr& clisock, SocketLib::Buffer& buffer) {
 }
 template<typename NetIoType>
-void BaseNetIo<NetIoType>::OnReceiveData(HttpSocketPtr clisock, HttpSvrRecvMsg& httpmsg) {
+void BaseNetIo<NetIoType>::OnReceiveData(HttpSocketPtr& clisock, HttpSvrRecvMsg& httpmsg) {
 }
 template<typename NetIoType>
-void BaseNetIo<NetIoType>::OnReceiveData(HttpConnectorPtr clisock, HttpCliRecvMsg& httpmsg) {
+void BaseNetIo<NetIoType>::OnReceiveData(HttpConnectorPtr& clisock, HttpCliRecvMsg& httpmsg) {
 }
 
 M_NETIO_NAMESPACE_END

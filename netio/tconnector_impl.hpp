@@ -77,16 +77,18 @@ template<typename ConnectorType>
 void BaseTcpConnector<ConnectorType>::_ConnectHandler(const SocketLib::SocketError& error, TcpConnectorPtr conector) {
 	if (error) {
 		lasterror = error;
-		this->_netio.OnConnected(this->shared_from_this(), error);
+		shard_ptr_t<ConnectorType> ref = this->shared_from_this();
+		this->_netio.OnConnected(ref, error);
 		return;
 	}
 	try {
 		this->_remoteep = this->_socket->RemoteEndPoint();
 		this->_localep = this->_socket->LocalEndPoint();
 		this->_flag = E_STATE_START;
-		this->_netio.OnConnected(this->shared_from_this(), error);
+		shard_ptr_t<ConnectorType> ref = this->shared_from_this();
+		this->_netio.OnConnected(ref, error);
 		function_t<void(SocketLib::s_uint32_t, SocketLib::SocketError)> handler =
-			bind_t(&BaseTcpConnector<ConnectorType>::_ReadHandler, this->shared_from_this(), placeholder_1, placeholder_2);
+			bind_t(&BaseTcpConnector<ConnectorType>::_ReadHandler, ref, placeholder_1, placeholder_2);
 		this->_socket->AsyncRecvSome(handler, this->_reader.readbuf, M_READ_SIZE);
 	}
 	catch (SocketLib::SocketError& err) {

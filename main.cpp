@@ -62,10 +62,10 @@ void ReplyData(netiolib::TcpSocketPtr clisock, netiolib::Buffer& buffer) {
 class TestNetIo : public netiolib::NetIo {
 public:
 	// 连线通知,这个函数里不要处理业务，防止堵塞
-	virtual void OnConnected(const netiolib::TcpSocketPtr& clisock) {
+	virtual void OnConnected(netiolib::TcpSocketPtr& clisock) {
 		cout << "OnConnected one : " << clisock->RemoteEndpoint().Address() << " " << clisock->RemoteEndpoint().Port() << endl;
 	}
-	virtual void OnConnected(const netiolib::TcpConnectorPtr& clisock, SocketLib::SocketError error) {
+	virtual void OnConnected(netiolib::TcpConnectorPtr& clisock, SocketLib::SocketError error) {
 		if (error) {
 			cout << "connect fail :" << error.What() << endl;
 		}
@@ -74,11 +74,11 @@ public:
 			//SendData(clisock);
 		}
 	}
-	virtual void OnConnected(netiolib::HttpSocketPtr clisock) {
+	virtual void OnConnected(netiolib::HttpSocketPtr& clisock) {
 		cout << "OnConnected one http : " << clisock->RemoteEndpoint().Address()
 			<< " " << clisock->RemoteEndpoint().Port() << endl;
 	}
-	virtual void OnConnected(netiolib::HttpConnectorPtr clisock, SocketLib::SocketError error) {
+	virtual void OnConnected(netiolib::HttpConnectorPtr& clisock, SocketLib::SocketError error) {
 		if (error) {
 			cout << "http connect fail :" << error.What() << endl;
 		}
@@ -88,23 +88,23 @@ public:
 	}
 
 	// 掉线通知,这个函数里不要处理业务，防止堵塞
-	virtual void OnDisconnected(const netiolib::TcpSocketPtr& clisock) {
+	virtual void OnDisconnected(netiolib::TcpSocketPtr& clisock) {
 		cout << "OnDisconnected one : " << clisock->RemoteEndpoint().Address() << " " << clisock->RemoteEndpoint().Port() << endl;
 	}
-	virtual void OnDisconnected(const netiolib::TcpConnectorPtr& clisock) {
+	virtual void OnDisconnected(netiolib::TcpConnectorPtr& clisock) {
 		cout << "OnDisconnected one : " << clisock->LocalEndpoint().Address() << " " << clisock->LocalEndpoint().Port() << endl;
 	}
-	virtual void OnDisconnected(netiolib::HttpSocketPtr clisock) {
+	virtual void OnDisconnected(netiolib::HttpSocketPtr& clisock) {
 		cout << "OnDisconnected one http : " << clisock->RemoteEndpoint().Address() << " "
 			<< clisock->RemoteEndpoint().Port() << endl;
 	}
-	virtual void OnDisconnected(netiolib::HttpConnectorPtr clisock) {
+	virtual void OnDisconnected(netiolib::HttpConnectorPtr& clisock) {
 		cout << "OnDisconnected one http connector: " << clisock->RemoteEndpoint().Address() << " "
 			<< clisock->RemoteEndpoint().Port() << endl;
 	}
 
 	// 数据包通知,这个函数里不要处理业务，防止堵塞
-	virtual void OnReceiveData(const netiolib::TcpSocketPtr& clisock, netiolib::Buffer& buffer) {
+	virtual void OnReceiveData(netiolib::TcpSocketPtr& clisock, netiolib::Buffer& buffer) {
 		print_log("receive data from :" << clisock->RemoteEndpoint().Address() << " " << clisock->RemoteEndpoint().Port()<<endl);
 		buffer.Write('\0');
 		print_log(" : " << buffer.Data() << endl);
@@ -112,19 +112,19 @@ public:
 		// 回复
 		ReplyData(clisock, buffer);
 	}
-	virtual void OnReceiveData(const netiolib::TcpConnectorPtr& clisock, netiolib::Buffer& buffer) {
+	virtual void OnReceiveData(netiolib::TcpConnectorPtr& clisock, netiolib::Buffer& buffer) {
 		print_log("receive data from :" << clisock->LocalEndpoint().Address() << " " << clisock->LocalEndpoint().Port() << endl);
 		buffer.Write('\0');
 		print_log(" : " << buffer.Data() << endl);
 		SendData(clisock);
 	}
-	virtual void OnReceiveData(netiolib::HttpSocketPtr clisock, netiolib::HttpSvrRecvMsg& httpmsg) {
+	virtual void OnReceiveData(netiolib::HttpSocketPtr& clisock, netiolib::HttpSvrRecvMsg& httpmsg) {
 		//cout << httpmsg.GetRequestLine() << endl;
 		netiolib::HttpSvrSendMsg& msg = clisock->GetSvrMsg();
 		msg.SetBody("newxiaoquanjie", 14);
 		clisock->SendHttpMsg();
 	}
-	virtual void OnReceiveData(netiolib::HttpConnectorPtr, netiolib::HttpCliRecvMsg& httmsg) {
+	virtual void OnReceiveData(netiolib::HttpConnectorPtr&, netiolib::HttpCliRecvMsg& httmsg) {
 		cout << httmsg.GetRespondLine() << endl;
 		cout << httmsg.GetHeader() << endl;
 		cout << httmsg.GetBody() << endl;

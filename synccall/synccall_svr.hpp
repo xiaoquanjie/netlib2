@@ -20,12 +20,12 @@ class SyncCallSvr;
 struct ISyncCallSvr {
 	friend class SyncCallIo;
 protected:
-	virtual void OnConnected(const netiolib::TcpSocketPtr& clisock) = 0;
-	virtual void OnConnected(const netiolib::TcpConnectorPtr& clisock, SocketLib::SocketError error) = 0;
-	virtual void OnDisconnected(const netiolib::TcpSocketPtr& clisock) = 0;
-	virtual void OnDisconnected(const netiolib::TcpConnectorPtr& clisock) = 0;
-	virtual void OnReceiveData(const netiolib::TcpSocketPtr& clisock, netiolib::Buffer& buffer) = 0;
-	virtual void OnReceiveData(const netiolib::TcpConnectorPtr& clisock, netiolib::Buffer& buffer) = 0;
+	virtual void OnConnected(netiolib::TcpSocketPtr& clisock) = 0;
+	virtual void OnConnected(netiolib::TcpConnectorPtr& clisock, SocketLib::SocketError error) = 0;
+	virtual void OnDisconnected(netiolib::TcpSocketPtr& clisock) = 0;
+	virtual void OnDisconnected(netiolib::TcpConnectorPtr& clisock) = 0;
+	virtual void OnReceiveData(netiolib::TcpSocketPtr& clisock, netiolib::Buffer& buffer) = 0;
+	virtual void OnReceiveData(netiolib::TcpConnectorPtr& clisock, netiolib::Buffer& buffer) = 0;
 };
 
 class SyncCallIo : public netiolib::NetIo {
@@ -34,24 +34,24 @@ public:
 		_server = server;
 	}
 protected:
-	virtual void OnConnected(const netiolib::TcpSocketPtr& clisock) {
+	virtual void OnConnected(netiolib::TcpSocketPtr& clisock) {
 		_server->OnConnected(clisock);
 	}
-	virtual void OnConnected(const netiolib::TcpConnectorPtr& clisock, SocketLib::SocketError error) {
+	virtual void OnConnected(netiolib::TcpConnectorPtr& clisock, SocketLib::SocketError error) {
 		_server->OnConnected(clisock, error);
 	}
 
-	virtual void OnDisconnected(const netiolib::TcpSocketPtr& clisock) {
+	virtual void OnDisconnected(netiolib::TcpSocketPtr& clisock) {
 		_server->OnDisconnected(clisock);
 	}
-	virtual void OnDisconnected(const netiolib::TcpConnectorPtr& clisock) {
+	virtual void OnDisconnected(netiolib::TcpConnectorPtr& clisock) {
 		_server->OnDisconnected(clisock);
 	}
 
-	virtual void OnReceiveData(const netiolib::TcpSocketPtr& clisock, netiolib::Buffer& buffer) {
+	virtual void OnReceiveData(netiolib::TcpSocketPtr& clisock, netiolib::Buffer& buffer) {
 		_server->OnReceiveData(clisock, buffer);
 	}
-	virtual void OnReceiveData(const netiolib::TcpConnectorPtr& clisock, netiolib::Buffer& buffer) {
+	virtual void OnReceiveData(netiolib::TcpConnectorPtr& clisock, netiolib::Buffer& buffer) {
 		_server->OnReceiveData(clisock, buffer);
 	}
 protected:
@@ -115,7 +115,7 @@ protected:
 		printf("%d thread is leaving..............\n", base::thread::ctid());
 	}
 
-	void OnConnected(const netiolib::TcpSocketPtr& clisock) {
+	void OnConnected(netiolib::TcpSocketPtr& clisock) {
 		M_PRINT_DEBUG_LOG("onconnected......\n");
 		std::string ip = clisock->LocalEndpoint().Address();
 		base::s_uint16_t port = clisock->LocalEndpoint().Port();
@@ -123,19 +123,19 @@ protected:
 		pscinfo->id = UniqueId(ip, port);
 		clisock->GetSocket().SetData(pscinfo);
 	}
-	void OnConnected(const netiolib::TcpConnectorPtr& clisock, SocketLib::SocketError error) {
+	void OnConnected(netiolib::TcpConnectorPtr& clisock, SocketLib::SocketError error) {
 		
 	}
 
-	void OnDisconnected(const netiolib::TcpSocketPtr& clisock) {
+	void OnDisconnected(netiolib::TcpSocketPtr& clisock) {
 		M_PRINT_DEBUG_LOG("ondisconnected......\n");
 		scinfo* pscinfo = (scinfo*)clisock->GetSocket().GetData();
 		delete pscinfo;
 	}
-	void OnDisconnected(const netiolib::TcpConnectorPtr& clisock) {
+	void OnDisconnected(netiolib::TcpConnectorPtr& clisock) {
 	}
 
-	void OnReceiveData(const netiolib::TcpSocketPtr& clisock, netiolib::Buffer& buffer) {
+	void OnReceiveData(netiolib::TcpSocketPtr& clisock, netiolib::Buffer& buffer) {
 		M_PRINT_DEBUG_LOG("onreceivedata......\n");
 		scinfo* pscinfo = (scinfo*)clisock->GetSocket().GetData();
 		if (!pscinfo) {
@@ -167,7 +167,7 @@ protected:
 			}
 		}
 	}
-	void OnReceiveData(const netiolib::TcpConnectorPtr& clisock, netiolib::Buffer& buffer) {
+	void OnReceiveData(netiolib::TcpConnectorPtr& clisock, netiolib::Buffer& buffer) {
 		
 	}
 
