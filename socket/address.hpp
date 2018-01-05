@@ -106,23 +106,18 @@ struct AddressV4
 		_addr._addr = g_htonl(addr);
 	}
 
-	explicit AddressV4(const char* addr)
-	{
-		if (g_inet_pton(M_AF_INET, addr, (void*)&_addr) != 1)
-			_addr._addr = M_INADDR_ANY;
+	explicit AddressV4(const char* addr){
+		g_inet_pton(M_AF_INET, addr, (void*)&_addr);
 	}
 
-	AddressV4(const std::string& addr)
-	{
-		if (g_inet_pton(M_AF_INET, addr.c_str(), (void*)&_addr) != 1)
-			_addr._addr = M_INADDR_ANY;
+	AddressV4(const std::string& addr){
+		g_inet_pton(M_AF_INET, addr.c_str(), (void*)&_addr);
 	}
 
 	AddressV4(const AddressV4& other):_addr(other._addr)
 	{}
 
-	AddressV4& operator=(const AddressV4& other)
-	{
+	AddressV4& operator=(const AddressV4& other){
 		_addr = other._addr;
 		return *this;
 	}
@@ -257,16 +252,12 @@ struct AddressV6
 	AddressV6(in6_addr_type addr):_addr(addr)
 	{}
 
-	explicit AddressV6(const char* addr)
-	{
-		if (g_inet_pton(M_AF_INET6, addr, (void*)&_addr) != 1)
-			_addr._addr = in6addr_any;
+	explicit AddressV6(const char* addr){
+		g_inet_pton(M_AF_INET6, addr, (void*)&_addr);
 	}
 
-	AddressV6(const std::string& addr)
-	{
-		if (g_inet_pton(M_AF_INET6, addr.c_str(), (void*)&_addr) != 1)
-			_addr._addr = in6addr_any;
+	AddressV6(const std::string& addr){
+		g_inet_pton(M_AF_INET6, addr.c_str(), (void*)&_addr);
 	}
 
 	AddressV6(const AddressV6& other) :_addr(other._addr)

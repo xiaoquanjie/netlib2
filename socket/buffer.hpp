@@ -44,6 +44,8 @@ public:
 	template<typename T>
 	M_SOCKET_DECL void Write(T const& value);
 
+	M_SOCKET_DECL void Write(std::string const& value);
+
 	template<typename T>
 	Buffer& operator<<(T const& value){
 		Write(value);
@@ -54,6 +56,8 @@ public:
 
 	template<typename T>
 	M_SOCKET_DECL void Read(T& value);
+
+	M_SOCKET_DECL void Read(std::string& value);
 
 	template<typename T>
 	Buffer& operator >> (T& value){
@@ -148,6 +152,12 @@ M_SOCKET_DECL void Buffer::Write(T const& value){
 	Write((void*)&value, sizeof(T));
 }
 
+M_SOCKET_DECL void Buffer::Write(std::string const& value) {
+	s_uint32_t len = value.length();
+	Write((void*)&len, sizeof(s_uint32_t));
+	Write((void*)value.c_str(), len);
+}
+
 M_SOCKET_DECL void Buffer::Read(void* data, s_uint32_t len){
 	if (_data._offset + len > _data._pos)
 		return;
@@ -159,6 +169,18 @@ M_SOCKET_DECL void Buffer::Read(void* data, s_uint32_t len){
 template<typename T>
 M_SOCKET_DECL void Buffer::Read(T& value){
 	Read((void*)&value, sizeof(T));
+}
+
+M_SOCKET_DECL void Buffer::Read(std::string& value) {
+	s_uint32_t len = 0;
+	Read(len);
+	if (len > 0) {
+		char* tmp = (char*)malloc(len + 1);
+		Read(tmp, len);
+		tmp[len] = 0;
+		value = tmp;
+		free(tmp);
+	}
 }
 
 M_SOCKET_DECL void Buffer::Swap(Buffer& buffer) {

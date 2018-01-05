@@ -166,7 +166,8 @@ void TcpBaseSocket<T, SocketType>::_WriteHandler(SocketLib::s_uint32_t tran_byte
 
 template<typename T, typename SocketType>
 inline void TcpBaseSocket<T, SocketType>::_CloseHandler() {
-	_netio.OnDisconnected(this->shared_from_this());
+	shard_ptr_t<T> ref = this->shared_from_this();
+	_netio.OnDisconnected(ref);
 }
 
 template<typename T, typename SocketType>
@@ -250,6 +251,7 @@ template<typename T, typename SocketType>
 bool TcpStreamSocket<T, SocketType>::_CutMsgPack(SocketLib::s_byte_t* buf, SocketLib::s_uint32_t tran_byte) {
 	// 减少内存拷贝是此函数的设计关键
 	SocketLib::s_uint32_t hdrlen = (SocketLib::s_uint32_t)sizeof(MessageHeader);
+	shard_ptr_t<T> ref;
 	do
 	{
 		// 算出头部长度
@@ -295,7 +297,9 @@ bool TcpStreamSocket<T, SocketType>::_CutMsgPack(SocketLib::s_byte_t* buf, Socke
 
 			// notify
 			_reader.curheader.size = 0;
-			this->_netio.OnReceiveData(this->shared_from_this(), _reader.msgbuffer2);
+			if (!ref)
+				ref = this->shared_from_this();
+			this->_netio.OnReceiveData(ref, _reader.msgbuffer2);
 			_reader.msgbuffer2.Clear();
 		}
 	} while (true);

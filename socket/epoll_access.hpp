@@ -259,7 +259,7 @@ M_SOCKET_DECL void EpollService::Access::Run(EpollService& service, SocketError&
 		_DoClose(simpl, closereqs, closereqs2);
 		g_setlasterr(0);
 		g_bzero(&events, sizeof(events));
-		s_int32_t ret = g_epoll_wait(simpl->_handler, events, max_events, -1);
+		s_int32_t ret = g_epoll_wait(simpl->_handler, events, max_events, 500);
 		if (ret == 0){
 			1; // time out
 			continue;

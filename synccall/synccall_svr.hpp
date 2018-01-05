@@ -8,18 +8,24 @@
 #include <stdlib.h>
 M_SYNCCALL_NAMESPACE_BEGIN
 
+#ifdef M_OPEN_DEBUG_LOG
+#define M_PRINT_DEBUG_LOG(info) printf(info)
+#else  
+#define M_PRINT_DEBUG_LOG(info)
+#endif
+
 class SyncCallClient;
 class SyncCallSvr;
 
 struct ISyncCallSvr {
 	friend class SyncCallIo;
 protected:
-	virtual void OnConnected(const netiolib::TcpSocketPtr& clisock) = 0;
-	virtual void OnConnected(const netiolib::TcpConnectorPtr& clisock, SocketLib::SocketError error) = 0;
-	virtual void OnDisconnected(const netiolib::TcpSocketPtr& clisock) = 0;
-	virtual void OnDisconnected(const netiolib::TcpConnectorPtr& clisock) = 0;
-	virtual void OnReceiveData(const netiolib::TcpSocketPtr& clisock, netiolib::Buffer& buffer) = 0;
-	virtual void OnReceiveData(const netiolib::TcpConnectorPtr& clisock, netiolib::Buffer& buffer) = 0;
+	virtual void OnConnected(netiolib::TcpSocketPtr& clisock) = 0;
+	virtual void OnConnected(netiolib::TcpConnectorPtr& clisock, SocketLib::SocketError error) = 0;
+	virtual void OnDisconnected(netiolib::TcpSocketPtr& clisock) = 0;
+	virtual void OnDisconnected(netiolib::TcpConnectorPtr& clisock) = 0;
+	virtual void OnReceiveData(netiolib::TcpSocketPtr& clisock, netiolib::Buffer& buffer) = 0;
+	virtual void OnReceiveData(netiolib::TcpConnectorPtr& clisock, netiolib::Buffer& buffer) = 0;
 };
 
 class SyncCallIo : public netiolib::NetIo {
@@ -28,24 +34,24 @@ public:
 		_server = server;
 	}
 protected:
-	virtual void OnConnected(const netiolib::TcpSocketPtr& clisock) {
+	virtual void OnConnected(netiolib::TcpSocketPtr& clisock) {
 		_server->OnConnected(clisock);
 	}
-	virtual void OnConnected(const netiolib::TcpConnectorPtr& clisock, SocketLib::SocketError error) {
+	virtual void OnConnected(netiolib::TcpConnectorPtr& clisock, SocketLib::SocketError error) {
 		_server->OnConnected(clisock, error);
 	}
 
-	virtual void OnDisconnected(const netiolib::TcpSocketPtr& clisock) {
+	virtual void OnDisconnected(netiolib::TcpSocketPtr& clisock) {
 		_server->OnDisconnected(clisock);
 	}
-	virtual void OnDisconnected(const netiolib::TcpConnectorPtr& clisock) {
+	virtual void OnDisconnected(netiolib::TcpConnectorPtr& clisock) {
 		_server->OnDisconnected(clisock);
 	}
 
-	virtual void OnReceiveData(const netiolib::TcpSocketPtr& clisock, netiolib::Buffer& buffer) {
+	virtual void OnReceiveData(netiolib::TcpSocketPtr& clisock, netiolib::Buffer& buffer) {
 		_server->OnReceiveData(clisock, buffer);
 	}
-	virtual void OnReceiveData(const netiolib::TcpConnectorPtr& clisock, netiolib::Buffer& buffer) {
+	virtual void OnReceiveData(netiolib::TcpConnectorPtr& clisock, netiolib::Buffer& buffer) {
 		_server->OnReceiveData(clisock, buffer);
 	}
 protected:
@@ -54,10 +60,14 @@ protected:
 
 class SyncCallSvr : public ISyncCallSvr {
 	friend class SyncCallIo;
-	typedef std::map<base::s_uint64_t, IServerHandler*> SvrHandlerMap;
-
 public:
+	struct scinfo {
+		base::s_uint16_t id;
+		netiolib::Buffer buffer;
+	};
+
 	SyncCallSvr() :_io(this) {
+		memset(_handlers, 0, sizeof(_handlers));
 	}
 
 	~SyncCallSvr() {
@@ -67,31 +77,20 @@ public:
 			delete (*iter);
 		}
 		_threads.clear();
+
+		for (base::s_uint16_t idx = 0; idx < (sizeof(_handlers) / sizeof(IServerHandler*)); ++idx) {
+			delete _handlers[idx];
+		}
 	}
 
 	bool RegisterHandler(const std::string& ip, unsigned short port, IServerHandler* handler) {
 		if (_io.ListenOne(ip, port)) {
-			base::s_uint64_t id = UniqueId(ip, port);
-			_svrhandler_map[id] = handler;
+			base::s_uint16_t id = UniqueId(ip, port);
+			_handlers[id] = handler;
 			return true;
 		}
 		else {
 			return false;
-		}
-	}
-
-	SyncCallClient* CreateClient(const std::string& ip,unsigned short port,unsigned int timeout) {
-		SyncCallClient* client = new SyncCallClient;
-		client->_ip = ip;
-		client->_port = port;
-		client->_timeo = timeout;
-		client->_io = &_io;
-		client->_connector.reset(new netiolib::TcpConnector(_io));
-		if (client->_connector->Connect(ip, port, timeout))
-			return client;
-		else {
-			delete client;
-			return 0;
 		}
 	}
 
@@ -102,6 +101,8 @@ public:
 				_threads.push_back(pthread);
 			}
 		}
+		while (_io.ServiceCount() != _threads.size())
+			;
 	}
 
 	void Stop() {
@@ -115,74 +116,70 @@ protected:
 		printf("%d thread is leaving..............\n", base::thread::ctid());
 	}
 
-	void OnConnected(const netiolib::TcpSocketPtr& clisock) {
+	void OnConnected(netiolib::TcpSocketPtr& clisock) {
+		M_PRINT_DEBUG_LOG("onconnected......\n");
 		std::string ip = clisock->LocalEndpoint().Address();
 		base::s_uint16_t port = clisock->LocalEndpoint().Port();
-		base::s_uint64_t* id = new base::s_uint64_t;
-		*id = UniqueId(ip, port);
-		clisock->GetSocket().SetData(id);
+		scinfo* pscinfo = new scinfo;
+		pscinfo->id = UniqueId(ip, port);
+		clisock->GetSocket().SetData(pscinfo);
 	}
-	void OnConnected(const netiolib::TcpConnectorPtr& clisock, SocketLib::SocketError error) {
+	void OnConnected(netiolib::TcpConnectorPtr& clisock, SocketLib::SocketError error) {
 		
 	}
 
-	void OnDisconnected(const netiolib::TcpSocketPtr& clisock) {
-		base::s_uint64_t* id = (base::s_uint64_t*)clisock->GetSocket().GetData();
-		delete id;
+	void OnDisconnected(netiolib::TcpSocketPtr& clisock) {
+		M_PRINT_DEBUG_LOG("ondisconnected......\n");
+		scinfo* pscinfo = (scinfo*)clisock->GetSocket().GetData();
+		delete pscinfo;
 	}
-	void OnDisconnected(const netiolib::TcpConnectorPtr& clisock) {
+	void OnDisconnected(netiolib::TcpConnectorPtr& clisock) {
 	}
 
-	void OnReceiveData(const netiolib::TcpSocketPtr& clisock, netiolib::Buffer& buffer) {
-		base::s_uint64_t* id = (base::s_uint64_t*)clisock->GetSocket().GetData();
-		if (id) {
-			SvrHandlerMap::iterator iter = _svrhandler_map.find(*id);
-			if (iter == _svrhandler_map.end()) {
-				printf("handler is not exist,id(%lld)\n", *id);
-				return;
-			}
+	void OnReceiveData(netiolib::TcpSocketPtr& clisock, netiolib::Buffer& buffer) {
+		M_PRINT_DEBUG_LOG("onreceivedata......\n");
+		scinfo* pscinfo = (scinfo*)clisock->GetSocket().GetData();
+		if (!pscinfo) {
+			printf("pscinfo is null\n");
+			return;
+		}
+		if (_handlers[pscinfo->id]) {
 			unsigned int way_type = 0;
 			buffer.Read(way_type);
 			unsigned int msg_type = 0;
 			buffer.Read(msg_type);
 			unsigned int pack_idx = 0;
 			buffer.Read(pack_idx);
+			pscinfo->buffer.Clear();
+			pscinfo->buffer.Write(way_type);
+			pscinfo->buffer.Write(msg_type);
+			pscinfo->buffer.Write(pack_idx);
 			// don't ask why the way_the is 666 or 999
-			if (way_type == 666) {
-				netiolib::Buffer* reply = new netiolib::Buffer;
-				reply->Write(way_type);
-				reply->Write(msg_type);
-				reply->Write(pack_idx);
-				iter->second->OnOneWayDealer(msg_type, buffer);
-				clisock->Send(reply);
+			if (way_type == M_ONEWAY_TYPE) {
+				_handlers[pscinfo->id]->OnOneWayDealer(msg_type, buffer);
+				clisock->Send(pscinfo->buffer.Data(), pscinfo->buffer.Length());
 			}
-			else if (way_type == 999) {
-				netiolib::Buffer* reply = new netiolib::Buffer;
-				reply->Write(way_type);
-				reply->Write(msg_type);
-				reply->Write(pack_idx);
-				iter->second->OnTwoWayDealer(msg_type, buffer, *reply);
-				clisock->Send(reply);
+			else if (way_type == M_TWOWAY_TYPE) {
+				_handlers[pscinfo->id]->OnTwoWayDealer(msg_type, buffer, pscinfo->buffer);
+				clisock->Send(pscinfo->buffer.Data(), pscinfo->buffer.Length());
 			}
 			else {
 				printf("error way_type(%d)\n", way_type);
 			}
 		}
 	}
-	void OnReceiveData(const netiolib::TcpConnectorPtr& clisock, netiolib::Buffer& buffer) {
+	void OnReceiveData(netiolib::TcpConnectorPtr& clisock, netiolib::Buffer& buffer) {
 		
 	}
 
-	base::s_uint64_t UniqueId(const std::string& ip, unsigned short port) {
-		base::s_uint32_t int_ip = inet_addr(ip.c_str());
-		base::s_uint64_t id = (((base::s_uint64_t)int_ip) << 17) + port;
-		return id;
+	base::s_uint16_t UniqueId(const std::string& ip, unsigned short port) {
+		return port;
 	}
 
 private:
 	SyncCallIo _io;
 	std::list<base::thread*> _threads;
-	SvrHandlerMap _svrhandler_map;
+	IServerHandler* _handlers[0xFFFF];
 };
 
 

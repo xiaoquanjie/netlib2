@@ -1,6 +1,7 @@
 #include "netio/netio.hpp"
 #include <iostream>
 #include "base/thread.hpp"
+#include "synccall/synccall.hpp"
 
 using namespace std;
 
@@ -61,10 +62,10 @@ void ReplyData(netiolib::TcpSocketPtr clisock, netiolib::Buffer& buffer) {
 class TestNetIo : public netiolib::NetIo {
 public:
 	// 连线通知,这个函数里不要处理业务，防止堵塞
-	virtual void OnConnected(const netiolib::TcpSocketPtr& clisock) {
+	virtual void OnConnected(netiolib::TcpSocketPtr& clisock) {
 		cout << "OnConnected one : " << clisock->RemoteEndpoint().Address() << " " << clisock->RemoteEndpoint().Port() << endl;
 	}
-	virtual void OnConnected(const netiolib::TcpConnectorPtr& clisock, SocketLib::SocketError error) {
+	virtual void OnConnected(netiolib::TcpConnectorPtr& clisock, SocketLib::SocketError error) {
 		if (error) {
 			cout << "connect fail :" << error.What() << endl;
 		}
@@ -73,11 +74,11 @@ public:
 			//SendData(clisock);
 		}
 	}
-	virtual void OnConnected(netiolib::HttpSocketPtr clisock) {
+	virtual void OnConnected(netiolib::HttpSocketPtr& clisock) {
 		cout << "OnConnected one http : " << clisock->RemoteEndpoint().Address()
 			<< " " << clisock->RemoteEndpoint().Port() << endl;
 	}
-	virtual void OnConnected(netiolib::HttpConnectorPtr clisock, SocketLib::SocketError error) {
+	virtual void OnConnected(netiolib::HttpConnectorPtr& clisock, SocketLib::SocketError error) {
 		if (error) {
 			cout << "http connect fail :" << error.What() << endl;
 		}
@@ -87,23 +88,23 @@ public:
 	}
 
 	// 掉线通知,这个函数里不要处理业务，防止堵塞
-	virtual void OnDisconnected(const netiolib::TcpSocketPtr& clisock) {
+	virtual void OnDisconnected(netiolib::TcpSocketPtr& clisock) {
 		cout << "OnDisconnected one : " << clisock->RemoteEndpoint().Address() << " " << clisock->RemoteEndpoint().Port() << endl;
 	}
-	virtual void OnDisconnected(const netiolib::TcpConnectorPtr& clisock) {
+	virtual void OnDisconnected(netiolib::TcpConnectorPtr& clisock) {
 		cout << "OnDisconnected one : " << clisock->LocalEndpoint().Address() << " " << clisock->LocalEndpoint().Port() << endl;
 	}
-	virtual void OnDisconnected(netiolib::HttpSocketPtr clisock) {
+	virtual void OnDisconnected(netiolib::HttpSocketPtr& clisock) {
 		cout << "OnDisconnected one http : " << clisock->RemoteEndpoint().Address() << " "
 			<< clisock->RemoteEndpoint().Port() << endl;
 	}
-	virtual void OnDisconnected(netiolib::HttpConnectorPtr clisock) {
+	virtual void OnDisconnected(netiolib::HttpConnectorPtr& clisock) {
 		cout << "OnDisconnected one http connector: " << clisock->RemoteEndpoint().Address() << " "
 			<< clisock->RemoteEndpoint().Port() << endl;
 	}
 
 	// 数据包通知,这个函数里不要处理业务，防止堵塞
-	virtual void OnReceiveData(const netiolib::TcpSocketPtr& clisock, netiolib::Buffer& buffer) {
+	virtual void OnReceiveData(netiolib::TcpSocketPtr& clisock, netiolib::Buffer& buffer) {
 		print_log("receive data from :" << clisock->RemoteEndpoint().Address() << " " << clisock->RemoteEndpoint().Port()<<endl);
 		buffer.Write('\0');
 		print_log(" : " << buffer.Data() << endl);
@@ -111,19 +112,19 @@ public:
 		// 回复
 		ReplyData(clisock, buffer);
 	}
-	virtual void OnReceiveData(const netiolib::TcpConnectorPtr& clisock, netiolib::Buffer& buffer) {
+	virtual void OnReceiveData(netiolib::TcpConnectorPtr& clisock, netiolib::Buffer& buffer) {
 		print_log("receive data from :" << clisock->LocalEndpoint().Address() << " " << clisock->LocalEndpoint().Port() << endl);
 		buffer.Write('\0');
 		print_log(" : " << buffer.Data() << endl);
 		SendData(clisock);
 	}
-	virtual void OnReceiveData(netiolib::HttpSocketPtr clisock, netiolib::HttpSvrRecvMsg& httpmsg) {
+	virtual void OnReceiveData(netiolib::HttpSocketPtr& clisock, netiolib::HttpSvrRecvMsg& httpmsg) {
 		//cout << httpmsg.GetRequestLine() << endl;
 		netiolib::HttpSvrSendMsg& msg = clisock->GetSvrMsg();
 		msg.SetBody("newxiaoquanjie", 14);
 		clisock->SendHttpMsg();
 	}
-	virtual void OnReceiveData(netiolib::HttpConnectorPtr, netiolib::HttpCliRecvMsg& httmsg) {
+	virtual void OnReceiveData(netiolib::HttpConnectorPtr&, netiolib::HttpCliRecvMsg& httmsg) {
 		cout << httmsg.GetRespondLine() << endl;
 		cout << httmsg.GetHeader() << endl;
 		cout << httmsg.GetBody() << endl;
@@ -351,28 +352,28 @@ void httpmsg_test() {
 	cout << "elapsed : " << ((double)(end_t-beg_t) / CLOCKS_PER_SEC) << endl;
 }
 
-void sync_test() {
-	TestNetIo test_io;
-	netiolib::TcpConnector connector(test_io);
-	SocketLib::Opts::SndTimeOut timeo(5, 0);
-	//connector.GetSocket().SetOption(timeo);
-	if (connector.Connect("127.0.0.1", 5001)) {
-		cout << "connector success" << endl;
-	}
-	else {
-		cout << test_io.GetLastError().What() << endl;
-	}
+void synccall_server();
+void synccall_client();
+void synccall_test() {
+	int i;
+	cout << "select 1 is server or client:";
+	cin >> i;
+	if (i == 1)
+		synccall_server();
+	else
+		synccall_client();
 }
 
-int main() {
 
+int main() {
+	
 	//httpmsg_test();
 	//test1(TO());
 	//slist_test();
 	//netlib_test();
 	//netlib_http_test();
 	//other_test();
-	sync_test();
+	synccall_test();
 
 	int pause_i;
 	cin >> pause_i;

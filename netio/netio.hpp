@@ -38,6 +38,7 @@ class TcpSocket;
 class TcpConnector;
 class HttpSocket;
 class HttpConnector;
+class SyncTcpConnector;
 
 typedef SocketLib::Buffer Buffer;
 typedef shard_ptr_t<SocketLib::Buffer> BufferPtr;
@@ -46,6 +47,7 @@ typedef shard_ptr_t<TcpConnector>	   TcpConnectorPtr;
 typedef shard_ptr_t<HttpSocket>		   HttpSocketPtr;
 typedef shard_ptr_t<HttpConnector>	   HttpConnectorPtr;
 typedef shard_ptr_t<SocketLib::TcpAcceptor<SocketLib::IoService> > NetIoTcpAcceptorPtr;
+typedef shard_ptr_t<SyncTcpConnector>  SyncTcpConnectorPtr;
 
 #define lasterror base::tlsdata<SocketLib::SocketError,0>::data()
 
@@ -74,6 +76,7 @@ public:
 
 	virtual void Run();
 	virtual void Stop();
+	size_t  ServiceCount();
 
 	// 获取最后的异常
 	inline SocketLib::SocketError GetLastError()const;
@@ -87,22 +90,22 @@ public:
 	*/
 
 	// 连线通知,这个函数里不要处理业务，防止堵塞
-	virtual void OnConnected(const TcpSocketPtr& clisock);
-	virtual void OnConnected(const TcpConnectorPtr& clisock, SocketLib::SocketError error);
-	virtual void OnConnected(HttpSocketPtr clisock);
-	virtual void OnConnected(HttpConnectorPtr clisock, SocketLib::SocketError error);
+	virtual void OnConnected(TcpSocketPtr& clisock);
+	virtual void OnConnected(TcpConnectorPtr& clisock, SocketLib::SocketError error);
+	virtual void OnConnected(HttpSocketPtr& clisock);
+	virtual void OnConnected(HttpConnectorPtr& clisock, SocketLib::SocketError error);
 
 	// 掉线通知,这个函数里不要处理业务，防止堵塞
-	virtual void OnDisconnected(const TcpSocketPtr& clisock);
-	virtual void OnDisconnected(const TcpConnectorPtr& clisock);
-	virtual void OnDisconnected(HttpSocketPtr clisock);
-	virtual void OnDisconnected(HttpConnectorPtr clisock);
+	virtual void OnDisconnected(TcpSocketPtr& clisock);
+	virtual void OnDisconnected(TcpConnectorPtr& clisock);
+	virtual void OnDisconnected(HttpSocketPtr& clisock);
+	virtual void OnDisconnected(HttpConnectorPtr& clisock);
 
 	// 数据包通知,这个函数里不要处理业务，防止堵塞
-	virtual void OnReceiveData(const TcpSocketPtr& clisock, SocketLib::Buffer& buffer);
-	virtual void OnReceiveData(const TcpConnectorPtr& clisock, SocketLib::Buffer& buffer);
-	virtual void OnReceiveData(HttpSocketPtr clisock, HttpSvrRecvMsg& httpmsg);
-	virtual void OnReceiveData(HttpConnectorPtr clisock, HttpCliRecvMsg& httpmsg);
+	virtual void OnReceiveData(TcpSocketPtr& clisock, SocketLib::Buffer& buffer);
+	virtual void OnReceiveData(TcpConnectorPtr& clisock, SocketLib::Buffer& buffer);
+	virtual void OnReceiveData(HttpSocketPtr& clisock, HttpSvrRecvMsg& httpmsg);
+	virtual void OnReceiveData(HttpConnectorPtr& clisock, HttpCliRecvMsg& httpmsg);
 
 
 protected:
@@ -243,7 +246,8 @@ protected:
 			_remoteep = _socket->RemoteEndPoint();
 			_localep = _socket->LocalEndPoint();
 			_flag = E_STATE_START;
-			_netio.OnConnected(this->shared_from_this());
+			shard_ptr_t<TcpSocket> ref = this->shared_from_this();
+			_netio.OnConnected(ref);
 			this->_TryRecvData();
 		}
 		catch (const SocketLib::SocketError& e) {
@@ -345,7 +349,8 @@ protected:
 			this->_remoteep = this->_socket->RemoteEndPoint();
 			this->_localep = this->_socket->LocalEndPoint();
 			this->_flag = E_STATE_START;
-			this->_netio.OnConnected(this->shared_from_this());
+			shard_ptr_t<HttpSocket> ref = this->shared_from_this();
+			this->_netio.OnConnected(ref);
 			this->_TryRecvData();
 		}
 		catch (const SocketLib::SocketError& e) {
@@ -393,6 +398,52 @@ public:
 	}
 };
 
+// 同步connector
+class SyncTcpConnector {
+public:
+	SyncTcpConnector();
+
+	~SyncTcpConnector();
+
+	bool Connect(const SocketLib::Tcp::EndPoint& ep, SocketLib::s_uint32_t timeo_sec = -1);
+
+	bool Connect(const std::string& addr, SocketLib::s_uint16_t port, SocketLib::s_uint32_t timeo_sec = -1);
+
+	const SocketLib::Tcp::EndPoint& LocalEndpoint()const;
+
+	const SocketLib::Tcp::EndPoint& RemoteEndpoint()const;
+
+	// 调用这个函数不意味着连接立即断开，会等所有的未处理的数据处理完就会断开
+	void Close();
+
+	bool Send(const SocketLib::s_byte_t* data, SocketLib::s_uint32_t len);
+
+	bool IsConnected()const;
+
+	SocketLib::Buffer* Recv();
+
+protected:
+	SocketLib::s_uint32_t _LocalEndian()const;
+
+	SocketLib::Buffer* _CutMsgPack(SocketLib::s_byte_t* buf, SocketLib::s_uint32_t& tran_byte);
+
+protected:
+	SocketLib::IoService _ioservice;
+	SocketLib::TcpConnector<SocketLib::IoService>* _socket;
+
+	// endpoint
+	SocketLib::Tcp::EndPoint _localep;
+	SocketLib::Tcp::EndPoint _remoteep;
+
+	MessageHeader		  _curheader;
+	SocketLib::s_byte_t*  _readbuf;
+	SocketLib::s_uint32_t _readsize;
+
+	SocketLib::Buffer _sndbuffer;
+	SocketLib::Buffer _rcvbuffer;
+	// 状态标志
+	unsigned short _flag;
+};
 
 M_NETIO_NAMESPACE_END
 #include "netio/netio_impl.hpp"

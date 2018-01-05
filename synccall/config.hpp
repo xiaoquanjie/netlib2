@@ -8,4 +8,10 @@
 #include "netio/netio.hpp"
 #include <string>
 
+#define M_ONEWAY_TYPE (666)
+#define M_TWOWAY_TYPE (999)
+
+// for debug
+//#define M_OPEN_DEBUG_LOG 1
+
 #endif
