@@ -51,6 +51,12 @@ void synccall_server(){
 }
 
 void synccall_client() {
+	int i = 0;
+	SocketLib::Buffer request;
+	std::string info = "this is a test!!!!";
+	for (int i = 0; i < 1024; ++i)
+		info.append("a");
+
 	synccall::SyncCallClient client;
 	//if (!client.Connect("172.16.81.247", 4001,-1)) {
 	if (!client.Connect("127.0.0.1", 4001, -1)) {
@@ -58,16 +64,10 @@ void synccall_client() {
 		return;
 	}
 	std::cout << "connect success" << std::endl;
-
-	int i = 0;
-	SocketLib::Buffer request;
-	std::string info = "this is a test!!!!";
-	for (int i = 0; i < 1024; ++i)
-		info.append("a");
 	
 	int idx = 0;
-	int req_total = 0;
-	int rep_total = 0;
+	base::s_uint64_t req_total = 0;
+	base::s_uint64_t rep_total = 0;
 	{
 		M_DISPLAYTIME();
 		while (true) {
@@ -93,6 +93,6 @@ void synccall_client() {
 				break;
 		}
 	}
-	std::cout << rep_total << " " << rep_total << std::endl;
+	std::cout << req_total << " " << rep_total << std::endl;
 }
 

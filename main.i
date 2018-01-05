@@ -5,10 +5,10 @@
 # 1 "<command line>" 1
 # 1 "<built-in>" 2
 # 1 "e:\\socket\\netlib2\\main.cpp" 2
-# 1 "./netio/netio.hpp" 1
-# 17 "./netio/netio.hpp"
-# 1 "./netio/config.hpp" 1
-# 20 "./netio/config.hpp"
+# 1 "E:\\socket\\netlib2/netio/netio.hpp" 1
+# 17 "E:\\socket\\netlib2/netio/netio.hpp"
+# 1 "E:\\socket\\netlib2/netio/config.hpp" 1
+# 20 "E:\\socket\\netlib2/netio/config.hpp"
 # 1 "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\list" 1 3
 
 
@@ -183,16 +183,7 @@ extern "C++"
 
 
     typedef bool __crt_bool;
-# 217 "C:\\Program Files (x86)\\Windows Kits\\10\\Include\\10.0.10240.0\\ucrt\\corecrt.h" 3
-    __declspec(dllimport) void __cdecl _invalid_parameter(
-                   wchar_t const*,
-                   wchar_t const*,
-                   wchar_t const*,
-                   unsigned int,
-                   uintptr_t
-        );
-
-
+# 226 "C:\\Program Files (x86)\\Windows Kits\\10\\Include\\10.0.10240.0\\ucrt\\corecrt.h" 3
 __declspec(dllimport) void __cdecl _invalid_parameter_noinfo(void);
 __declspec(dllimport) __declspec(noreturn) void __cdecl _invalid_parameter_noinfo_noreturn(void);
 
@@ -250,13 +241,20 @@ typedef _Mbstatet mbstate_t;
 
 
 
-#pragma detect_mismatch("_ITERATOR_DEBUG_LEVEL", "2")
-# 268 "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\yvals.h" 3
-#pragma detect_mismatch("RuntimeLibrary", "MDd_DynamicDebug")
+#pragma detect_mismatch("_ITERATOR_DEBUG_LEVEL", "0")
+
+
+
+
+
+
+
+
+#pragma detect_mismatch("RuntimeLibrary", "MD_DynamicRelease")
 # 412 "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\yvals.h" 3
 # 1 "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\use_ansi.h" 1 3
 # 57 "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\use_ansi.h" 3
-#pragma comment(lib, "msvcprt" "d" "")
+#pragma comment(lib, "msvcprt" "" "")
 # 412 "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\yvals.h" 2 3
 # 592 "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\yvals.h" 3
 typedef long long _Longlong;
@@ -16035,408 +16033,6 @@ typedef struct _CrtMemState
     size_t lHighWaterCount;
     size_t lTotalCount;
 } _CrtMemState;
-# 151 "C:\\Program Files (x86)\\Windows Kits\\10\\Include\\10.0.10240.0\\ucrt\\crtdbg.h" 3
-        __declspec(dllimport) int* __cdecl __p__crtDbgFlag(void);
-        __declspec(dllimport) long* __cdecl __p__crtBreakAlloc(void);
-
-
-
-
-        __declspec(dllimport) _CRT_ALLOC_HOOK __cdecl _CrtGetAllocHook(void);
-
-        __declspec(dllimport) _CRT_ALLOC_HOOK __cdecl _CrtSetAllocHook(
-                     _CRT_ALLOC_HOOK _PfnNewHook
-            );
-
-        __declspec(dllimport) _CRT_DUMP_CLIENT __cdecl _CrtGetDumpClient(void);
-
-        __declspec(dllimport) _CRT_DUMP_CLIENT __cdecl _CrtSetDumpClient(
-                     _CRT_DUMP_CLIENT _PFnNewDump
-            );
-
-
-
-    __declspec(dllimport) int __cdecl _CrtCheckMemory(void);
-
-    typedef void (__cdecl* _CrtDoForAllClientObjectsCallback)(void*, void*);
-
-    __declspec(dllimport) void __cdecl _CrtDoForAllClientObjects(
-             _CrtDoForAllClientObjectsCallback _Callback,
-             void* _Context
-        );
-
-    __declspec(dllimport) int __cdecl _CrtDumpMemoryLeaks(void);
-
-    __declspec(dllimport) int __cdecl _CrtIsMemoryBlock(
-                  void const* _Block,
-                  unsigned int _Size,
-                  long* _RequestNumber,
-                  char** _FileName,
-                  int* _LineNumber
-        );
-
-
-    __declspec(dllimport) int __cdecl _CrtIsValidHeapPointer(
-                 void const* _Pointer
-        );
-
-
-    __declspec(dllimport) int __cdecl _CrtIsValidPointer(
-                 void const* _Pointer,
-                 unsigned int _Size,
-                 int _ReadWrite
-        );
-
-    __declspec(dllimport) void __cdecl _CrtMemCheckpoint(
-              _CrtMemState* _State
-        );
-
-    __declspec(dllimport) int __cdecl _CrtMemDifference(
-              _CrtMemState* _State,
-              _CrtMemState const* _OldState,
-              _CrtMemState const* _NewState
-        );
-
-    __declspec(dllimport) void __cdecl _CrtMemDumpAllObjectsSince(
-                 _CrtMemState const* _State
-        );
-
-    __declspec(dllimport) void __cdecl _CrtMemDumpStatistics(
-             _CrtMemState const* _State
-        );
-
-
-    __declspec(dllimport) int __cdecl _CrtReportBlockType(
-                 void const* _Block
-        );
-
-    __declspec(dllimport) long __cdecl _CrtSetBreakAlloc(
-             long _NewValue
-        );
-
-    __declspec(dllimport) int __cdecl _CrtSetDbgFlag(
-             int _NewFlag
-        );
-# 327 "C:\\Program Files (x86)\\Windows Kits\\10\\Include\\10.0.10240.0\\ucrt\\crtdbg.h" 3
-    __declspec(dllimport) void __cdecl _aligned_free_dbg(
-                                       void* _Block
-        );
-
-
-    __declspec(dllimport) __declspec(allocator) void* __cdecl _aligned_malloc_dbg(
-                   size_t _Size,
-                   size_t _Alignment,
-                   char const* _FileName,
-                   int _LineNumber
-        );
-
-    __declspec(dllimport) size_t __cdecl _aligned_msize_dbg(
-                      void* _Block,
-                      size_t _Alignment,
-                      size_t _Offset
-        );
-
-
-    __declspec(dllimport) __declspec(allocator) void* __cdecl _aligned_offset_malloc_dbg(
-                   size_t _Size,
-                   size_t _Alignment,
-                   size_t _Offset,
-                   char const* _FileName,
-                   int _LineNumber
-        );
-
-
-    __declspec(dllimport) __declspec(allocator) void* __cdecl _aligned_offset_realloc_dbg(
-                                       void* _Block,
-                                       size_t _Size,
-                                       size_t _Alignment,
-                                       size_t _Offset,
-                                       char const* _FileName,
-                                       int _LineNumber
-        );
-
-
-    __declspec(dllimport) __declspec(allocator) void* __cdecl _aligned_offset_recalloc_dbg(
-                                       void* _Block,
-                                       size_t _Count,
-                                       size_t _Size,
-                                       size_t _Alignment,
-                                       size_t _Offset,
-                                       char const* _FileName,
-                                       int _LineNumber
-        );
-
-
-    __declspec(dllimport) __declspec(allocator) void* __cdecl _aligned_realloc_dbg(
-                                       void* _Block,
-                                       size_t _Size,
-                                       size_t _Alignment,
-                                       char const* _FileName,
-                                       int _LineNumber
-        );
-
-
-    __declspec(dllimport) __declspec(allocator) void* __cdecl _aligned_recalloc_dbg(
-                                       void* _Block,
-                                       size_t _Count,
-                                       size_t _Size,
-                                       size_t _Alignment,
-                                       char const* _FileName,
-                                       int _LineNumber
-        );
-
-
-    __declspec(dllimport) __declspec(allocator) void* __cdecl _calloc_dbg(
-                   size_t _Count,
-                   size_t _Size,
-                   int _BlockUse,
-                   char const* _FileName,
-                   int _LineNumber
-        );
-
-
-    __declspec(dllimport) __declspec(allocator) void* __cdecl _expand_dbg(
-                      void* _Block,
-                      size_t _Size,
-                      int _BlockUse,
-                      char const* _FileName,
-                      int _LineNumber
-        );
-
-    __declspec(dllimport) void __cdecl _free_dbg(
-                                       void* _Block,
-                                       int _BlockUse
-        );
-
-
-    __declspec(dllimport) __declspec(allocator) void* __cdecl _malloc_dbg(
-                   size_t _Size,
-                   int _BlockUse,
-                   char const* _FileName,
-                   int _LineNumber
-        );
-
-    __declspec(dllimport) size_t __cdecl _msize_dbg(
-                      void* _Block,
-                      int _BlockUse
-        );
-
-
-    __declspec(dllimport) __declspec(allocator) void* __cdecl _realloc_dbg(
-                                       void* _Block,
-                                       size_t _Size,
-                                       int _BlockUse,
-                                       char const* _FileName,
-                                       int _LineNumber
-        );
-
-
-    __declspec(dllimport) __declspec(allocator) void* __cdecl _recalloc_dbg(
-                                       void* _Block,
-                                       size_t _Count,
-                                       size_t _Size,
-                                       int _BlockUse,
-                                       char const* _FileName,
-                                       int _LineNumber
-        );
-
-
-
-    __declspec(dllimport) errno_t __cdecl _dupenv_s_dbg(
-                                                                              char** _PBuffer,
-                                       size_t* _PBufferSizeInBytes,
-                                       char const* _VarName,
-                                       int _BlockType,
-                                       char const* _FileName,
-                                       int _LineNumber
-        );
-
-
-
-    __declspec(dllimport) __declspec(allocator) char* __cdecl _fullpath_dbg(
-                                         char* _FullPath,
-                                         char const* _Path,
-                                         size_t _SizeInBytes,
-                                         int _BlockType,
-                                         char const* _FileName,
-                                         int _LineNumber
-        );
-
-
-
-    __declspec(dllimport) __declspec(allocator) char* __cdecl _getcwd_dbg(
-                                         char* _DstBuf,
-                                         int _SizeInBytes,
-                                         int _BlockType,
-                                         char const* _FileName,
-                                         int _LineNumber
-        );
-
-
-
-
-    __declspec(dllimport) __declspec(allocator) char* __cdecl _getdcwd_dbg(
-                                         int _Drive,
-                                         char* _DstBuf,
-                                         int _SizeInBytes,
-                                         int _BlockType,
-                                         char const* _FileName,
-                                         int _LineNumber
-        );
-
-
-    __declspec(dllimport) __declspec(allocator) char* __cdecl _strdup_dbg(
-                   char const* _String,
-                   int _BlockUse,
-                   char const* _FileName,
-                   int _LineNumber
-        );
-
-
-    __declspec(dllimport) __declspec(allocator) char* __cdecl _tempnam_dbg(
-                   char const* _DirName,
-                   char const* _FilePrefix,
-                   int _BlockType,
-                   char const* _FileName,
-                   int _LineNumber
-        );
-
-
-
-    __declspec(dllimport) __declspec(allocator) wchar_t* __cdecl _wcsdup_dbg(
-                   wchar_t const* _String,
-                   int _BlockUse,
-                   char const* _FileName,
-                   int _LineNumber
-        );
-
-
-
-    __declspec(dllimport) errno_t __cdecl _wdupenv_s_dbg(
-                                                                              wchar_t** _PBuffer,
-                                         size_t* _PBufferSizeInWords,
-                                         wchar_t const* _VarName,
-                                         int _BlockType,
-                                         char const* _FileName,
-                                         int _LineNumber
-        );
-
-
-
-    __declspec(dllimport) __declspec(allocator) wchar_t* __cdecl _wfullpath_dbg(
-                                         wchar_t* _FullPath,
-                                         wchar_t const* _Path,
-                                         size_t _SizeInWords,
-                                         int _BlockType,
-                                         char const* _FileName,
-                                         int _LineNumber
-        );
-
-
-
-    __declspec(dllimport) __declspec(allocator) wchar_t* __cdecl _wgetcwd_dbg(
-                                         wchar_t* _DstBuf,
-                                         int _SizeInWords,
-                                         int _BlockType,
-                                         char const* _FileName,
-                                         int _LineNumber
-        );
-
-
-
-    __declspec(dllimport) __declspec(allocator) wchar_t* __cdecl _wgetdcwd_dbg(
-                                         int _Drive,
-                                         wchar_t* _DstBuf,
-                                         int _SizeInWords,
-                                         int _BlockType,
-                                         char const* _FileName,
-                                         int _LineNumber
-        );
-
-
-    __declspec(dllimport) __declspec(allocator) wchar_t* __cdecl _wtempnam_dbg(
-                   wchar_t const* _DirName,
-                   wchar_t const* _FilePrefix,
-                   int _BlockType,
-                   char const* _FileName,
-                   int _LineNumber
-        );
-# 606 "C:\\Program Files (x86)\\Windows Kits\\10\\Include\\10.0.10240.0\\ucrt\\crtdbg.h" 3
-    __declspec(dllimport) int __cdecl _CrtDbgReport(
-                   int _ReportType,
-                   char const* _FileName,
-                   int _Linenumber,
-                   char const* _ModuleName,
-                   char const* _Format,
-        ...);
-
-    __declspec(dllimport) int __cdecl _CrtDbgReportW(
-                   int _ReportType,
-                   wchar_t const* _FileName,
-                   int _LineNumber,
-                   wchar_t const* _ModuleName,
-                   wchar_t const* _Format,
-        ...);
-
-
-    __declspec(dllimport) int __cdecl _VCrtDbgReportA(
-                   int _ReportType,
-                   void* _ReturnAddress,
-                   char const* _FileName,
-                   int _LineNumber,
-                   char const* _ModuleName,
-                   char const* _Format,
-                   va_list _ArgList
-        );
-
-    __declspec(dllimport) int __cdecl _VCrtDbgReportW(
-                   int _ReportType,
-                   void* _ReturnAddress,
-                   wchar_t const* _FileName,
-                   int _LineNumber,
-                   wchar_t const* _ModuleName,
-                   wchar_t const* _Format,
-                   va_list _ArgList
-        );
-
-    __declspec(dllimport) size_t __cdecl _CrtSetDebugFillThreshold(
-             size_t _NewDebugFillThreshold
-        );
-
-    __declspec(dllimport) size_t __cdecl _CrtGetDebugFillThreshold(void);
-
-    __declspec(dllimport) _HFILE __cdecl _CrtSetReportFile(
-                 int _ReportType,
-                 _HFILE _ReportFile
-        );
-
-    __declspec(dllimport) int __cdecl _CrtSetReportMode(
-             int _ReportType,
-             int _ReportMode
-        );
-
-
-
-        extern long _crtAssertBusy;
-
-        __declspec(dllimport) _CRT_REPORT_HOOK __cdecl _CrtGetReportHook(void);
-
-
-
-
-        __declspec(dllimport) _CRT_REPORT_HOOK __cdecl _CrtSetReportHook(
-                     _CRT_REPORT_HOOK _PFnNewHook
-            );
-
-        __declspec(dllimport) int __cdecl _CrtSetReportHook2(
-                     int _Mode,
-                     _CRT_REPORT_HOOK _PFnNewHook
-            );
-
-        __declspec(dllimport) int __cdecl _CrtSetReportHookW2(
-                     int _Mode,
-                     _CRT_REPORT_HOOKW _PFnNewHook
-            );
 # 808 "C:\\Program Files (x86)\\Windows Kits\\10\\Include\\10.0.10240.0\\ucrt\\crtdbg.h" 3
 }
 # 808 "C:\\Program Files (x86)\\Windows Kits\\10\\Include\\10.0.10240.0\\ucrt\\crtdbg.h" 3
@@ -16597,7 +16193,7 @@ template<class _Elem,
                            _Elem *_First1, size_t _Dest_size,
                      const _Elem *_First2, size_t _Count)
   {
-  { if (!(_Count <= _Dest_size)) { (void)( (!!(("_Count <= _Dest_size" && 0))) || (1 != _CrtDbgReportW(2, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\iosfwd", 173, 0, L"%ls", L"\"_Count <= _Dest_size\" && 0")) || (__debugbreak(), 0) ); ::_invalid_parameter(L"_Count <= _Dest_size", L__FUNCTION__, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\iosfwd", 173, 0); return (0); } };
+  { if (!(_Count <= _Dest_size)) { ((void)0); ::_invalid_parameter_noinfo_noreturn(); return (0); } };
   return (copy(_First1, _First2, _Count));
   }
 
@@ -17778,18 +17374,7 @@ using ::std:: tuple_size;
 
 
 namespace std {
-# 25 "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xutility" 3
-typedef const wchar_t *_Dbfile_t;
-typedef unsigned int _Dbline_t;
-
-__declspec(dllimport) void __cdecl _Debug_message(const wchar_t *,
- const wchar_t *, unsigned int);
-
-
-
-
-
-
+# 36 "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xutility" 3
 struct _Container_proxy;
 struct _Container_base12;
 struct _Iterator_base12;
@@ -17886,8 +17471,8 @@ public:
   else
    {
 
-   _Lockit _Lock(3);
-   _Orphan_me();
+
+
 
    }
 
@@ -17897,8 +17482,8 @@ public:
  ~_Iterator_base12() noexcept
   {
 
-  _Lockit _Lock(3);
-  _Orphan_me();
+
+
 
   }
 
@@ -17907,26 +17492,15 @@ public:
   if (_Parent == 0)
    {
 
-   _Lockit _Lock(3);
-   _Orphan_me();
+
+
 
    }
   else
    {
    _Container_proxy *_Parent_proxy = _Parent->_Myproxy;
-
-
-   if (_Myproxy != _Parent_proxy)
-    {
-    _Lockit _Lock(3);
-    _Orphan_me();
-    _Mynextiter = _Parent_proxy->_Myfirstiter;
-    _Parent_proxy->_Myfirstiter = this;
-    _Myproxy = _Parent_proxy;
-    }
-
-
-
+# 172 "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xutility" 3
+   _Myproxy = _Parent_proxy;
 
    }
   }
@@ -17948,19 +17522,7 @@ public:
 
  void _Orphan_me()
   {
-
-  if (_Myproxy != 0)
-   {
-   _Iterator_base12 **_Pnext = &_Myproxy->_Myfirstiter;
-   while (*_Pnext != 0 && *_Pnext != this)
-    _Pnext = &(*_Pnext)->_Mynextiter;
-
-   if (*_Pnext == 0)
-    _Debug_message(L"ITERATOR LIST CORRUPTED!", L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xutility", 202);
-   *_Pnext = _Mynextiter;
-   _Myproxy = 0;
-   }
-
+# 207 "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xutility" 3
   }
 
  _Container_proxy *_Myproxy;
@@ -17970,23 +17532,13 @@ public:
 
 inline void _Container_base12::_Orphan_all()
  {
-
- if (_Myproxy != 0)
-  {
-  _Lockit _Lock(3);
-
-  for (_Iterator_base12 **_Pnext = &_Myproxy->_Myfirstiter;
-   *_Pnext != 0; *_Pnext = (*_Pnext)->_Mynextiter)
-   (*_Pnext)->_Myproxy = 0;
-  _Myproxy->_Myfirstiter = 0;
-  }
-
+# 227 "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xutility" 3
  }
 
 inline void _Container_base12::_Swap_all(_Container_base12& _Right)
  {
 
- _Lockit _Lock(3);
+
 
 
  _Container_proxy *_Temp = _Myproxy;
@@ -18000,12 +17552,12 @@ inline void _Container_base12::_Swap_all(_Container_base12& _Right)
  }
 
 
+typedef _Container_base0 _Container_base;
+typedef _Iterator_base0 _Iterator_base;
 
 
 
 
-typedef _Container_base12 _Container_base;
-typedef _Iterator_base12 _Iterator_base;
 
 
 
@@ -18184,16 +17736,19 @@ template<class _Iter> inline
  {
  return (_Src);
  }
-# 445 "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xutility" 3
+
+
+
+
+
+
+
 template<class _Iter> inline
- _Iter _Unchecked_idl0(_Iter _Src)
+ decltype(_Unchecked(::std:: declval<_Iter>())) _Unchecked_idl0(_Iter _Src)
  {
- return (_Src);
+ return (_Unchecked(_Src));
  }
-
-
-
-
+# 454 "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xutility" 3
 template<class _Iter,
  class _UIter> inline
  _Iter& _Rechecked(_Iter& _Dest, _UIter _Src)
@@ -18368,36 +17923,17 @@ template<class _Ty>
   : true_type
  {
  };
-# 683 "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xutility" 3
-template<class _Iter,
- class _Diff> inline
- auto _Unchecked_n1(_Iter _Src, _Diff, false_type)
- {
- return (_Src);
- }
+
+
+
 
 template<class _Iter,
  class _Diff> inline
- auto _Unchecked_n1(_Iter _Src, _Diff _Count, true_type)
+ auto _Unchecked_n(_Iter _Src, _Diff)
  {
- if (0 < _Count)
-  {
-  static_cast<void>((_Src) + (_Count));
-  }
-
  return (_Unchecked(_Src));
  }
-
-template<class _Iter,
- class _Diff> inline
- auto _Unchecked_n(_Iter _Src, _Diff _Count)
- {
- return (_Unchecked_n1(_Src, _Count, is_base_of<random_access_iterator_tag, _Iter_cat_t<_Iter>>()));
- }
-
-
-
-
+# 712 "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xutility" 3
 template<class _Ty1,
  class _Ty2>
  struct _Is_same_size
@@ -18498,171 +18034,14 @@ template<class _Source,
  {
  return {};
  }
-# 887 "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xutility" 3
-template<class _Pr,
- class _Ty1,
- class _Ty2> inline
- constexpr bool _Debug_lt_pred(_Pr&& _Pred,
-  _Ty1&& _Left, _Ty2&& _Right,
-  _Dbfile_t _File, _Dbline_t _Line)
-  noexcept(noexcept(!_Pred(_Left, _Right)) && noexcept(_Pred(_Right, _Left)))
-
- {
- return (!_Pred(_Left, _Right)
-  ? false
-  : _Pred(_Right, _Left)
-   ? (_Debug_message(L"invalid comparator", _File, _Line), true)
-   : true);
- }
-
-
-template<class _Ty1,
- class _Ty2> inline
- constexpr bool _Debug_lt(_Ty1&& _Left, _Ty2&& _Right,
-  _Dbfile_t _File, _Dbline_t _Line)
-  noexcept(noexcept(!(_Left < _Right)) && noexcept(_Right < _Left))
-
- {
- return (_Debug_lt_pred(less<>(),
-  ::std:: forward<_Ty1>(_Left), ::std:: forward<_Ty2>(_Right), _File, _Line));
- }
-
-
-template<class _InIt> inline
- void _Debug_pointer(_InIt&, _Dbfile_t, _Dbline_t)
- {
- }
-
-template<class _Ty> inline
- void _Debug_pointer(_Ty *_Ptr, _Dbfile_t _File, _Dbline_t _Line)
- {
- if (_Ptr == 0)
-  _Debug_message(L"invalid null pointer", _File, _Line);
- }
-
-
-template<class _InIt> inline
- void _Debug_pointer_if(bool, _InIt&, _Dbfile_t, _Dbline_t)
- {
- }
-
-template<class _Ty> inline
- void _Debug_pointer_if(bool _Test, _Ty *_Ptr,
-  _Dbfile_t _File, _Dbline_t _Line)
- {
- if (_Test && _Ptr == 0)
-  _Debug_message(L"invalid null pointer", _File, _Line);
- }
-
-
-template<class _InIt> inline
- void _Debug_range2(_InIt _First, _InIt _Last,
-  _Dbfile_t, _Dbline_t, input_iterator_tag)
- {
- static_cast<void>(_First == _Last);
- }
-
-template<class _RanIt> inline
- void _Debug_range2(_RanIt _First, _RanIt _Last,
-  _Dbfile_t _File, _Dbline_t _Line, random_access_iterator_tag)
- {
- if (_First != _Last)
-  {
-  _Debug_pointer(_First, _File, _Line);
-  _Debug_pointer(_Last, _File, _Line);
-  if (_Last < _First)
-   _Debug_message(L"invalid iterator range", _File, _Line);
-  }
- }
-
-template<class _InIt> inline
- void _Debug_range(_InIt _First, _InIt _Last,
-  _Dbfile_t _File, _Dbline_t _Line)
- {
- _Debug_range2(_First, _Last, _File, _Line, _Iter_cat_t<_InIt>());
- }
-
-
-template<class _InIt,
- class _Pty> inline
- void _Debug_range_ptr2(_InIt _First, _InIt _Last, _Pty& _Ptr,
-  _Dbfile_t _File, _Dbline_t _Line, input_iterator_tag)
- {
- if (_First != _Last)
-  _Debug_pointer(_Ptr, _File, _Line);
- }
-
-template<class _RanIt,
- class _Pty> inline
- void _Debug_range_ptr2(_RanIt _First, _RanIt _Last, _Pty& _Ptr,
-  _Dbfile_t _File, _Dbline_t _Line, random_access_iterator_tag)
- {
- if (_First != _Last)
-  {
-  _Debug_pointer(_First, _File, _Line);
-  _Debug_pointer(_Last, _File, _Line);
-  if (_Last < _First)
-   _Debug_message(L"invalid iterator range", _File, _Line);
-  _Debug_pointer(_Ptr, _File, _Line);
-  }
- }
-
-template<class _InIt,
- class _Pty> inline
- void _Debug_range_ptr(_InIt _First, _InIt _Last, _Pty& _Ptr,
-  _Dbfile_t _File, _Dbline_t _Line)
- {
- _Debug_range_ptr2(_First, _Last, _Ptr, _File, _Line, _Iter_cat_t<_InIt>());
- }
-
-
-template<class _InIt,
- class _Pr> inline
- void _Debug_order2(_InIt, _InIt, _Pr&,
-  _Dbfile_t, _Dbline_t, input_iterator_tag)
- {
- }
-
-template<class _FwdIt,
- class _Pr> inline
- void _Debug_order2(_FwdIt _First, _FwdIt _Last, _Pr& _Pred,
-  _Dbfile_t _File, _Dbline_t _Line, forward_iterator_tag)
- {
- for (_FwdIt _Next = _First; _First != _Last && ++_Next != _Last; ++_First)
-  if (_Debug_lt_pred(_Pred, *_Next, *_First, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xutility", 1017))
-   _Debug_message(L"sequence not ordered", _File, _Line);
- }
-
-template<class _InIt,
- class _Pr> inline
- void _Debug_order(_InIt _First, _InIt _Last, _Pr&& _Pred,
-  _Dbfile_t _File, _Dbline_t _Line)
- {
- _Debug_range_ptr(_First, _Last, _Pred, _File, _Line);
- _Debug_order2(_First, _Last, _Pred, _File, _Line, _Iter_cat_t<_InIt>());
- }
-# 1043 "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xutility" 3
-template<class _Ty,
- size_t _Actual,
- class _Diff> inline
- void _Debug_array_size2(_Ty (&)[_Actual], _Diff _Desired,
-  _Dbfile_t _File, _Dbline_t _Line)
- {
- if (_Actual < _Desired)
-  _Debug_message(L"array too small", _File, _Line);
- }
-
-
-
-
-
+# 1057 "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xutility" 3
 template<class _InIt,
  class _Diff> inline
  void _Advance1(_InIt& _Where, _Diff _Off, input_iterator_tag)
  {
 
- if (_Off < 0)
-  _Debug_message(L"negative offset in advance", L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xutility", 1063);
+
+
 
 
  for (; 0 < _Off; --_Off)
@@ -18710,14 +18089,7 @@ template<class _RanIt> inline
  _Iter_diff_t<_RanIt>
   _Distance1(_RanIt _First, _RanIt _Last, random_access_iterator_tag)
  {
-
- if (_First != _Last)
-  {
-  _Debug_pointer(_First, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xutility", 1114);
-  _Debug_pointer(_Last, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xutility", 1115);
-  }
-
-
+# 1119 "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xutility" 3
  return (_Last - _First);
  }
 
@@ -19160,16 +18532,14 @@ public:
  typedef const _Ty *pointer;
  typedef const _Ty& reference;
  enum {_EEN_SIZE = _Size};
-# 1687 "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xutility" 3
+
  _Array_const_iterator()
-  : _Ptr(),
-  _Idx(0)
+  : _Ptr(0)
   {
   }
 
  explicit _Array_const_iterator(pointer _Parg, size_t _Off = 0)
-  : _Ptr(_Parg),
-  _Idx(_Off)
+  : _Ptr(_Parg + _Off)
   {
   }
 
@@ -19177,33 +18547,18 @@ public:
 
  _Myiter& _Rechecked(_Unchecked_type _Right)
   {
-  _Idx = _Right - _Ptr;
+  _Ptr = _Right;
   return (*this);
   }
 
  _Unchecked_type _Unchecked() const
   {
-  return (_Ptr + _Idx);
+  return (_Ptr);
   }
 
  reference operator*() const
   {
-
-  if (_Ptr == 0
-   || _Size <= _Idx)
-   {
-   _Debug_message(L"array iterator not dereferencable", L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xutility", 1718);
-   { (void)( (!!(("Standard C++ Libraries Out of Range" && 0))) || (1 != _CrtDbgReportW(2, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xutility", 1719, 0, L"%ls", L"\"Standard C++ Libraries Out of Range\" && 0")) || (__debugbreak(), 0) ); ::_invalid_parameter(L"\"out of range\"", L__FUNCTION__, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xutility", 1719, 0); };
-   }
-
-
-
-
-
-
-                              ;
-
-  return (_Ptr[_Idx]);
+  return (*_Ptr);
   }
 
  pointer operator->() const
@@ -19213,20 +18568,7 @@ public:
 
  _Myiter& operator++()
   {
-
-  if (_Ptr == 0
-   || _Size <= _Idx)
-   {
-   _Debug_message(L"array iterator not incrementable", L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xutility", 1743);
-   { (void)( (!!(("Standard C++ Libraries Out of Range" && 0))) || (1 != _CrtDbgReportW(2, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xutility", 1744, 0, L"%ls", L"\"Standard C++ Libraries Out of Range\" && 0")) || (__debugbreak(), 0) ); ::_invalid_parameter(L"\"out of range\"", L__FUNCTION__, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xutility", 1744, 0); };
-   }
-
-
-
-
-
-
-  ++_Idx;
+  ++_Ptr;
   return (*this);
   }
 
@@ -19239,20 +18581,7 @@ public:
 
  _Myiter& operator--()
   {
-
-  if (_Ptr == 0
-   || _Idx <= 0)
-   {
-   _Debug_message(L"array iterator not decrementable", L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xutility", 1769);
-   { (void)( (!!(("Standard C++ Libraries Out of Range" && 0))) || (1 != _CrtDbgReportW(2, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xutility", 1770, 0, L"%ls", L"\"Standard C++ Libraries Out of Range\" && 0")) || (__debugbreak(), 0) ); ::_invalid_parameter(L"\"out of range\"", L__FUNCTION__, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xutility", 1770, 0); };
-   }
-
-
-
-
-
-
-  --_Idx;
+  --_Ptr;
   return (*this);
   }
 
@@ -19265,18 +18594,7 @@ public:
 
  _Myiter& operator+=(difference_type _Off)
   {
-
-  if (_Size < _Idx + _Off)
-   {
-   _Debug_message(L"array iterator + offset out of range", L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xutility", 1794);
-   { (void)( (!!(("Standard C++ Libraries Out of Range" && 0))) || (1 != _CrtDbgReportW(2, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xutility", 1795, 0, L"%ls", L"\"Standard C++ Libraries Out of Range\" && 0")) || (__debugbreak(), 0) ); ::_invalid_parameter(L"\"out of range\"", L__FUNCTION__, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xutility", 1795, 0); };
-   }
-
-
-
-
-
-  _Idx += _Off;
+  _Ptr += _Off;
   return (*this);
   }
 
@@ -19299,10 +18617,7 @@ public:
 
  difference_type operator-(const _Myiter& _Right) const
   {
-  _Compat(_Right);
-  return (_Idx < _Right._Idx
-   ? -(difference_type)(_Right._Idx - _Idx)
-   : (difference_type)_Idx - _Right._Idx);
+  return (_Ptr - _Right._Ptr);
   }
 
  reference operator[](difference_type _Off) const
@@ -19312,8 +18627,7 @@ public:
 
  bool operator==(const _Myiter& _Right) const
   {
-  _Compat(_Right);
-  return (_Idx == _Right._Idx);
+  return (_Ptr == _Right._Ptr);
   }
 
  bool operator!=(const _Myiter& _Right) const
@@ -19323,8 +18637,7 @@ public:
 
  bool operator<(const _Myiter& _Right) const
   {
-  _Compat(_Right);
-  return (_Idx < _Right._Idx);
+  return (_Ptr < _Right._Ptr);
   }
 
  bool operator>(const _Myiter& _Right) const
@@ -19342,19 +18655,8 @@ public:
   return (!(*this < _Right));
   }
 
-
- void _Compat(const _Myiter& _Right) const
-  {
-  if (_Ptr != _Right._Ptr)
-   {
-   _Debug_message(L"array iterators incompatible", L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xutility", 1873);
-   { (void)( (!!(("Standard C++ Libraries Invalid Argument" && 0))) || (1 != _CrtDbgReportW(2, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xutility", 1874, 0, L"%ls", L"\"Standard C++ Libraries Invalid Argument\" && 0")) || (__debugbreak(), 0) ); ::_invalid_parameter(L"\"invalid argument\"", L__FUNCTION__, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xutility", 1874, 0); };
-   }
-  }
-# 1885 "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xutility" 3
  pointer _Ptr;
- size_t _Idx;
-
+# 1888 "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xutility" 3
  };
 
 template<class _Ty,
@@ -19819,7 +19121,7 @@ template<class _InIt,
  _OutIt _Copy_no_deprecate1(_InIt _First, _InIt _Last,
   _OutIt _Dest, random_access_iterator_tag, random_access_iterator_tag)
  {
- static_cast<void>((_Dest) + ((_Last) - (_First)));
+                                         ;
  return (_Rechecked(_Dest,
   _Copy_unchecked(_First, _Last, _Unchecked(_Dest))));
  }
@@ -19829,7 +19131,7 @@ template<class _InIt,
  _OutIt _Copy_no_deprecate(_InIt _First, _InIt _Last,
   _OutIt _Dest)
  {
- _Debug_range_ptr(_First, _Last, _Dest, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xutility", 2362);
+                                       ;
  return (_Copy_no_deprecate1(_Unchecked(_First), _Unchecked(_Last),
   _Dest, _Iter_cat_t<_InIt>(), _Iter_cat_t<_OutIt>()));
  }
@@ -19839,24 +19141,10 @@ template<class _InIt,
  _OutIt copy(_InIt _First, _InIt _Last,
   _OutIt _Dest)
  {
- struct _Unchecked_iterators { static void __declspec(deprecated("Call to 'std::" "copy" "' with parameters that may be unsafe - " "this call relies on the caller to check that the passed values are correct. " "To disable this warning, use -D_SCL_SECURE_NO_WARNINGS. " "See documentation on how to use Visual C++ 'Checked Iterators'")) _Deprecate(false_type) { } static void _Deprecate(true_type) { } }; (_Unchecked_iterators::_Deprecate(_Is_checked(_Dest)));
+ struct _Unchecked_iterators { static void _Deprecate(false_type) { } static void _Deprecate(true_type) { } }; (_Unchecked_iterators::_Deprecate(_Is_checked(_Dest)));
  return (_Copy_no_deprecate(_First, _Last, _Dest));
  }
-
-
-template<class _InIt,
- class _OutTy,
- size_t _OutSize> inline
- _OutTy *copy(_InIt _First, _InIt _Last,
-  _OutTy (&_Dest)[_OutSize])
- {
- return (_Unchecked(
-  _Copy_no_deprecate(_First, _Last,
-   _Array_iterator<_OutTy, _OutSize>(_Dest))));
- }
-
-
-
+# 2390 "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xutility" 3
 template<class _InIt,
  class _Diff,
  class _OutIt> inline
@@ -19925,52 +19213,11 @@ template<class _InIt,
   _OutIt _Dest)
  {
 
- struct _Unchecked_iterators { static void __declspec(deprecated("Call to 'std::" "copy_n" "' with parameters that may be unsafe - " "this call relies on the caller to check that the passed values are correct. " "To disable this warning, use -D_SCL_SECURE_NO_WARNINGS. " "See documentation on how to use Visual C++ 'Checked Iterators'")) _Deprecate(false_type) { } static void _Deprecate(true_type) { } }; (_Unchecked_iterators::_Deprecate(_Is_checked(_Dest)));
+ struct _Unchecked_iterators { static void _Deprecate(false_type) { } static void _Deprecate(true_type) { } }; (_Unchecked_iterators::_Deprecate(_Is_checked(_Dest)));
  return (_Rechecked(_Dest,
   _Copy_n_unchecked(_Unchecked_n(_First, _Count), _Count, _Unchecked_n(_Dest, _Count))));
  }
-
-
-template<class _InTy,
- size_t _InSize,
- class _Diff,
- class _OutIt> inline
- _OutIt copy_n(_InTy (&_First)[_InSize], _Diff _Count,
-  _OutIt _Dest)
- {
-
- struct _Unchecked_iterators { static void __declspec(deprecated("Call to 'std::" "copy_n" "' with parameters that may be unsafe - " "this call relies on the caller to check that the passed values are correct. " "To disable this warning, use -D_SCL_SECURE_NO_WARNINGS. " "See documentation on how to use Visual C++ 'Checked Iterators'")) _Deprecate(false_type) { } static void _Deprecate(true_type) { } }; (_Unchecked_iterators::_Deprecate(_Is_checked(_Dest)));
- _Debug_array_size2(_First, _Count, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xutility", 2473);
- return (_Rechecked(_Dest,
-  _Copy_n_unchecked(_First, _Count, _Unchecked_n(_Dest, _Count))));
- }
-
-template<class _InIt,
- class _Diff,
- class _OutTy,
- size_t _OutSize> inline
- _OutTy *copy_n(_InIt _First, _Diff _Count,
-  _OutTy (&_Dest)[_OutSize])
- {
- _Debug_array_size2(_Dest, _Count, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xutility", 2485);
- return (_Copy_n_unchecked(_Unchecked_n(_First, _Count), _Count, _Dest));
- }
-
-template<class _InTy,
- size_t _InSize,
- class _Diff,
- class _OutTy,
- size_t _OutSize> inline
- _OutTy *copy_n(_InTy (&_First)[_InSize], _Diff _Count,
-  _OutTy (&_Dest)[_OutSize])
- {
- _Debug_array_size2(_First, _Count, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xutility", 2497);
- _Debug_array_size2(_Dest, _Count, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xutility", 2498);
- return (_Copy_n_unchecked(_First, _Count, _Dest));
- }
-
-
-
+# 2504 "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xutility" 3
 template<class _BidIt1,
  class _BidIt2> inline
  _BidIt2 _Copy_backward_memmove(_BidIt1 _First, _BidIt1 _Last,
@@ -20025,7 +19272,7 @@ template<class _BidIt1,
  _BidIt2 _Copy_backward1(_BidIt1 _First, _BidIt1 _Last,
   _BidIt2 _Dest, random_access_iterator_tag, random_access_iterator_tag)
  {
- static_cast<void>((_Dest) - ((_Last) - (_First)));
+                                                  ;
  return (_Rechecked(_Dest,
   _Copy_backward_unchecked(_First, _Last, _Unchecked(_Dest))));
  }
@@ -20035,8 +19282,8 @@ template<class _BidIt1,
  _BidIt2 copy_backward(_BidIt1 _First, _BidIt1 _Last,
   _BidIt2 _Dest)
  {
- struct _Unchecked_iterators { static void __declspec(deprecated("Call to 'std::" "copy_backward" "' with parameters that may be unsafe - " "this call relies on the caller to check that the passed values are correct. " "To disable this warning, use -D_SCL_SECURE_NO_WARNINGS. " "See documentation on how to use Visual C++ 'Checked Iterators'")) _Deprecate(false_type) { } static void _Deprecate(true_type) { } }; (_Unchecked_iterators::_Deprecate(_Is_checked(_Dest)));
- _Debug_range_ptr(_First, _Last, _Dest, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xutility", 2569);
+ struct _Unchecked_iterators { static void _Deprecate(false_type) { } static void _Deprecate(true_type) { } }; (_Unchecked_iterators::_Deprecate(_Is_checked(_Dest)));
+                                       ;
  return (_Copy_backward1(_Unchecked(_First), _Unchecked(_Last),
   _Dest, _Iter_cat_t<_BidIt1>(), _Iter_cat_t<_BidIt2>()));
  }
@@ -20083,7 +19330,7 @@ template<class _InIt,
  _OutIt _Move_no_deprecate1(_InIt _First, _InIt _Last,
   _OutIt _Dest, random_access_iterator_tag, random_access_iterator_tag)
  {
- static_cast<void>((_Dest) + ((_Last) - (_First)));
+                                         ;
  return (_Rechecked(_Dest,
   _Move_unchecked(_First, _Last, _Unchecked(_Dest))));
  }
@@ -20093,7 +19340,7 @@ template<class _InIt,
  _OutIt _Move_no_deprecate(_InIt _First, _InIt _Last,
   _OutIt _Dest)
  {
- _Debug_range_ptr(_First, _Last, _Dest, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xutility", 2626);
+                                       ;
  return (_Move_no_deprecate1(_Unchecked(_First), _Unchecked(_Last),
   _Dest, _Iter_cat_t<_InIt>(), _Iter_cat_t<_OutIt>()));
  }
@@ -20103,24 +19350,10 @@ template<class _InIt,
  _OutIt move(_InIt _First, _InIt _Last,
   _OutIt _Dest)
  {
- struct _Unchecked_iterators { static void __declspec(deprecated("Call to 'std::" "move" "' with parameters that may be unsafe - " "this call relies on the caller to check that the passed values are correct. " "To disable this warning, use -D_SCL_SECURE_NO_WARNINGS. " "See documentation on how to use Visual C++ 'Checked Iterators'")) _Deprecate(false_type) { } static void _Deprecate(true_type) { } }; (_Unchecked_iterators::_Deprecate(_Is_checked(_Dest)));
+ struct _Unchecked_iterators { static void _Deprecate(false_type) { } static void _Deprecate(true_type) { } }; (_Unchecked_iterators::_Deprecate(_Is_checked(_Dest)));
  return (_Move_no_deprecate(_First, _Last, _Dest));
  }
-
-
-template<class _InIt,
- class _OutTy,
- size_t _OutSize> inline
- _OutTy *move(_InIt _First, _InIt _Last,
-  _OutTy (&_Dest)[_OutSize])
- {
- return (_Unchecked(
-  _Move_no_deprecate(_First, _Last,
-   _Array_iterator<_OutTy, _OutSize>(_Dest))));
- }
-
-
-
+# 2654 "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xutility" 3
 template<class _BidIt1,
  class _BidIt2> inline
  _BidIt2 _Move_backward_unchecked1(_BidIt1 _First, _BidIt1 _Last,
@@ -20162,7 +19395,7 @@ template<class _BidIt1,
  _BidIt2 _Move_backward1(_BidIt1 _First, _BidIt1 _Last,
   _BidIt2 _Dest, random_access_iterator_tag, random_access_iterator_tag)
  {
- static_cast<void>((_Dest) - ((_Last) - (_First)));
+                                                  ;
  return (_Rechecked(_Dest,
   _Move_backward_unchecked(_First, _Last, _Unchecked(_Dest))));
  }
@@ -20172,8 +19405,8 @@ template<class _BidIt1,
  _BidIt2 move_backward(_BidIt1 _First, _BidIt1 _Last,
   _BidIt2 _Dest)
  {
- struct _Unchecked_iterators { static void __declspec(deprecated("Call to 'std::" "move_backward" "' with parameters that may be unsafe - " "this call relies on the caller to check that the passed values are correct. " "To disable this warning, use -D_SCL_SECURE_NO_WARNINGS. " "See documentation on how to use Visual C++ 'Checked Iterators'")) _Deprecate(false_type) { } static void _Deprecate(true_type) { } }; (_Unchecked_iterators::_Deprecate(_Is_checked(_Dest)));
- _Debug_range_ptr(_First, _Last, _Dest, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xutility", 2706);
+ struct _Unchecked_iterators { static void _Deprecate(false_type) { } static void _Deprecate(true_type) { } }; (_Unchecked_iterators::_Deprecate(_Is_checked(_Dest)));
+                                       ;
  return (_Move_backward1(_Unchecked(_First), _Unchecked(_Last),
   _Dest, _Iter_cat_t<_BidIt1>(), _Iter_cat_t<_BidIt2>()));
  }
@@ -20254,7 +19487,7 @@ template<class _FwdIt,
  class _Ty> inline
  void fill(_FwdIt _First, _FwdIt _Last, const _Ty& _Val)
  {
- _Debug_range(_First, _Last, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xutility", 2787);
+                            ;
  _Fill_unchecked(_Unchecked(_First), _Unchecked(_Last), _Val);
  }
 
@@ -20428,7 +19661,7 @@ template<class _InIt1,
  bool _Equal_no_deprecate1(_InIt1 _First1, _InIt1 _Last1,
   _InIt2 _First2, _Pr& _Pred, random_access_iterator_tag, random_access_iterator_tag)
  {
- static_cast<void>((_First2) + ((_Last1) - (_First1)));
+                                             ;
  return (_Equal_unchecked(_First1, _Last1, _Unchecked(_First2), _Pred));
  }
 
@@ -20438,8 +19671,8 @@ template<class _InIt1,
  bool _Equal_no_deprecate(_InIt1 _First1, _InIt1 _Last1,
   _InIt2 _First2, _Pr& _Pred)
  {
- _Debug_range_ptr(_First1, _Last1, _First2, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xutility", 2971);
- _Debug_pointer_if(_First1 != _Last1, _Pred, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xutility", 2972);
+                                           ;
+                                            ;
  return (_Equal_no_deprecate1(_Unchecked(_First1), _Unchecked(_Last1),
   _First2, _Pred, _Iter_cat_t<_InIt1>(), _Iter_cat_t<_InIt2>()));
  }
@@ -20450,25 +19683,10 @@ template<class _InIt1,
  bool equal(_InIt1 _First1, _InIt1 _Last1,
   _InIt2 _First2, _Pr _Pred)
  {
- struct _Unchecked_iterators { static void __declspec(deprecated("Call to 'std::" "equal" "' with parameters that may be unsafe - " "this call relies on the caller to check that the passed values are correct. " "To disable this warning, use -D_SCL_SECURE_NO_WARNINGS. " "See documentation on how to use Visual C++ 'Checked Iterators'")) _Deprecate(false_type) { } static void _Deprecate(true_type) { } }; (_Unchecked_iterators::_Deprecate(_Is_checked(_First2)));
+ struct _Unchecked_iterators { static void _Deprecate(false_type) { } static void _Deprecate(true_type) { } }; (_Unchecked_iterators::_Deprecate(_Is_checked(_First2)));
  return (_Equal_no_deprecate(_First1, _Last1, _First2, _Pred));
  }
-
-
-template<class _InIt1,
- class _InTy,
- size_t _InSize,
- class _Pr,
- class = enable_if_t<!is_same<_InTy *, _Pr>::value>> inline
- bool equal(_InIt1 _First1, _InIt1 _Last1,
-  _InTy (&_First2)[_InSize], _Pr _Pred)
- {
- return (_Equal_no_deprecate(_First1, _Last1,
-  _Array_iterator<_InTy, _InSize>(_First2), _Pred));
- }
-
-
-
+# 3002 "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xutility" 3
 template<class _InIt1,
  class _InIt2> inline
  bool equal(_InIt1 _First1, _InIt1 _Last1,
@@ -20477,20 +19695,7 @@ template<class _InIt1,
  return (::std:: equal(_First1, _Last1, _First2,
   equal_to<>()));
  }
-
-
-template<class _InIt1,
- class _InTy,
- size_t _InSize> inline
- bool equal(_InIt1 _First1, _InIt1 _Last1,
-  _InTy (&_First2)[_InSize])
- {
- return (::std:: equal(_First1, _Last1, _First2,
-  equal_to<>()));
- }
-
-
-
+# 3024 "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xutility" 3
 template<class _InIt1,
  class _InIt2,
  class _Pr> inline
@@ -20499,7 +19704,7 @@ template<class _InIt1,
    input_iterator_tag, input_iterator_tag)
  {
 
- _Debug_pointer_if(_First1 != _Last1 && _First2 != _Last2, _Pred, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xutility", 3032);
+                                                                 ;
  for (; _First1 != _Last1 && _First2 != _Last2; ++_First1, (void)++_First2)
   if (!_Pred(*_First1, *_First2))
    return (false);
@@ -20516,7 +19721,7 @@ template<class _InIt1,
 
  if (_Last1 - _First1 != _Last2 - _First2)
   return (false);
- _Debug_pointer_if(_First1 != _Last1, _Pred, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xutility", 3049);
+                                            ;
  return (_Equal_unchecked(_First1, _Last1, _First2, _Pred));
  }
 
@@ -20526,8 +19731,8 @@ template<class _InIt1,
  bool equal(_InIt1 _First1, _InIt1 _Last1,
   _InIt2 _First2, _InIt2 _Last2, _Pr _Pred)
  {
- _Debug_range(_First1, _Last1, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xutility", 3059);
- _Debug_range(_First2, _Last2, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xutility", 3060);
+                              ;
+                              ;
  return (_Equal_unchecked(_Unchecked(_First1), _Unchecked(_Last1),
   _Unchecked(_First2), _Unchecked(_Last2), _Pred,
    _Iter_cat_t<_InIt1>(), _Iter_cat_t<_InIt2>()));
@@ -20608,7 +19813,7 @@ template<class _InIt1,
  {
  for (; _First1 != _Last1 && _First2 != _Last2; ++_First1, (void)++_First2)
   {
-  if (_Debug_lt_pred(_Pred, *_First1, *_First2, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xutility", 3141))
+  if (_Pred(*_First1, *_First2))
    return (true);
   else if (_Pred(*_First2, *_First1))
    return (false);
@@ -20646,9 +19851,9 @@ template<class _InIt1,
  bool lexicographical_compare(_InIt1 _First1, _InIt1 _Last1,
   _InIt2 _First2, _InIt2 _Last2, _Pr _Pred)
  {
- _Debug_range(_First1, _Last1, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xutility", 3179);
- _Debug_range(_First2, _Last2, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xutility", 3180);
- _Debug_pointer_if(_First1 != _Last1 && _First2 != _Last2, _Pred, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xutility", 3181);
+                              ;
+                              ;
+                                                                 ;
  return (_Lex_compare_unchecked(_Unchecked(_First1), _Unchecked(_Last1),
   _Unchecked(_First2), _Unchecked(_Last2), _Pred));
  }
@@ -20751,7 +19956,7 @@ template<class _InIt,
  class _Ty> inline
  _InIt find(_InIt _First, _InIt _Last, const _Ty& _Val)
  {
- _Debug_range(_First, _Last, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xutility", 3284);
+                            ;
  return (_Rechecked(_First,
   _Find_unchecked(_Unchecked(_First), _Unchecked(_Last), _Val)));
  }
@@ -20787,7 +19992,7 @@ template<class _InIt,
  _Iter_diff_t<_InIt>
   count(_InIt _First, _InIt _Last, const _Ty& _Val)
  {
- _Debug_range(_First, _Last, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xutility", 3320);
+                            ;
  return (_Count_unchecked(_Unchecked(_First), _Unchecked(_Last), _Val));
  }
 
@@ -20886,7 +20091,7 @@ template<class _FwdIt1,
  bool _Is_permutation_no_deprecate1(_FwdIt1 _First1, _FwdIt1 _Last1,
   _FwdIt2 _First2, _Pr& _Pred, random_access_iterator_tag, random_access_iterator_tag)
  {
- static_cast<void>((_First2) + ((_Last1) - (_First1)));
+                                             ;
  return (_Is_permutation_unchecked(_First1, _Last1, _Unchecked(_First2), _Pred));
  }
 
@@ -20896,8 +20101,8 @@ template<class _FwdIt1,
  bool _Is_permutation_no_deprecate(_FwdIt1 _First1, _FwdIt1 _Last1,
   _FwdIt2 _First2, _Pr& _Pred)
  {
- _Debug_range_ptr(_First1, _Last1, _First2, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xutility", 3429);
- _Debug_pointer_if(_First1 != _Last1, _Pred, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xutility", 3430);
+                                           ;
+                                            ;
  return (_Is_permutation_no_deprecate1(_Unchecked(_First1), _Unchecked(_Last1),
   _First2, _Pred, _Iter_cat_t<_FwdIt1>(), _Iter_cat_t<_FwdIt2>()));
  }
@@ -20908,25 +20113,10 @@ template<class _FwdIt1,
  bool is_permutation(_FwdIt1 _First1, _FwdIt1 _Last1,
   _FwdIt2 _First2, _Pr _Pred)
  {
- struct _Unchecked_iterators { static void __declspec(deprecated("Call to 'std::" "is_permutation" "' with parameters that may be unsafe - " "this call relies on the caller to check that the passed values are correct. " "To disable this warning, use -D_SCL_SECURE_NO_WARNINGS. " "See documentation on how to use Visual C++ 'Checked Iterators'")) _Deprecate(false_type) { } static void _Deprecate(true_type) { } }; (_Unchecked_iterators::_Deprecate(_Is_checked(_First2)));
+ struct _Unchecked_iterators { static void _Deprecate(false_type) { } static void _Deprecate(true_type) { } }; (_Unchecked_iterators::_Deprecate(_Is_checked(_First2)));
  return (_Is_permutation_no_deprecate(_First1, _Last1, _First2, _Pred));
  }
-
-
-template<class _FwdIt1,
- class _InTy,
- size_t _InSize,
- class _Pr,
- class = enable_if_t<!is_same<_InTy *, _Pr>::value>> inline
- bool is_permutation(_FwdIt1 _First1, _FwdIt1 _Last1,
-  _InTy (&_First2)[_InSize], _Pr _Pred)
- {
- return (_Is_permutation_no_deprecate(_First1, _Last1,
-  _Array_iterator<_InTy, _InSize>(_First2), _Pred));
- }
-
-
-
+# 3460 "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xutility" 3
 template<class _FwdIt1,
  class _FwdIt2> inline
  bool is_permutation(_FwdIt1 _First1, _FwdIt1 _Last1,
@@ -20935,20 +20125,7 @@ template<class _FwdIt1,
  return (::std:: is_permutation(_First1, _Last1,
   _First2, equal_to<>()));
  }
-
-
-
-template<class _FwdIt1,
- class _InTy,
- size_t _InSize> inline
- bool is_permutation(_FwdIt1 _First1, _FwdIt1 _Last1,
-  _InTy (&_First2)[_InSize])
- {
- return (::std:: is_permutation(_First1, _Last1, _First2, equal_to<>()));
- }
-
-
-
+# 3482 "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xutility" 3
 template<class _FwdIt1,
  class _FwdIt2,
  class _Pr> inline
@@ -20957,7 +20134,7 @@ template<class _FwdIt1,
   forward_iterator_tag, forward_iterator_tag)
  {
 
- _Debug_pointer_if(_First1 != _Last1 && _First2 != _Last2, _Pred, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xutility", 3490);
+                                                                 ;
  for (; _First1 != _Last1 && _First2 != _Last2; ++_First1, (void)++_First2)
   if (!_Pred(*_First1, *_First2))
    {
@@ -20982,7 +20159,7 @@ template<class _FwdIt1,
 
  if (_Last1 - _First1 != _Last2 - _First2)
   return (false);
- _Debug_pointer_if(_First1 != _Last1, _Pred, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xutility", 3515);
+                                            ;
  return (_Is_permutation_unchecked(_First1, _Last1, _First2, _Pred));
  }
 
@@ -20993,8 +20170,8 @@ template<class _FwdIt1,
   _FwdIt2 _First2, _FwdIt2 _Last2, _Pr _Pred)
  {
 
- _Debug_range(_First1, _Last1, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xutility", 3526);
- _Debug_range(_First2, _Last2, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xutility", 3527);
+                              ;
+                              ;
  return (_Is_permutation_unchecked(_Unchecked(_First1), _Unchecked(_Last1),
   _Unchecked(_First2), _Unchecked(_Last2), _Pred,
   _Iter_cat_t<_FwdIt1>(), _Iter_cat_t<_FwdIt2>()));
@@ -21021,7 +20198,7 @@ template<class _BidIt> inline
 template<class _BidIt> inline
  void reverse(_BidIt _First, _BidIt _Last)
  {
- _Debug_range(_First, _Last, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xutility", 3554);
+                            ;
  _Reverse_unchecked(_Unchecked(_First), _Unchecked(_Last));
  }
 
@@ -21092,8 +20269,8 @@ template<class _FwdIt> inline
 template<class _FwdIt> inline
  _FwdIt rotate(_FwdIt _First, _FwdIt _Mid, _FwdIt _Last)
  {
- _Debug_range(_First, _Mid, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xutility", 3625);
- _Debug_range(_Mid, _Last, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xutility", 3626);
+                           ;
+                          ;
  return (_Rechecked(_First,
   _Rotate_unchecked(_Unchecked(_First), _Unchecked(_Mid),
   _Unchecked(_Last))));
@@ -21221,11 +20398,11 @@ public:
     size_t _Count = ((const char *)++_Ptr - (const char *)_Right);
 
 
-    _Myptr = (_Elem *)_malloc_dbg(_Count, 2,
-     "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xutility", 3755);
 
 
 
+
+    _Myptr = (_Elem *):: malloc(_Count);
 
 
     if (_Myptr != 0)
@@ -21267,10 +20444,10 @@ private:
   if (_Myptr != 0)
 
 
-   _free_dbg(_Myptr, 2);
 
 
 
+   :: free(_Myptr);
 
 
   _Myptr = 0;
@@ -21365,18 +20542,18 @@ inline
   {
   static_assert(sizeof (void *) < 32,
    "Big allocations should at least match vector register size");
-  const size_t _Block_size = (2 * sizeof(void *) + 32 - 1) + _User_size;
+  const size_t _Block_size = (sizeof(void *) + 32 - 1) + _User_size;
   if (_Block_size <= _User_size)
    _Xbad_alloc();
   const uintptr_t _Ptr_container =
    reinterpret_cast<uintptr_t>(::operator new(_Block_size));
-  { if (!(_Ptr_container != 0)) { (void)( (!!(("_Ptr_container != 0" && 0))) || (1 != _CrtDbgReportW(2, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xmemory0", 70, 0, L"%ls", L"\"_Ptr_container != 0\" && 0")) || (__debugbreak(), 0) ); ::_invalid_parameter(L"\"invalid argument\"", L__FUNCTION__, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xmemory0", 70, 0); } ; };
-  _Ptr = reinterpret_cast<void *>((_Ptr_container + (2 * sizeof(void *) + 32 - 1))
+  { if (!(_Ptr_container != 0)) { ((void)0); ::_invalid_parameter_noinfo_noreturn(); } ; };
+  _Ptr = reinterpret_cast<void *>((_Ptr_container + (sizeof(void *) + 32 - 1))
    & ~(32 - 1));
   static_cast<uintptr_t *>(_Ptr)[-1] = _Ptr_container;
 
 
-  static_cast<uintptr_t *>(_Ptr)[-2] = 0xFAFAFAFAUL;
+
 
   }
  else
@@ -21384,7 +20561,7 @@ inline
 
   {
   _Ptr = ::operator new(_User_size);
-  { if (!(_Ptr != 0)) { (void)( (!!(("_Ptr != 0" && 0))) || (1 != _CrtDbgReportW(2, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xmemory0", 84, 0, L"%ls", L"\"_Ptr != 0\" && 0")) || (__debugbreak(), 0) ); ::_invalid_parameter(L"\"invalid argument\"", L__FUNCTION__, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xmemory0", 84, 0); } ; };
+  { if (!(_Ptr != 0)) { ((void)0); ::_invalid_parameter_noinfo_noreturn(); } ; };
   }
  return (_Ptr);
  }
@@ -21394,38 +20571,29 @@ inline
  void _Deallocate(void * _Ptr, size_t _Count, size_t _Sz)
  {
 
- { if (!(_Count <= (size_t)(-1) / _Sz)) { (void)( (!!(("_Count <= (size_t)(-1) / _Sz" && 0))) || (1 != _CrtDbgReportW(2, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xmemory0", 94, 0, L"%ls", L"\"_Count <= (size_t)(-1) / _Sz\" && 0")) || (__debugbreak(), 0) ); ::_invalid_parameter(L"\"invalid argument\"", L__FUNCTION__, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xmemory0", 94, 0); } ; };
+ { if (!(_Count <= (size_t)(-1) / _Sz)) { ((void)0); ::_invalid_parameter_noinfo_noreturn(); } ; };
  const size_t _User_size = _Count * _Sz;
  if (4096 <= _User_size)
   {
   const uintptr_t _Ptr_user = reinterpret_cast<uintptr_t>(_Ptr);
-  { if (!((_Ptr_user & (32 - 1)) == 0)) { (void)( (!!(("(_Ptr_user & (_BIG_ALLOCATION_ALIGNMENT - 1)) == 0" && 0))) || (1 != _CrtDbgReportW(2, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xmemory0", 100, 0, L"%ls", L"\"(_Ptr_user & (_BIG_ALLOCATION_ALIGNMENT - 1)) == 0\" && 0")) || (__debugbreak(), 0) ); ::_invalid_parameter(L"\"invalid argument\"", L__FUNCTION__, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xmemory0", 100, 0); } ; };
+  { if (!((_Ptr_user & (32 - 1)) == 0)) { ((void)0); ::_invalid_parameter_noinfo_noreturn(); } ; };
 
   const uintptr_t _Ptr_ptr = _Ptr_user - sizeof(void *);
   const uintptr_t _Ptr_container =
    *reinterpret_cast<uintptr_t *>(_Ptr_ptr);
-
-
-
-
-  { if (!(reinterpret_cast<uintptr_t *>(_Ptr_ptr)[-1] == 0xFAFAFAFAUL)) { (void)( (!!(("reinterpret_cast<uintptr_t *>(_Ptr_ptr)[-1] == _BIG_ALLOCATION_SENTINEL" && 0))) || (1 != _CrtDbgReportW(2, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xmemory0", 110, 0, L"%ls", L"\"reinterpret_cast<uintptr_t *>(_Ptr_ptr)[-1] == _BIG_ALLOCATION_SENTINEL\" && 0")) || (__debugbreak(), 0) ); ::_invalid_parameter(L"\"invalid argument\"", L__FUNCTION__, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xmemory0", 110, 0); } ; };
-
-
-
-
-
-  { if (!(_Ptr_container < _Ptr_user)) { (void)( (!!(("_Ptr_container < _Ptr_user" && 0))) || (1 != _CrtDbgReportW(2, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xmemory0", 114, 0, L"%ls", L"\"_Ptr_container < _Ptr_user\" && 0")) || (__debugbreak(), 0) ); ::_invalid_parameter(L"\"invalid argument\"", L__FUNCTION__, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xmemory0", 114, 0); } ; };
-
-
-  { if (!(2 * sizeof(void *) <= _Ptr_user - _Ptr_container)) { (void)( (!!(("2 * sizeof(void *) <= _Ptr_user - _Ptr_container" && 0))) || (1 != _CrtDbgReportW(2, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xmemory0", 118, 0, L"%ls", L"\"2 * sizeof(void *) <= _Ptr_user - _Ptr_container\" && 0")) || (__debugbreak(), 0) ); ::_invalid_parameter(L"\"invalid argument\"", L__FUNCTION__, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xmemory0", 118, 0); } ; };
+# 114 "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xmemory0" 3
+  { if (!(_Ptr_container < _Ptr_user)) { ((void)0); ::_invalid_parameter_noinfo_noreturn(); } ; };
 
 
 
 
 
 
+  { if (!(sizeof(void *) <= _Ptr_user - _Ptr_container)) { ((void)0); ::_invalid_parameter_noinfo_noreturn(); } ; };
 
-  { if (!(_Ptr_user - _Ptr_container <= (2 * sizeof(void *) + 32 - 1))) { (void)( (!!(("_Ptr_user - _Ptr_container <= _NON_USER_SIZE" && 0))) || (1 != _CrtDbgReportW(2, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xmemory0", 126, 0, L"%ls", L"\"_Ptr_user - _Ptr_container <= _NON_USER_SIZE\" && 0")) || (__debugbreak(), 0) ); ::_invalid_parameter(L"\"invalid argument\"", L__FUNCTION__, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xmemory0", 126, 0); } ; };
+
+
+  { if (!(_Ptr_user - _Ptr_container <= (sizeof(void *) + 32 - 1))) { ((void)0); ::_invalid_parameter_noinfo_noreturn(); } ; };
 
 
   _Ptr = reinterpret_cast<void *>(_Ptr_container);
@@ -22380,9 +21548,9 @@ template<class _Alty> inline
  if (_Left != _Right)
   {
 
-  _Debug_message(L"containers incompatible for swap", L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xmemory0", 1080);
 
 
+  ::std:: terminate();
 
   }
  }
@@ -25878,7 +25046,7 @@ template<class _InIt,
  _FwdIt _Uninitialized_copy1(_InIt _First, _InIt _Last,
   _FwdIt _Dest, random_access_iterator_tag, random_access_iterator_tag)
  {
- static_cast<void>((_Dest) + ((_Last) - (_First)));
+                                         ;
  return (_Rechecked(_Dest,
   _Uninitialized_copy_unchecked(_First, _Last, _Unchecked(_Dest))));
  }
@@ -25888,26 +25056,12 @@ template<class _InIt,
  _FwdIt uninitialized_copy(_InIt _First, _InIt _Last,
   _FwdIt _Dest)
  {
- struct _Unchecked_iterators { static void __declspec(deprecated("Call to 'std::" "uninitialized_copy" "' with parameters that may be unsafe - " "this call relies on the caller to check that the passed values are correct. " "To disable this warning, use -D_SCL_SECURE_NO_WARNINGS. " "See documentation on how to use Visual C++ 'Checked Iterators'")) _Deprecate(false_type) { } static void _Deprecate(true_type) { } }; (_Unchecked_iterators::_Deprecate(_Is_checked(_Dest)));
- _Debug_range_ptr(_First, _Last, _Dest, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xmemory", 103);
+ struct _Unchecked_iterators { static void _Deprecate(false_type) { } static void _Deprecate(true_type) { } }; (_Unchecked_iterators::_Deprecate(_Is_checked(_Dest)));
+                                       ;
  return (_Uninitialized_copy1(_Unchecked(_First), _Unchecked(_Last),
   _Dest, _Iter_cat_t<_InIt>(), _Iter_cat_t<_FwdIt>()));
  }
-
-
-template<class _InIt,
- class _OutTy,
- size_t _OutSize> inline
- _OutTy *uninitialized_copy(_InIt _First, _InIt _Last,
-  _OutTy (&_Dest)[_OutSize])
- {
- return (_Unchecked(
-  ::std:: uninitialized_copy(_First, _Last,
-   _Array_iterator<_OutTy, _OutSize>(_Dest))));
- }
-
-
-
+# 122 "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xmemory" 3
 template<class _InIt,
  class _Diff,
  class _FwdIt> inline
@@ -25955,52 +25109,11 @@ template<class _InIt,
   _FwdIt _Dest)
  {
 
- struct _Unchecked_iterators { static void __declspec(deprecated("Call to 'std::" "uninitialized_copy_n" "' with parameters that may be unsafe - " "this call relies on the caller to check that the passed values are correct. " "To disable this warning, use -D_SCL_SECURE_NO_WARNINGS. " "See documentation on how to use Visual C++ 'Checked Iterators'")) _Deprecate(false_type) { } static void _Deprecate(true_type) { } }; (_Unchecked_iterators::_Deprecate(_Is_checked(_Dest)));
+ struct _Unchecked_iterators { static void _Deprecate(false_type) { } static void _Deprecate(true_type) { } }; (_Unchecked_iterators::_Deprecate(_Is_checked(_Dest)));
  return (_Rechecked(_Dest,
   _Uninitialized_copy_n_unchecked(_Unchecked_n(_First, _Count), _Count, _Unchecked_n(_Dest, _Count))));
  }
-
-
-template<class _InTy,
- size_t _InSize,
- class _Diff,
- class _FwdIt> inline
- _FwdIt uninitialized_copy_n(_InTy (&_First)[_InSize], _Diff _Count,
-  _FwdIt _Dest)
- {
-
- struct _Unchecked_iterators { static void __declspec(deprecated("Call to 'std::" "uninitialized_copy_n" "' with parameters that may be unsafe - " "this call relies on the caller to check that the passed values are correct. " "To disable this warning, use -D_SCL_SECURE_NO_WARNINGS. " "See documentation on how to use Visual C++ 'Checked Iterators'")) _Deprecate(false_type) { } static void _Deprecate(true_type) { } }; (_Unchecked_iterators::_Deprecate(_Is_checked(_Dest)));
- _Debug_array_size2(_First, _Count, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xmemory", 184);
- return (_Rechecked(_Dest,
-  _Uninitialized_copy_n_unchecked(_First, _Count, _Unchecked_n(_Dest, _Count))));
- }
-
-template<class _InIt,
- class _Diff,
- class _OutTy,
- size_t _OutSize> inline
- _OutTy *uninitialized_copy_n(_InIt _First, _Diff _Count,
-  _OutTy (&_Dest)[_OutSize])
- {
- _Debug_array_size2(_Dest, _Count, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xmemory", 196);
- return (_Uninitialized_copy_n_unchecked(_Unchecked_n(_First, _Count), _Count, _Dest));
- }
-
-template<class _InTy,
- size_t _InSize,
- class _Diff,
- class _OutTy,
- size_t _OutSize> inline
- _OutTy *uninitialized_copy_n(_InTy (&_First)[_InSize], _Diff _Count,
-  _OutTy (&_Dest)[_OutSize])
- {
- _Debug_array_size2(_First, _Count, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xmemory", 208);
- _Debug_array_size2(_Dest, _Count, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xmemory", 209);
- return (_Uninitialized_copy_n_unchecked(_First, _Count, _Dest));
- }
-
-
-
+# 215 "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xmemory" 3
 template<class _InIt,
  class _FwdIt,
  class _Alloc> inline
@@ -26141,7 +25254,7 @@ template<class _FwdIt,
  class _Tval> inline
  void uninitialized_fill(_FwdIt _First, _FwdIt _Last, const _Tval& _Val)
  {
- _Debug_range(_First, _Last, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xmemory", 355);
+                            ;
  _Uninitialized_fill_unchecked(_Unchecked(_First), _Unchecked(_Last), _Val);
  }
 
@@ -26549,8 +25662,8 @@ public:
  _Ty& operator*() const noexcept
   {
 
-  if (_Myptr == 0)
-   _Debug_message(L"auto_ptr not dereferencable", L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xmemory", 764);
+
+
 
 
   return (*get());
@@ -26559,8 +25672,8 @@ public:
  _Ty *operator->() const noexcept
   {
 
-  if (_Myptr == 0)
-   _Debug_message(L"auto_ptr not dereferencable", L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xmemory", 774);
+
+
 
 
   return (get());
@@ -26671,17 +25784,6 @@ public:
 
  reference operator*() const
   {
-
-  const auto _Mycont = static_cast<const _Mystr *>(this->_Getcont());
-  const auto _Contptr = _Mycont ? _Mycont->_Myptr() : 0;
-  if (_Mycont == 0
-   || _Ptr == nullptr_t{}
-   || _Unfancy(_Ptr) < _Contptr
-   || _Contptr + _Mycont->_Mysize <= _Unfancy(_Ptr))
-   {
-   _Debug_message(L"string iterator not dereferencable", L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xstring", 76);
-   { (void)( (!!(("Standard C++ Libraries Out of Range" && 0))) || (1 != _CrtDbgReportW(2, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xstring", 77, 0, L"%ls", L"\"Standard C++ Libraries Out of Range\" && 0")) || (__debugbreak(), 0) ); ::_invalid_parameter(L"\"out of range\"", L__FUNCTION__, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xstring", 77, 0); };
-   }
 # 88 "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xstring" 3
                                         ;
 
@@ -26695,15 +25797,6 @@ public:
 
  _Myiter& operator++()
   {
-
-  const auto _Mycont = static_cast<const _Mystr *>(this->_Getcont());
-  if (_Mycont == 0
-   || _Ptr == nullptr_t{}
-   || _Mycont->_Myptr() + _Mycont->_Mysize <= _Unfancy(_Ptr))
-   {
-   _Debug_message(L"string iterator not incrementable", L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xstring", 106);
-   { (void)( (!!(("Standard C++ Libraries Out of Range" && 0))) || (1 != _CrtDbgReportW(2, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xstring", 107, 0, L"%ls", L"\"Standard C++ Libraries Out of Range\" && 0")) || (__debugbreak(), 0) ); ::_invalid_parameter(L"\"out of range\"", L__FUNCTION__, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xstring", 107, 0); };
-   }
 # 117 "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xstring" 3
   ++_Ptr;
   return (*this);
@@ -26718,15 +25811,6 @@ public:
 
  _Myiter& operator--()
   {
-
-  const auto _Mycont = static_cast<const _Mystr *>(this->_Getcont());
-  if (_Mycont == 0
-   || _Ptr == nullptr_t{}
-   || _Unfancy(_Ptr) <= _Mycont->_Myptr())
-   {
-   _Debug_message(L"string iterator not decrementable", L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xstring", 136);
-   { (void)( (!!(("Standard C++ Libraries Out of Range" && 0))) || (1 != _CrtDbgReportW(2, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xstring", 137, 0, L"%ls", L"\"Standard C++ Libraries Out of Range\" && 0")) || (__debugbreak(), 0) ); ::_invalid_parameter(L"\"out of range\"", L__FUNCTION__, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xstring", 137, 0); };
-   }
 # 147 "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xstring" 3
   --_Ptr;
   return (*this);
@@ -26741,20 +25825,6 @@ public:
 
  _Myiter& operator+=(difference_type _Off)
   {
-
-  if (_Off != 0)
-   {
-   const auto _Mycont = static_cast<const _Mystr *>(this->_Getcont());
-   const auto _Contptr = _Mycont ? _Mycont->_Myptr() : 0;
-   if (_Mycont == 0
-    || _Ptr == nullptr_t{}
-    || _Unfancy(_Ptr) + _Off < _Contptr
-    || _Contptr + _Mycont->_Mysize < _Unfancy(_Ptr) + _Off)
-    {
-    _Debug_message(L"string iterator + offset out of range", L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xstring", 170);
-    { (void)( (!!(("Standard C++ Libraries Out of Range" && 0))) || (1 != _CrtDbgReportW(2, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xstring", 171, 0, L"%ls", L"\"Standard C++ Libraries Out of Range\" && 0")) || (__debugbreak(), 0) ); ::_invalid_parameter(L"\"out of range\"", L__FUNCTION__, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xstring", 171, 0); };
-    }
-   }
 # 187 "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xstring" 3
   _Ptr += _Off;
   return (*this);
@@ -26819,17 +25889,12 @@ public:
   {
   return (!(*this < _Right));
   }
-
-
- void _Compat(const _Myiter& _Right) const
+# 268 "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xstring" 3
+ void _Compat(const _Myiter&) const
   {
-  if (this->_Getcont() != _Right._Getcont())
-   {
-   _Debug_message(L"string iterators incompatible", L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xstring", 256);
-   { (void)( (!!(("Standard C++ Libraries Invalid Argument" && 0))) || (1 != _CrtDbgReportW(2, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xstring", 257, 0, L"%ls", L"\"Standard C++ Libraries Invalid Argument\" && 0")) || (__debugbreak(), 0) ); ::_invalid_parameter(L"\"invalid argument\"", L__FUNCTION__, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xstring", 257, 0); };
-   }
   }
-# 273 "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xstring" 3
+
+
  pointer _Ptr;
  };
 
@@ -27142,11 +26207,11 @@ public:
   {
   return (_Get_data()._Myptr());
   }
-# 611 "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xstring" 3
+
+
  _String_alloc()
   : _Mypair(_Zero_then_variadic_args_t())
   {
-  _Alloc_proxy();
   }
 
  template<class _Any_alloc,
@@ -27155,63 +26220,18 @@ public:
   : _Mypair(_One_then_variadic_args_t(),
    ::std:: forward<_Any_alloc>(_Al))
   {
-  _Alloc_proxy();
-  }
-
- ~_String_alloc() noexcept
-  {
-  _Free_proxy();
   }
 
  void _Copy_alloc(const _Alty& _Al)
   {
-  _Free_proxy();
   _Pocca(_Getal(), _Al);
-  _Alloc_proxy();
   }
 
  void _Move_alloc(_Alty& _Al)
   {
-  _Free_proxy();
   _Pocma(_Getal(), _Al);
-  _Alloc_proxy();
   }
-
- void _Alloc_proxy()
-  {
-  typename _Alty::template rebind<_Container_proxy>::other
-   _Alproxy(_Getal());
-  _Myproxy() = _Unfancy(_Alproxy.allocate(1));
-  _Alproxy.construct(_Myproxy(), _Container_proxy());
-  _Myproxy()->_Mycont = &_Get_data();
-  }
-
- void _Free_proxy()
-  {
-  typename _Alty::template rebind<_Container_proxy>::other
-   _Alproxy(_Getal());
-  _Orphan_all();
-  _Alproxy.destroy(_Myproxy());
-  _Alproxy.deallocate(_Alproxy.address(*_Myproxy()), 1);
-  _Myproxy() = 0;
-  }
-
- _Iterator_base12 **_Getpfirst() const
-  {
-  return (_Get_data()._Getpfirst());
-  }
-
- _Container_proxy * & _Myproxy() noexcept
-  {
-  return (_Get_data()._Myproxy);
-  }
-
- _Container_proxy * const & _Myproxy() const noexcept
-  {
-  return (_Get_data()._Myproxy);
-  }
-
-
+# 680 "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xstring" 3
  void _Orphan_all()
   {
   _Get_data()._Orphan_all();
@@ -27400,7 +26420,7 @@ public:
   basic_string(_Iter _First, _Iter _Last, const _Alloc& _Al = _Alloc())
   : _Mybase(_Al)
   {
-  _Debug_range(_First, _Last, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xstring", 868);
+                             ;
   _Tidy();
   _Construct(_Unchecked(_First), _Unchecked(_Last), _Iter_cat_t<_Iter>());
   }
@@ -27620,7 +26640,7 @@ public:
 
  _Myt& append(const _Elem *_Ptr, size_type _Count)
   {
-  _Debug_pointer_if(_Count != 0, _Ptr, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xstring", 1088);
+                                      ;
   if (_Inside(_Ptr))
    return (append(*this,
     _Ptr - this->_Myptr(), _Count));
@@ -27638,7 +26658,7 @@ public:
 
  _Myt& append(const _Elem *_Ptr)
   {
-  _Debug_pointer(_Ptr, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xstring", 1106);
+                      ;
   return (append(_Ptr, _Traits::length(_Ptr)));
   }
 
@@ -27698,7 +26718,7 @@ public:
 
  _Myt& assign(const _Elem *_Ptr, size_type _Count)
   {
-  _Debug_pointer_if(_Count != 0, _Ptr, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xstring", 1166);
+                                      ;
   if (_Inside(_Ptr))
    return (assign(*this,
     _Ptr - this->_Myptr(), _Count));
@@ -27713,7 +26733,7 @@ public:
 
  _Myt& assign(const _Elem *_Ptr)
   {
-  _Debug_pointer(_Ptr, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xstring", 1181);
+                      ;
   return (assign(_Ptr, _Traits::length(_Ptr)));
   }
 
@@ -27783,7 +26803,7 @@ public:
  _Myt& insert(size_type _Off,
   const _Elem *_Ptr, size_type _Count)
   {
-  _Debug_pointer_if(_Count != 0, _Ptr, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xstring", 1251);
+                                      ;
   if (_Inside(_Ptr))
    return (insert(_Off, *this,
     _Ptr - this->_Myptr(), _Count));
@@ -27804,7 +26824,7 @@ public:
 
  _Myt& insert(size_type _Off, const _Elem *_Ptr)
   {
-  _Debug_pointer(_Ptr, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xstring", 1272);
+                      ;
   return (insert(_Off, _Ptr, _Traits::length(_Ptr)));
   }
 
@@ -27902,7 +26922,7 @@ public:
 
  iterator erase(const_iterator _First, const_iterator _Last)
   {
-  _Debug_range(_First, _Last, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xstring", 1370);
+                             ;
   size_type _Count = _First - begin();
   erase(_Count, _Last - _First);
   return (begin() + _Count);
@@ -27986,7 +27006,7 @@ public:
  _Myt& replace(size_type _Off,
   size_type _N0, const _Elem *_Ptr, size_type _Count)
   {
-  _Debug_pointer_if(_Count != 0, _Ptr, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xstring", 1454);
+                                      ;
   if (_Inside(_Ptr))
    return (replace(_Off, _N0, *this,
     _Ptr - this->_Myptr(),
@@ -28016,7 +27036,7 @@ public:
 
  _Myt& replace(size_type _Off, size_type _N0, const _Elem *_Ptr)
   {
-  _Debug_pointer(_Ptr, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xstring", 1484);
+                      ;
   return (replace(_Off, _N0, _Ptr, _Traits::length(_Ptr)));
   }
 
@@ -28212,27 +27232,13 @@ public:
 
  reference operator[](size_type _Off)
   {
-
-  if (this->_Mysize() < _Off)
-   _Debug_message(L"string subscript out of range", L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xstring", 1682);
-
-
-
-
-
+# 1688 "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xstring" 3
   return (this->_Myptr()[_Off]);
   }
 
  const_reference operator[](size_type _Off) const
   {
-
-  if (this->_Mysize() < _Off)
-   _Debug_message(L"string subscript out of range", L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xstring", 1695);
-
-
-
-
-
+# 1701 "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xstring" 3
   return (this->_Myptr()[_Off]);
   }
 
@@ -28332,11 +27338,11 @@ public:
   return (this->_Mysize() == 0);
   }
 
- __declspec(deprecated("Call to 'std::" "basic_string::copy" "' with parameters that may be unsafe - " "this call relies on the caller to check that the passed values are correct. " "To disable this warning, use -D_SCL_SECURE_NO_WARNINGS. " "See documentation on how to use Visual C++ 'Checked Iterators'"))
+
  size_type copy(_Elem *_Ptr,
   size_type _Count, size_type _Off = 0) const
   {
-  _Debug_pointer_if(_Count != 0, _Ptr, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xstring", 1811);
+                                      ;
   _Check_offset(_Off);
   _Count = _Clamp_suffix_size(_Off, _Count);
   _Traits::copy(_Ptr, this->_Myptr() + _Off, _Count);
@@ -28346,7 +27352,7 @@ public:
  size_type _Copy_s(_Elem *_Dest, size_type _Dest_size,
   size_type _Count, size_type _Off = 0) const
   {
-  _Debug_pointer_if(_Count != 0, _Dest, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xstring", 1821);
+                                       ;
   _Check_offset(_Off);
   _Count = _Clamp_suffix_size(_Off, _Count);
   _Traits::_Copy_s(_Dest, _Dest_size, this->_Myptr() + _Off, _Count);
@@ -28401,7 +27407,7 @@ public:
  size_type find(const _Elem *_Ptr,
   size_type _Off, size_type _Count) const
   {
-  _Debug_pointer_if(_Count != 0, _Ptr, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xstring", 1876);
+                                      ;
   if (_Count == 0 && _Off <= this->_Mysize())
    return (_Off);
 
@@ -28421,7 +27427,7 @@ public:
 
  size_type find(const _Elem *_Ptr, size_type _Off = 0) const
   {
-  _Debug_pointer(_Ptr, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xstring", 1896);
+                      ;
   return (find(_Ptr, _Off, _Traits::length(_Ptr)));
   }
 
@@ -28438,7 +27444,7 @@ public:
  size_type rfind(const _Elem *_Ptr,
   size_type _Off, size_type _Count) const
   {
-  _Debug_pointer_if(_Count != 0, _Ptr, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xstring", 1913);
+                                      ;
   if (_Count == 0)
    return (_Off < this->_Mysize() ? _Off
     : this->_Mysize());
@@ -28460,7 +27466,7 @@ public:
 
  size_type rfind(const _Elem *_Ptr, size_type _Off = npos) const
   {
-  _Debug_pointer(_Ptr, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xstring", 1935);
+                      ;
   return (rfind(_Ptr, _Off, _Traits::length(_Ptr)));
   }
 
@@ -28478,7 +27484,7 @@ public:
  size_type find_first_of(const _Elem *_Ptr,
   size_type _Off, size_type _Count) const
   {
-  _Debug_pointer_if(_Count != 0, _Ptr, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xstring", 1953);
+                                      ;
   if (0 < _Count && _Off < this->_Mysize())
    {
    const _Elem *const _Vptr = this->_Myptr() + this->_Mysize();
@@ -28494,7 +27500,7 @@ public:
  size_type find_first_of(const _Elem *_Ptr,
   size_type _Off = 0) const
   {
-  _Debug_pointer(_Ptr, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xstring", 1969);
+                      ;
   return (find_first_of(_Ptr, _Off, _Traits::length(_Ptr)));
   }
 
@@ -28513,7 +27519,7 @@ public:
  size_type find_last_of(const _Elem *_Ptr,
   size_type _Off, size_type _Count) const
   {
-  _Debug_pointer_if(_Count != 0, _Ptr, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xstring", 1988);
+                                      ;
   if (0 < _Count && 0 < this->_Mysize())
    {
    const _Elem *_Uptr = this->_Myptr()
@@ -28531,7 +27537,7 @@ public:
  size_type find_last_of(const _Elem *_Ptr,
   size_type _Off = npos) const
   {
-  _Debug_pointer(_Ptr, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xstring", 2006);
+                      ;
   return (find_last_of(_Ptr, _Off, _Traits::length(_Ptr)));
   }
 
@@ -28551,7 +27557,7 @@ public:
  size_type find_first_not_of(const _Elem *_Ptr,
   size_type _Off, size_type _Count) const
   {
-  _Debug_pointer_if(_Count != 0, _Ptr, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xstring", 2026);
+                                      ;
   if (_Off < this->_Mysize())
    {
    const _Elem *const _Vptr = this->_Myptr() + this->_Mysize();
@@ -28566,7 +27572,7 @@ public:
  size_type find_first_not_of(const _Elem *_Ptr,
   size_type _Off = 0) const
   {
-  _Debug_pointer(_Ptr, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xstring", 2041);
+                      ;
   return (find_first_not_of(_Ptr, _Off, _Traits::length(_Ptr)));
   }
 
@@ -28585,7 +27591,7 @@ public:
  size_type find_last_not_of(const _Elem *_Ptr,
   size_type _Off, size_type _Count) const
   {
-  _Debug_pointer_if(_Count != 0, _Ptr, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xstring", 2060);
+                                      ;
   if (0 < this->_Mysize())
    {
    const _Elem *_Uptr = this->_Myptr()
@@ -28602,7 +27608,7 @@ public:
  size_type find_last_not_of(const _Elem *_Ptr,
   size_type _Off = npos) const
   {
-  _Debug_pointer(_Ptr, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xstring", 2077);
+                      ;
   return (find_last_not_of(_Ptr, _Off, _Traits::length(_Ptr)));
   }
 
@@ -28670,14 +27676,14 @@ public:
 
  int compare(const _Elem *_Ptr) const
   {
-  _Debug_pointer(_Ptr, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xstring", 2145);
+                      ;
   return (_Traits_compare(this->_Myptr(), this->_Mysize(),
    _Ptr, _Traits::length(_Ptr)));
   }
 
  int compare(size_type _Off, size_type _N0, const _Elem *_Ptr) const
   {
-  _Debug_pointer(_Ptr, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xstring", 2152);
+                      ;
   _Check_offset(_Off);
   return (_Traits_compare(this->_Myptr() + _Off, _Clamp_suffix_size(_Off, _N0),
    _Ptr, _Traits::length(_Ptr)));
@@ -28686,7 +27692,7 @@ public:
  int compare(size_type _Off,
   size_type _N0, const _Elem *_Ptr, size_type _Count) const
   {
-  _Debug_pointer_if(_Count != 0, _Ptr, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xstring", 2161);
+                                      ;
   _Check_offset(_Off);
   return (_Traits_compare(this->_Myptr() + _Off, _Clamp_suffix_size(_Off, _N0),
    _Ptr, _Count));
@@ -29569,30 +28575,12 @@ public:
 
  reference operator*() const
   {
-
-  const auto _Mycont = static_cast<const _Mylist *>(this->_Getcont());
-  if (_Mycont == 0
-   || this->_Ptr == nullptr_t{}
-   || this->_Ptr == _Mycont->_Myhead)
-   {
-   _Debug_message(L"list iterator not dereferencable", L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\list", 211);
-   { (void)( (!!(("Standard C++ Libraries Out of Range" && 0))) || (1 != _CrtDbgReportW(2, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\list", 212, 0, L"%ls", L"\"Standard C++ Libraries Out of Range\" && 0")) || (__debugbreak(), 0) ); ::_invalid_parameter(L"\"out of range\"", L__FUNCTION__, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\list", 212, 0); };
-   }
 # 222 "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\list" 3
   return (_Mylist::_Myval(this->_Ptr));
   }
 
  _Myiter& operator++()
   {
-
-  const auto _Mycont = static_cast<const _Mylist *>(this->_Getcont());
-  if (_Mycont == 0
-   || this->_Ptr == nullptr_t{}
-   || this->_Ptr == _Mycont->_Myhead)
-   {
-   _Debug_message(L"list iterator not incrementable", L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\list", 233);
-   { (void)( (!!(("Standard C++ Libraries Out of Range" && 0))) || (1 != _CrtDbgReportW(2, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\list", 234, 0, L"%ls", L"\"Standard C++ Libraries Out of Range\" && 0")) || (__debugbreak(), 0) ); ::_invalid_parameter(L"\"out of range\"", L__FUNCTION__, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\list", 234, 0); };
-   }
 # 244 "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\list" 3
   this->_Ptr = _Mylist::_Nextnode(this->_Ptr);
   return (*this);
@@ -29607,16 +28595,10 @@ public:
 
  _Myiter& operator--()
   {
+# 275 "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\list" 3
+  this->_Ptr = _Mylist::_Prevnode(this->_Ptr);
 
-  const auto _Mycont = static_cast<const _Mylist *>(this->_Getcont());
-  if (_Mycont == 0
-   || this->_Ptr == nullptr_t{}
-   || (this->_Ptr = _Mylist::_Prevnode(this->_Ptr)) == _Mycont->_Myhead)
-   {
-   _Debug_message(L"list iterator not decrementable", L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\list", 263);
-   { (void)( (!!(("Standard C++ Libraries Out of Range" && 0))) || (1 != _CrtDbgReportW(2, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\list", 264, 0, L"%ls", L"\"Standard C++ Libraries Out of Range\" && 0")) || (__debugbreak(), 0) ); ::_invalid_parameter(L"\"out of range\"", L__FUNCTION__, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\list", 264, 0); };
-   }
-# 278 "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\list" 3
+
   return (*this);
   }
 
@@ -29629,17 +28611,7 @@ public:
 
  bool operator==(const _Myiter& _Right) const
   {
-
-  if (this->_Getcont() != _Right._Getcont())
-   {
-   _Debug_message(L"list iterators incompatible", L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\list", 293);
-   { (void)( (!!(("Standard C++ Libraries Invalid Argument" && 0))) || (1 != _CrtDbgReportW(2, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\list", 294, 0, L"%ls", L"\"Standard C++ Libraries Invalid Argument\" && 0")) || (__debugbreak(), 0) ); ::_invalid_parameter(L"\"invalid argument\"", L__FUNCTION__, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\list", 294, 0); };
-   }
-
-
-
-
-
+# 301 "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\list" 3
   return (this->_Ptr == _Right._Ptr);
   }
 
@@ -29937,17 +28909,12 @@ public:
   {
   return (_List_val<_Val_types>::_Myval(_Pnode));
   }
-# 631 "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\list" 3
+
+
  _List_alloc()
   : _Mypair(_Zero_then_variadic_args_t())
   {
   _Myhead() = _Buyheadnode();
-  try {
-  _Alloc_proxy();
-  } catch (...) {
-  _Freeheadnode(_Myhead());
-  throw;
-  }
   }
 
  template<class _Any_alloc,
@@ -29957,69 +28924,23 @@ public:
    ::std:: forward<_Any_alloc>(_Al))
   {
   _Myhead() = _Buyheadnode();
-  try {
-  _Alloc_proxy();
-  } catch (...) {
-  _Freeheadnode(_Myhead());
-  throw;
-  }
   }
 
  ~_List_alloc() noexcept
   {
   _Freeheadnode(_Myhead());
-  _Free_proxy();
   }
 
  void _Copy_alloc(const _Alty& _Al)
   {
-  _Free_proxy();
   _Pocca(_Getal(), _Al);
-  _Alloc_proxy();
   }
 
  void _Move_alloc(_Alty& _Al)
   {
-  _Free_proxy();
   _Pocma(_Getal(), _Al);
-  _Alloc_proxy();
   }
-
- void _Alloc_proxy()
-  {
-  typename _Alty::template rebind<_Container_proxy>::other
-   _Alproxy(_Getal());
-  _Myproxy() = _Unfancy(_Alproxy.allocate(1));
-  _Alproxy.construct(_Myproxy(), _Container_proxy());
-  _Myproxy()->_Mycont = &_Get_data();
-  }
-
- void _Free_proxy()
-  {
-  typename _Alty::template rebind<_Container_proxy>::other
-   _Alproxy(_Getal());
-  _Orphan_all();
-  _Alproxy.destroy(_Myproxy());
-  _Alproxy.deallocate(_Alproxy.address(*_Myproxy()), 1);
-  _Myproxy() = 0;
-  }
-
- _Iterator_base12 **_Getpfirst() const
-  {
-  return (_Get_data()._Getpfirst());
-  }
-
- _Container_proxy * & _Myproxy() noexcept
-  {
-  return (_Get_data()._Myproxy);
-  }
-
- _Container_proxy * const & _Myproxy() const noexcept
-  {
-  return (_Get_data()._Myproxy);
-  }
-
-
+# 713 "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\list" 3
  _Nodeptr _Buyheadnode()
   {
   return (_Buynode0(_Nodeptr(), _Nodeptr()));
@@ -30357,8 +29278,8 @@ public:
   iterator emplace(const_iterator _Where, _Valty&&... _Val)
   {
 
-  if (_Where._Getcont() != &this->_Get_data())
-   _Debug_message(L"list emplace iterator outside range", L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\list", 1051);
+
+
 
 
   _Insert(_Where._Unchecked(), ::std:: forward<_Valty>(_Val)...);
@@ -30655,8 +29576,8 @@ public:
  iterator insert(const_iterator _Where, const _Ty& _Val)
   {
 
-  if (_Where._Getcont() != &this->_Get_data())
-   _Debug_message(L"list insert iterator outside range", L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\list", 1349);
+
+
 
 
   _Insert(_Where._Unchecked(), _Val);
@@ -30667,8 +29588,8 @@ public:
   size_type _Count, const _Ty& _Val)
   {
 
-  if (_Where._Getcont() != &this->_Get_data())
-   _Debug_message(L"list insert iterator outside range", L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\list", 1361);
+
+
 
 
   iterator _Prev = _Make_iter(_Where);
@@ -30691,8 +29612,8 @@ public:
   insert(const_iterator _Where, _Iter _First, _Iter _Last)
   {
 
-  if (_Where._Getcont() != &this->_Get_data())
-   _Debug_message(L"list insert iterator outside range", L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\list", 1385);
+
+
 
 
   iterator _Prev = _Make_iter(_Where);
@@ -30734,7 +29655,7 @@ public:
   void _Insert_range(_Unchecked_const_iterator _Where,
    _Iter _First, _Iter _Last, forward_iterator_tag)
   {
-  _Debug_range(_First, _Last, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\list", 1427);
+                             ;
   _Iter _Next = _First;
 
   try {
@@ -30752,15 +29673,8 @@ public:
 
  _Nodeptr _Unlinknode(const_iterator _Where)
   {
-
-  if (_Where._Getcont() != &this->_Get_data()
-   || _Where._Ptr == this->_Myhead())
-   _Debug_message(L"list erase iterator outside range", L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\list", 1448);
+# 1453 "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\list" 3
   _Nodeptr _Pnode = (_Where)._Mynode();
-  _Orphan_ptr(_Pnode);
-
-
-
 
 
   this->_Nextnode(this->_Prevnode(_Pnode)) =
@@ -30810,7 +29724,7 @@ public:
   {
 
 
-  this->_Orphan_ptr(nullptr);
+
 
   _Nodeptr _Pnode = this->_Nextnode(this->_Myhead());
   this->_Nextnode(this->_Myhead()) = this->_Myhead();
@@ -30854,12 +29768,12 @@ public:
   const_iterator _First)
   {
 
-  if (_First == _Right.end())
-   _Debug_message(L"list splice iterator outside range", L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\list", 1548);
-  else
 
 
 
+
+
+  if (_First != _Right.end())
 
 
    {
@@ -30999,11 +29913,11 @@ public:
    {
    iterator _First1 = begin(), _Last1 = end();
    iterator _First2 = _Right.begin(), _Last2 = _Right.end();
-   _Debug_order(_First1, _Last1, _Pred, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\list", 1692);
-   _Debug_order(_First2, _Last2, _Pred, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\list", 1693);
+                                            ;
+                                            ;
 
    while (_First1 != _Last1 && _First2 != _Last2)
-    if (_Debug_lt_pred(_Pred, *_First2, *_First1, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\list", 1696))
+    if (_Pred(*_First2, *_First1))
      {
      iterator _Mid2 = _First2;
      _Splice(_First1, _Right, _First2, ++_Mid2, 1);
@@ -31044,7 +29958,7 @@ public:
 
   for (bool _Initial_loop = true; ; _Initial_loop = false)
    {
-   if (_Debug_lt_pred(_Pred, *_Mid, *_First, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\list", 1737))
+   if (_Pred(*_Mid, *_First))
     {
     if (_Initial_loop)
      _Newfirst = _Mid;
@@ -31082,65 +29996,9 @@ public:
   _Myt& _Right, const_iterator _First, const_iterator _Last,
   size_type _Count)
   {
-
-  if (_Where._Getcont() != &this->_Get_data())
-   _Debug_message(L"list splice iterator outside range", L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\list", 1777);
+# 1832 "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\list" 3
   if (this->_Getal() != _Right._Getal())
-   _Debug_message(L"list containers incompatible for splice", L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\list", 1779);
-
-  if (this != &_Right)
-   {
-   _Lockit _Lock(3);
-
-   const bool _One = _Count == 1;
-   const bool _All = !_One && _Count == _Right.size();
-   const bool _Some = !_One && !_All;
-
-   _Nodeptr _Oldprev = this->_Prevnode(_First._Ptr);
-
-   if (_Some)
-    for (_Nodeptr _Ptr = _First._Ptr; _Ptr != _Last._Ptr;
-     _Ptr = this->_Nextnode(_Ptr))
-     {
-     this->_Prevnode(_Ptr) = nullptr_t{};
-     }
-
-   const_iterator **_Pnext = (const_iterator **)_Right._Getpfirst();
-
-   if (_Pnext == 0)
-    _Debug_message(L"list container corrupted", L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\list", 1801);
-
-   while (*_Pnext != 0)
-    {
-    const_iterator& _Iter = **_Pnext;
-
-    if ((_One && _Iter._Ptr == _First._Ptr)
-     || (_All && _Iter._Ptr != _Right._Myhead())
-     || (_Some && this->_Prevnode(_Iter._Ptr) == nullptr_t{}))
-     {
-     *_Pnext = (const_iterator *)_Iter._Mynextiter;
-     _Iter._Myproxy = this->_Myproxy();
-     _Iter._Mynextiter = this->_Myproxy()->_Myfirstiter;
-     this->_Myproxy()->_Myfirstiter = &_Iter;
-     }
-    else
-     {
-     _Pnext = (const_iterator **)_Iter._Getpnext();
-     }
-    }
-
-   if (_Some)
-    for (_Nodeptr _Ptr = _First._Ptr; _Ptr != _Last._Ptr;
-     _Ptr = this->_Nextnode(_Ptr))
-     {
-     this->_Prevnode(_Ptr) = _Oldprev;
-     _Oldprev = _Ptr;
-     }
-   }
-
-
-
-
+   ::std:: terminate();
 
 
   _Splice_same(_Where, _Right, _First, _Last, _Count);
@@ -31218,26 +30076,7 @@ public:
    _Xlength_error("list<T> too long");
   this->_Mysize() += _Count;
   }
-
-
- void _Orphan_ptr(_Nodeptr _Ptr)
-  {
-  _Lockit _Lock(3);
-  const_iterator **_Pnext = (const_iterator **)this->_Getpfirst();
-  if (_Pnext != 0)
-   while (*_Pnext != 0)
-    {
-    if ((*_Pnext)->_Ptr == this->_Myhead()
-     || (_Ptr != nullptr_t{} && (*_Pnext)->_Ptr != _Ptr))
-     _Pnext = (const_iterator **)(*_Pnext)->_Getpnext();
-    else
-     {
-     (*_Pnext)->_Clrcont();
-     *_Pnext = *(const_iterator **)(*_Pnext)->_Getpnext();
-     }
-    }
-  }
-
+# 1931 "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\list" 3
  };
 
 
@@ -31303,7 +30142,7 @@ template<class _Ty,
 
 #pragma warning(pop)
 #pragma pack(pop)
-# 20 "./netio/config.hpp" 2
+# 20 "E:\\socket\\netlib2/netio/config.hpp" 2
 
 # 1 "C:\\Program Files (x86)\\Windows Kits\\10\\Include\\10.0.10240.0\\ucrt\\time.h" 1 3
 # 14 "C:\\Program Files (x86)\\Windows Kits\\10\\Include\\10.0.10240.0\\ucrt\\time.h" 3
@@ -31721,28 +30560,22 @@ __declspec(dllimport) int __cdecl _timespec64_get(
 }
 # 600 "C:\\Program Files (x86)\\Windows Kits\\10\\Include\\10.0.10240.0\\ucrt\\time.h" 3
 #pragma pack(pop)
-# 21 "./netio/config.hpp" 2
+# 21 "E:\\socket\\netlib2/netio/config.hpp" 2
 
-# 1 "./socket/socket.hpp" 1
-# 17 "./socket/socket.hpp"
-# 1 "./socket/config.hpp" 1
-# 32 "./socket/config.hpp"
+# 1 "E:\\socket\\netlib2/socket/socket.hpp" 1
+# 17 "E:\\socket\\netlib2/socket/socket.hpp"
+# 1 "E:\\socket\\netlib2/socket/config.hpp" 1
+# 32 "E:\\socket\\netlib2/socket/config.hpp"
 # 1 "C:\\Program Files (x86)\\Windows Kits\\10\\Include\\10.0.10240.0\\ucrt\\assert.h" 1 3
 # 14 "C:\\Program Files (x86)\\Windows Kits\\10\\Include\\10.0.10240.0\\ucrt\\assert.h" 3
 #pragma pack(push, 8)
 # 14 "C:\\Program Files (x86)\\Windows Kits\\10\\Include\\10.0.10240.0\\ucrt\\assert.h" 3
  extern "C" {
-# 26 "C:\\Program Files (x86)\\Windows Kits\\10\\Include\\10.0.10240.0\\ucrt\\assert.h" 3
-    __declspec(dllimport) void __cdecl _wassert(
-               wchar_t const* _Message,
-               wchar_t const* _File,
-               unsigned _Line
-        );
 # 41 "C:\\Program Files (x86)\\Windows Kits\\10\\Include\\10.0.10240.0\\ucrt\\assert.h" 3
 }
 # 41 "C:\\Program Files (x86)\\Windows Kits\\10\\Include\\10.0.10240.0\\ucrt\\assert.h" 3
 #pragma pack(pop)
-# 32 "./socket/config.hpp" 2
+# 32 "E:\\socket\\netlib2/socket/config.hpp" 2
 
 # 1 "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\string" 1 3
 
@@ -32059,8 +30892,6 @@ private:
                __declspec(dllimport) int __cdecl __toascii( int _C);
                __declspec(dllimport) int __cdecl __iscsymf( int _C);
                __declspec(dllimport) int __cdecl __iscsym( int _C);
-# 110 "C:\\Program Files (x86)\\Windows Kits\\10\\Include\\10.0.10240.0\\ucrt\\ctype.h" 3
-        __declspec(dllimport) int __cdecl _chvalidator( int _Ch, int _Mask);
 # 144 "C:\\Program Files (x86)\\Windows Kits\\10\\Include\\10.0.10240.0\\ucrt\\ctype.h" 3
     __inline __crt_locale_data_public* __cdecl __acrt_get_locale_data_prefix(void const volatile* const _LocalePointers)
     {
@@ -32069,7 +30900,7 @@ private:
     }
 
 
-    __declspec(dllimport) int __cdecl _chvalidator_l( _locale_t, int _Ch, int _Mask);
+
 
 
     __inline int __cdecl _chvalidchk_l(
@@ -32079,8 +30910,15 @@ private:
         )
     {
 
-        return _chvalidator_l(_Locale, _C, _Mask);
-# 170 "C:\\Program Files (x86)\\Windows Kits\\10\\Include\\10.0.10240.0\\ucrt\\ctype.h" 3
+
+
+        if (_Locale)
+        {
+            return __acrt_get_locale_data_prefix(_Locale)->_locale_pctype[_C] & _Mask;
+        }
+
+        return (__pctype_func()[(_C)] & (_Mask));
+
     }
 
 
@@ -32709,39 +31547,7 @@ template<class _Elem>
 
 struct __declspec(dllimport) _Crt_new_delete
  {
-
- void * __cdecl operator new(size_t _Size)
-  {
-  void * _Ptr = operator new(_Size, nothrow);
-  if (!_Ptr)
-   _Xbad_alloc();
-  return (_Ptr);
-  }
-
- void * __cdecl operator new(size_t _Size, const nothrow_t&) noexcept
-  {
-  return (_malloc_dbg(_Size > 0 ? _Size : 1, 2, "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xlocale", 74));
-  }
-
- void __cdecl operator delete(void * _Ptr) noexcept
-  {
-  :: free(_Ptr);
-  }
-
- void __cdecl operator delete(void * _Ptr, const nothrow_t&) noexcept
-  {
-  operator delete(_Ptr);
-  }
-
- void * __cdecl operator new(size_t, void *_Ptr) noexcept
-  {
-  return (_Ptr);
-  }
-
- void __cdecl operator delete(void *, void *) noexcept
-  {
-  }
-
+# 96 "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xlocale" 3
  };
 
 class locale
@@ -33326,8 +32132,8 @@ template<class _Elem> inline
  {
  size_t _Count = :: strlen(_Ptr) + 1;
 
- _Elem *_Ptrdest = (_Elem *)_calloc_dbg(_Count, sizeof (_Elem),
-  2, "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xlocale", 723);
+ _Elem *_Ptrdest = (_Elem *)calloc(_Count, sizeof (_Elem));
+
 
  if (!_Ptrdest)
   _Xbad_alloc();
@@ -33359,8 +32165,8 @@ template<> inline
    break;
  ++_Wchars;
 
- wchar_t *_Ptrdest = (wchar_t *)_calloc_dbg(_Wchars, sizeof (wchar_t),
-  2, "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xlocale", 756);
+ wchar_t *_Ptrdest = (wchar_t *)calloc(_Wchars, sizeof (wchar_t));
+
 
  if (!_Ptrdest)
   _Xbad_alloc();
@@ -33399,8 +32205,8 @@ template<> inline
    break;
  ++_Wchars;
 
- wchar_t *_Ptrdest = (wchar_t *)_calloc_dbg(_Wchars, sizeof (wchar_t),
-  2, "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xlocale", 796);
+ wchar_t *_Ptrdest = (wchar_t *)calloc(_Wchars, sizeof (wchar_t));
+
 
  if (!_Ptrdest)
   _Xbad_alloc();
@@ -34278,8 +33084,8 @@ protected:
   const _Byte *_First1, const _Byte *_Last1, const _Byte *& _Mid1,
    _Elem *_First2, _Elem *_Last2, _Elem *& _Mid2) const
   {
-  _Debug_range(_First1, _Last1, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xlocale", 1674);
-  _Debug_range(_First2, _Last2, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xlocale", 1675);
+                               ;
+                               ;
   _Mid1 = _First1, _Mid2 = _First2;
   result _Ans = _Mid1 == _Last1 ? ok : partial;
   int _Bytes;
@@ -34314,8 +33120,8 @@ protected:
   const _Elem *_First1, const _Elem *_Last1, const _Elem *& _Mid1,
    _Byte *_First2, _Byte *_Last2, _Byte *& _Mid2) const
   {
-  _Debug_range(_First1, _Last1, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xlocale", 1710);
-  _Debug_range(_First2, _Last2, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xlocale", 1711);
+                               ;
+                               ;
   _Mid1 = _First1, _Mid2 = _First2;
   int _Bytes;
 
@@ -34351,7 +33157,7 @@ protected:
  virtual result do_unshift(_Statype& _State,
   _Byte *_First2, _Byte *_Last2, _Byte *& _Mid2) const
   {
-  _Debug_range(_First2, _Last2, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xlocale", 1747);
+                               ;
   _Mid2 = _First2;
   result _Ans = ok;
   int _Bytes;
@@ -34376,7 +33182,7 @@ protected:
  virtual int do_length(_Statype& _State, const _Byte *_First1,
   const _Byte *_Last1, size_t _Count) const
   {
-  _Debug_range(_First1, _Last1, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xlocale", 1772);
+                               ;
   int _Wchars;
   const _Byte *_Mid1;
   _Statype _Mystate = _State;
@@ -34512,8 +33318,8 @@ protected:
   const _Byte *_First1, const _Byte *_Last1, const _Byte *& _Mid1,
    _Elem *_First2, _Elem *_Last2, _Elem *& _Mid2) const
   {
-  _Debug_range(_First1, _Last1, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xlocale", 1908);
-  _Debug_range(_First2, _Last2, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xlocale", 1909);
+                               ;
+                               ;
   _Mid1 = _First1, _Mid2 = _First2;
   result _Ans = _Mid1 == _Last1 ? ok : partial;
   int _Bytes;
@@ -34548,8 +33354,8 @@ protected:
   const _Elem *_First1, const _Elem *_Last1, const _Elem *& _Mid1,
    _Byte *_First2, _Byte *_Last2, _Byte *& _Mid2) const
   {
-  _Debug_range(_First1, _Last1, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xlocale", 1944);
-  _Debug_range(_First2, _Last2, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xlocale", 1945);
+                               ;
+                               ;
   _Mid1 = _First1, _Mid2 = _First2;
   int _Bytes;
 
@@ -34585,7 +33391,7 @@ protected:
  virtual result do_unshift(_Statype& _State,
   _Byte *_First2, _Byte *_Last2, _Byte *& _Mid2) const
   {
-  _Debug_range(_First2, _Last2, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xlocale", 1981);
+                               ;
   _Mid2 = _First2;
   result _Ans = ok;
   int _Bytes;
@@ -34610,7 +33416,7 @@ protected:
  virtual int do_length(_Statype& _State, const _Byte *_First1,
   const _Byte *_Last1, size_t _Count) const
   {
-  _Debug_range(_First1, _Last1, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xlocale", 2006);
+                               ;
   int _Wchars;
   const _Byte *_Mid1;
   _Statype _Mystate = _State;
@@ -34839,7 +33645,7 @@ protected:
  virtual const _Elem * do_is(const _Elem *_First, const _Elem *_Last,
   mask *_Dest) const
   {
-  _Debug_range_ptr(_First, _Last, _Dest, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xlocale", 2235);
+                                        ;
   for (; _First != _Last; ++_First, ++_Dest)
    *_Dest = _Ctype._Table[(unsigned char)narrow(*_First)];
   return (_First);
@@ -34848,7 +33654,7 @@ protected:
  virtual const _Elem * do_scan_is(mask _Maskval,
   const _Elem *_First, const _Elem *_Last) const
   {
-  _Debug_range(_First, _Last, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xlocale", 2244);
+                             ;
   for (; _First != _Last && !is(_Maskval, *_First); ++_First)
    ;
   return (_First);
@@ -34857,7 +33663,7 @@ protected:
  virtual const _Elem * do_scan_not(mask _Maskval,
   const _Elem *_First, const _Elem *_Last) const
   {
-  _Debug_range(_First, _Last, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xlocale", 2253);
+                             ;
   for (; _First != _Last && is(_Maskval, *_First); ++_First)
    ;
   return (_First);
@@ -34875,7 +33681,7 @@ protected:
  virtual const _Elem * do_tolower(_Elem *_First,
   const _Elem *_Last) const
   {
-  _Debug_range((const _Elem *)_First, _Last, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xlocale", 2271);
+                                            ;
   for (; _First != _Last; ++_First)
    {
    unsigned char _Byte = (unsigned char)narrow(*_First, '\0');
@@ -34897,7 +33703,7 @@ protected:
  virtual const _Elem * do_toupper(_Elem *_First,
   const _Elem *_Last) const
   {
-  _Debug_range((const _Elem *)_First, _Last, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xlocale", 2293);
+                                            ;
   for (; _First != _Last; ++_First)
    {
    unsigned char _Byte = (unsigned char)narrow(*_First, '\0');
@@ -34915,7 +33721,7 @@ protected:
  virtual const char * do_widen(const char *_First,
   const char *_Last, _Elem *_Dest) const
   {
-  _Debug_range_ptr(_First, _Last, _Dest, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xlocale", 2311);
+                                        ;
   for (; _First != _Last; ++_First, ++_Dest)
    *_Dest = _Maklocchr(*_First, (_Elem *)0, _Cvt);
   return (_First);
@@ -34940,7 +33746,7 @@ protected:
  virtual const _Elem * do_narrow(const _Elem *_First,
   const _Elem *_Last, char _Dflt, char *_Dest) const
   {
-  _Debug_range_ptr(_First, _Last, _Dest, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xlocale", 2336);
+                                        ;
   for (; _First != _Last; ++_First, ++_Dest)
    *_Dest = _Donarrow(*_First, _Dflt);
   return (_First);
@@ -34974,7 +33780,7 @@ public:
  const _Elem * is(const _Elem *_First,
   const _Elem *_Last, mask *_Dest) const
   {
-  _Debug_range_ptr(_First, _Last, _Dest, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xlocale", 2370);
+                                        ;
   for (; _First != _Last; ++_First, ++_Dest)
    *_Dest = _Ctype._Table[(unsigned char)*_First];
   return (_First);
@@ -34983,7 +33789,7 @@ public:
  const _Elem * scan_is(mask _Maskval,
   const _Elem *_First, const _Elem *_Last) const
   {
-  _Debug_range(_First, _Last, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xlocale", 2379);
+                             ;
   for (; _First != _Last && !is(_Maskval, *_First); ++_First)
    ;
   return (_First);
@@ -34992,7 +33798,7 @@ public:
  const _Elem * scan_not(mask _Maskval,
   const _Elem *_First, const _Elem *_Last) const
   {
-  _Debug_range(_First, _Last, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xlocale", 2388);
+                             ;
   for (; _First != _Last && is(_Maskval, *_First); ++_First)
    ;
   return (_First);
@@ -35122,7 +33928,7 @@ protected:
  virtual const _Elem * do_tolower(_Elem *_First,
   const _Elem *_Last) const
   {
-  _Debug_range((const _Elem *)_First, _Last, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xlocale", 2518);
+                                            ;
   for (; _First != _Last; ++_First)
    *_First = (_Elem)_Tolower((unsigned char)*_First, &_Ctype);
   return ((const _Elem *)_First);
@@ -35136,7 +33942,7 @@ protected:
  virtual const _Elem * do_toupper(_Elem *_First,
   const _Elem *_Last) const
   {
-  _Debug_range((const _Elem *)_First, _Last, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xlocale", 2532);
+                                            ;
   for (; _First != _Last; ++_First)
    *_First = (_Elem)_Toupper((unsigned char)*_First, &_Ctype);
   return ((const _Elem *)_First);
@@ -35150,7 +33956,7 @@ protected:
  virtual const _Elem * do_widen(const char *_First,
   const char *_Last, _Elem *_Dest) const
   {
-  _Debug_range_ptr(_First, _Last, _Dest, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xlocale", 2546);
+                                        ;
   :: memcpy(_Dest, _First, _Last - _First);
   return (_Last);
   }
@@ -35163,7 +33969,7 @@ protected:
  virtual const _Elem * do_narrow(const _Elem *_First,
   const _Elem *_Last, char, char *_Dest) const
   {
-  _Debug_range_ptr(_First, _Last, _Dest, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xlocale", 2559);
+                                        ;
   :: memcpy(_Dest, _First, _Last - _First);
   return (_Last);
   }
@@ -35296,14 +34102,14 @@ protected:
  virtual const _Elem * do_is(const _Elem *_First,
   const _Elem *_Last, mask *_Dest) const
   {
-  _Debug_range_ptr(_First, _Last, _Dest, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xlocale", 2692);
+                                        ;
   return (:: _Getwctypes(_First, _Last, _Dest, &_Ctype));
   }
 
  virtual const _Elem * do_scan_is(mask _Maskval,
   const _Elem *_First, const _Elem *_Last) const
   {
-  _Debug_range(_First, _Last, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xlocale", 2699);
+                             ;
   for (; _First != _Last && !is(_Maskval, *_First); ++_First)
    ;
   return (_First);
@@ -35312,7 +34118,7 @@ protected:
  virtual const _Elem * do_scan_not(mask _Maskval,
   const _Elem *_First, const _Elem *_Last) const
   {
-  _Debug_range(_First, _Last, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xlocale", 2708);
+                             ;
   for (; _First != _Last && is(_Maskval, *_First); ++_First)
    ;
   return (_First);
@@ -35326,7 +34132,7 @@ protected:
  virtual const _Elem * do_tolower(_Elem *_First,
   const _Elem *_Last) const
   {
-  _Debug_range((const _Elem *)_First, _Last, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xlocale", 2722);
+                                            ;
   for (; _First != _Last; ++_First)
    *_First = _Towlower(*_First, &_Ctype);
   return ((const _Elem *)_First);
@@ -35340,7 +34146,7 @@ protected:
  virtual const _Elem * do_toupper(_Elem *_First,
   const _Elem *_Last) const
   {
-  _Debug_range((const _Elem *)_First, _Last, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xlocale", 2736);
+                                            ;
   for (; _First != _Last; ++_First)
    *_First = _Towupper(*_First, &_Ctype);
   return ((const _Elem *)_First);
@@ -35362,7 +34168,7 @@ protected:
  virtual const char * do_widen(const char *_First,
   const char *_Last, _Elem *_Dest) const
   {
-  _Debug_range_ptr(_First, _Last, _Dest, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xlocale", 2758);
+                                        ;
   for (; _First != _Last; ++_First, ++_Dest)
    *_Dest = _Dowiden(*_First);
   return (_First);
@@ -35384,7 +34190,7 @@ protected:
  virtual const _Elem * do_narrow(const _Elem *_First,
   const _Elem *_Last, char _Dflt, char *_Dest) const
   {
-  _Debug_range_ptr(_First, _Last, _Dest, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xlocale", 2780);
+                                        ;
   for (; _First != _Last; ++_First, ++_Dest)
    *_Dest = _Donarrow(*_First, _Dflt);
   return (_First);
@@ -35520,7 +34326,7 @@ protected:
  virtual const _Elem * do_is(const _Elem *_First,
   const _Elem *_Last, mask *_Dest) const
   {
-  _Debug_range_ptr(_First, _Last, _Dest, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xlocale", 2916);
+                                        ;
   return ((const _Elem *):: _Getwctypes((const wchar_t *)_First,
    (const wchar_t *)_Last, _Dest, &_Ctype));
   }
@@ -35528,7 +34334,7 @@ protected:
  virtual const _Elem * do_scan_is(mask _Maskval,
   const _Elem *_First, const _Elem *_Last) const
   {
-  _Debug_range(_First, _Last, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xlocale", 2924);
+                             ;
   for (; _First != _Last && !is(_Maskval, *_First); ++_First)
    ;
   return (_First);
@@ -35537,7 +34343,7 @@ protected:
  virtual const _Elem * do_scan_not(mask _Maskval,
   const _Elem *_First, const _Elem *_Last) const
   {
-  _Debug_range(_First, _Last, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xlocale", 2933);
+                             ;
   for (; _First != _Last && is(_Maskval, *_First); ++_First)
    ;
   return (_First);
@@ -35551,7 +34357,7 @@ protected:
  virtual const _Elem * do_tolower(_Elem *_First,
   const _Elem *_Last) const
   {
-  _Debug_range((const _Elem *)_First, _Last, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xlocale", 2947);
+                                            ;
   for (; _First != _Last; ++_First)
    *_First = _Towlower(*_First, &_Ctype);
   return ((const _Elem *)_First);
@@ -35565,7 +34371,7 @@ protected:
  virtual const _Elem * do_toupper(_Elem *_First,
   const _Elem *_Last) const
   {
-  _Debug_range((const _Elem *)_First, _Last, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xlocale", 2961);
+                                            ;
   for (; _First != _Last; ++_First)
    *_First = _Towupper(*_First, &_Ctype);
   return ((const _Elem *)_First);
@@ -35587,7 +34393,7 @@ protected:
  virtual const char * do_widen(const char *_First,
   const char *_Last, _Elem *_Dest) const
   {
-  _Debug_range_ptr(_First, _Last, _Dest, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xlocale", 2983);
+                                        ;
   for (; _First != _Last; ++_First, ++_Dest)
    *_Dest = _Dowiden(*_First);
   return (_First);
@@ -35609,7 +34415,7 @@ protected:
  virtual const _Elem * do_narrow(const _Elem *_First,
   const _Elem *_Last, char _Dflt, char *_Dest) const
   {
-  _Debug_range_ptr(_First, _Last, _Dest, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xlocale", 3005);
+                                        ;
   for (; _First != _Last; ++_First, ++_Dest)
    *_Dest = _Donarrow(*_First, _Dflt);
   return (_First);
@@ -37504,8 +36310,8 @@ public:
    _Peek();
 
 
-  if (_Strbuf == 0)
-   _Debug_message(L"istreambuf_iterator is not dereferencable", L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\streambuf", 517);
+
+
 
 
   return (_Val);
@@ -37519,8 +36325,8 @@ public:
  _Myt& operator++()
   {
 
-  if (_Strbuf == 0)
-   _Debug_message(L"istreambuf_iterator is not incrementable", L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\streambuf", 532);
+
+
 
 
   _Inc();
@@ -37761,8 +36567,8 @@ inline wchar_t *_Maklocwcs(const wchar_t *_Ptr)
  {
  size_t _Count = :: wcslen(_Ptr) + 1;
 
- wchar_t *_Ptrdest = (wchar_t *)_calloc_dbg(_Count, sizeof (wchar_t),
-  2, "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xlocnum", 102);
+ wchar_t *_Ptrdest = (wchar_t *)calloc(_Count, sizeof (wchar_t));
+
 
  if (!_Ptrdest)
   _Xbad_alloc();
@@ -38087,7 +36893,7 @@ protected:
   ios_base& _Iosbase, ios_base::iostate& _State,
    bool& _Val) const
   {
-  _Debug_range(_First, _Last, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xlocnum", 427);
+                             ;
   int _Ans = -1;
 
   if (_Iosbase.flags() & ios_base::boolalpha)
@@ -38124,7 +36930,7 @@ protected:
   ios_base& _Iosbase, ios_base::iostate& _State,
    unsigned short& _Val) const
   {
-  _Debug_range(_First, _Last, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xlocnum", 464);
+                             ;
   char _Ac[32], *_Ep;
   int _Errno = 0;
   int _Base = _Getifld(_Ac, _First, _Last, _Iosbase.flags(),
@@ -38147,7 +36953,7 @@ protected:
   ios_base& _Iosbase, ios_base::iostate& _State,
    unsigned int& _Val) const
   {
-  _Debug_range(_First, _Last, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xlocnum", 487);
+                             ;
   char _Ac[32], *_Ep;
   int _Errno = 0;
   int _Base = _Getifld(_Ac, _First, _Last, _Iosbase.flags(),
@@ -38169,7 +36975,7 @@ protected:
   ios_base& _Iosbase, ios_base::iostate& _State,
    long& _Val) const
   {
-  _Debug_range(_First, _Last, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xlocnum", 509);
+                             ;
   char _Ac[32], *_Ep;
   int _Errno = 0;
   const long _Ans = :: _Stolx(_Ac, &_Ep,
@@ -38189,7 +36995,7 @@ protected:
   ios_base& _Iosbase, ios_base::iostate& _State,
    unsigned long& _Val) const
   {
-  _Debug_range(_First, _Last, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xlocnum", 529);
+                             ;
   char _Ac[32], *_Ep;
   int _Errno = 0;
   const unsigned long _Ans = :: _Stoulx(_Ac, &_Ep,
@@ -38209,7 +37015,7 @@ protected:
   ios_base& _Iosbase, ios_base::iostate& _State,
    long long& _Val) const
   {
-  _Debug_range(_First, _Last, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xlocnum", 549);
+                             ;
   char _Ac[32], *_Ep;
   int _Errno = 0;
   const long long _Ans = :: _Stollx(_Ac, &_Ep,
@@ -38229,7 +37035,7 @@ protected:
   ios_base& _Iosbase, ios_base::iostate& _State,
    unsigned long long& _Val) const
   {
-  _Debug_range(_First, _Last, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xlocnum", 569);
+                             ;
   char _Ac[32], *_Ep;
   int _Errno = 0;
   const unsigned long long _Ans = :: _Stoullx(_Ac, &_Ep,
@@ -38255,7 +37061,7 @@ protected:
   ios_base& _Iosbase, ios_base::iostate& _State,
    float& _Val) const
   {
-  _Debug_range(_First, _Last, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xlocnum", 595);
+                             ;
   char _Ac[(8 + 768 + 16)], *_Ep;
   int _Errno = 0;
   int _Hexexp = 1000000000;
@@ -38279,7 +37085,7 @@ protected:
   ios_base& _Iosbase, ios_base::iostate& _State,
    double& _Val) const
   {
-  _Debug_range(_First, _Last, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xlocnum", 619);
+                             ;
   char _Ac[(8 + 768 + 16)], *_Ep;
   int _Errno = 0;
   int _Hexexp = 1000000000;
@@ -38303,7 +37109,7 @@ protected:
   ios_base& _Iosbase, ios_base::iostate& _State,
    long double& _Val) const
   {
-  _Debug_range(_First, _Last, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xlocnum", 643);
+                             ;
   char _Ac[(8 + 768 + 16)], *_Ep;
   int _Errno = 0;
   int _Hexexp = 1000000000;
@@ -38329,7 +37135,7 @@ protected:
   ios_base& _Iosbase, ios_base::iostate& _State,
    void *& _Val) const
   {
-  _Debug_range(_First, _Last, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xlocnum", 669);
+                             ;
   char _Ac[32], *_Ep;
   int _Errno = 0;
 
@@ -38916,7 +37722,7 @@ protected:
  virtual _OutIt do_put(_OutIt _Dest,
   ios_base& _Iosbase, _Elem _Fill, bool _Val) const
   {
-  _Debug_pointer(_Dest, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xlocnum", 1256);
+                       ;
   if (!(_Iosbase.flags() & ios_base::boolalpha))
    return (do_put(_Dest, _Iosbase, _Fill, (long)_Val));
   else
@@ -39074,7 +37880,7 @@ private:
   ios_base& _Iosbase, _Elem _Fill, const char *_Buf,
    size_t _Count) const
   {
-  _Debug_pointer(_Dest, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xlocnum", 1414);
+                       ;
   size_t _Prefix = 0 < _Count && (*_Buf == '+' || *_Buf == '-')
    ? 1 : 0;
 
@@ -39176,7 +37982,7 @@ private:
  _OutIt __cdecl _Iput(_OutIt _Dest,
   ios_base& _Iosbase, _Elem _Fill, char *_Buf, size_t _Count) const
   {
-  _Debug_pointer(_Dest, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xlocnum", 1516);
+                       ;
   size_t _Prefix = 0 < _Count && (*_Buf == '+' || *_Buf == '-')
    ? 1 : 0;
   if ((_Iosbase.flags() & ios_base::basefield) == ios_base::hex
@@ -39781,20 +38587,20 @@ public:
 # 196 "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\ostream" 3
  _Myt& operator<<(_Myt& (__cdecl *_Pfn)(_Myt&))
   {
-  _Debug_pointer(_Pfn, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\ostream", 198);
+                      ;
   return ((*_Pfn)(*this));
   }
 
  _Myt& operator<<(_Myios& (__cdecl *_Pfn)(_Myios&))
   {
-  _Debug_pointer(_Pfn, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\ostream", 204);
+                      ;
   (*_Pfn)(*(_Myios *)this);
   return (*this);
   }
 
  _Myt& operator<<(ios_base& (__cdecl *_Pfn)(ios_base&))
   {
-  _Debug_pointer(_Pfn, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\ostream", 211);
+                      ;
   (*_Pfn)(*(ios_base *)this);
   return (*this);
   }
@@ -40136,7 +38942,7 @@ public:
    _State |= ios_base::badbit;
   else if (0 < _Count)
    {
-   _Debug_pointer(_Str, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\ostream", 562);
+                       ;
    try {
    if (_Myios::rdbuf()->sputn(_Str, _Count) != _Count)
     _State |= ios_base::badbit;
@@ -40701,20 +39507,20 @@ public:
 # 197 "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\istream" 3
  _Myt& operator>>(_Myt& (__cdecl *_Pfn)(_Myt&))
   {
-  _Debug_pointer(_Pfn, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\istream", 199);
+                      ;
   return ((*_Pfn)(*this));
   }
 
  _Myt& operator>>(_Myios& (__cdecl *_Pfn)(_Myios&))
   {
-  _Debug_pointer(_Pfn, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\istream", 205);
+                      ;
   (*_Pfn)(*(_Myios *)this);
   return (*this);
   }
 
  _Myt& operator>>(ios_base& (__cdecl *_Pfn)(ios_base&))
   {
-  _Debug_pointer(_Pfn, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\istream", 212);
+                      ;
   (*_Pfn)(*(ios_base *)this);
   return (*this);
   }
@@ -41065,7 +39871,7 @@ public:
      break;
     else
      {
-     _Debug_pointer(_Str, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\istream", 572);
+                         ;
      *_Str++ = _Traits::to_char_type(_Meta);
      ++_Chcount;
      }
@@ -41168,7 +39974,7 @@ public:
      }
     else
      {
-     _Debug_pointer(_Str, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\istream", 675);
+                         ;
      *_Str++ = _Traits::to_char_type(_Meta);
      ++_Chcount;
      }
@@ -41225,7 +40031,7 @@ public:
   if (_Ok && 0 < _Count)
    {
    try {
-   _Debug_pointer(_Str, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\istream", 732);
+                       ;
    const streamsize _Num = _Myios::rdbuf()->sgetn(_Str, _Count);
    _Chcount += _Num;
    if (_Num != _Count)
@@ -41251,7 +40057,7 @@ public:
    _State |= ios_base::eofbit;
   else if (0 < _Count && 0 < _Num)
    {
-   _Debug_pointer(_Str, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\istream", 758);
+                       ;
    read(_Str, _Num < _Count ? _Num : _Count);
    }
 
@@ -41459,7 +40265,7 @@ template<class _Elem,
  basic_istream<_Elem, _Traits>& operator>>(
   basic_istream<_Elem, _Traits>& _Istr, _Elem *_Str)
  {
- _Debug_pointer(_Str, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\istream", 1009);
+                     ;
  typedef basic_istream<_Elem, _Traits> _Myis;
  typedef ctype<_Elem> _Ctype;
  ios_base::iostate _State = ios_base::goodbit;
@@ -42299,7 +41105,7 @@ inline u32string operator "" s(const char32_t *_Str, size_t _Len)
 
 #pragma warning(pop)
 #pragma pack(pop)
-# 33 "./socket/config.hpp" 2
+# 33 "E:\\socket\\netlib2/socket/config.hpp" 2
 
 
 
@@ -132019,7 +130825,7 @@ typedef struct timeval *PTIMEVAL;
 typedef struct timeval *LPTIMEVAL;
 # 4309 "C:\\Program Files (x86)\\Windows Kits\\8.1\\Include\\um\\WinSock2.h" 3
 }
-# 37 "./socket/config.hpp" 2
+# 37 "E:\\socket\\netlib2/socket/config.hpp" 2
 
 # 1 "C:\\Program Files (x86)\\Windows Kits\\8.1\\Include\\um\\WS2tcpip.h" 1 3
 # 36 "C:\\Program Files (x86)\\Windows Kits\\8.1\\Include\\um\\WS2tcpip.h" 3
@@ -133098,7 +131904,7 @@ idealsendbacklognotify(
 }
 # 1021 "C:\\Program Files (x86)\\Windows Kits\\8.1\\Include\\um\\WS2tcpip.h" 3
 }
-# 38 "./socket/config.hpp" 2
+# 38 "E:\\socket\\netlib2/socket/config.hpp" 2
 
 
 
@@ -135195,7 +134001,7 @@ template<class _Ty> inline
 
 #pragma warning(pop)
 #pragma pack(pop)
-# 41 "./socket/config.hpp" 2
+# 41 "E:\\socket\\netlib2/socket/config.hpp" 2
 
 # 1 "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\functional" 1 3
 
@@ -138258,7 +137064,7 @@ template<class _Fty,
 
 #pragma warning(pop)
 #pragma pack(pop)
-# 42 "./socket/config.hpp" 2
+# 42 "E:\\socket\\netlib2/socket/config.hpp" 2
 
 # 1 "C:\\Program Files (x86)\\Windows Kits\\8.1\\Include\\um\\MSWSock.h" 1 3
 # 35 "C:\\Program Files (x86)\\Windows Kits\\8.1\\Include\\um\\MSWSock.h" 3
@@ -138785,11 +137591,11 @@ typedef struct _RIO_EXTENSION_FUNCTION_TABLE {
 
 
 }
-# 43 "./socket/config.hpp" 2
+# 43 "E:\\socket\\netlib2/socket/config.hpp" 2
 
 
 #pragma comment(lib,"WS2_32.lib")
-# 64 "./socket/config.hpp"
+# 64 "E:\\socket\\netlib2/socket/config.hpp"
 # 1 "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\iostream" 1 3
 
 
@@ -138827,18 +137633,18 @@ private:
 
 #pragma warning(pop)
 #pragma pack(pop)
-# 64 "./socket/config.hpp" 2
-# 243 "./socket/config.hpp"
-# 1 "./socket/win_config.hpp" 1
-# 243 "./socket/config.hpp" 2
+# 64 "E:\\socket\\netlib2/socket/config.hpp" 2
+# 243 "E:\\socket\\netlib2/socket/config.hpp"
+# 1 "E:\\socket\\netlib2/socket/win_config.hpp" 1
+# 243 "E:\\socket\\netlib2/socket/config.hpp" 2
 
-# 1 "./socket/linux_config.hpp" 1
-# 244 "./socket/config.hpp" 2
+# 1 "E:\\socket\\netlib2/socket/linux_config.hpp" 1
+# 244 "E:\\socket\\netlib2/socket/config.hpp" 2
 
-# 1 "./socket/type.hpp" 1
-# 17 "./socket/type.hpp"
-# 1 "./base/config.hpp" 1
-# 19 "./base/config.hpp"
+# 1 "E:\\socket\\netlib2/socket/type.hpp" 1
+# 17 "E:\\socket\\netlib2/socket/type.hpp"
+# 1 "E:\\socket\\netlib2/base/config.hpp" 1
+# 19 "E:\\socket\\netlib2/base/config.hpp"
 namespace base{
 
 
@@ -138858,7 +137664,7 @@ typedef unsigned long long s_uint64_t;
 typedef char s_byte_t;
 
 }
-# 17 "./socket/type.hpp" 2
+# 17 "E:\\socket\\netlib2/socket/type.hpp" 2
 
 namespace SocketLib{
 
@@ -138881,7 +137687,7 @@ typedef base::s_byte_t s_byte_t;
 typedef OVERLAPPED overlapped_t;
 typedef OVERLAPPED wsaoverlapped_t;
 typedef WSABUF wsabuf_t;
-# 47 "./socket/type.hpp"
+# 47 "E:\\socket\\netlib2/socket/type.hpp"
 typedef SOCKET socket_t;
 typedef sockaddr sockaddr_t;
 typedef sockaddr_in sockaddr_in_t;
@@ -138895,7 +137701,7 @@ enum EShutdownType
  E_Shutdown_WR = 0x01,
  E_Ehutdown_BOTH = 0x02
 };
-# 124 "./socket/type.hpp"
+# 124 "E:\\socket\\netlib2/socket/type.hpp"
 template<typename T>
 struct HandlerTraits
 {
@@ -139024,12 +137830,12 @@ struct HandlerTraits<std::tr1::function<ReturnType(Arg1, Arg2, Arg3, Arg4, Arg5)
 
 
 }
-# 245 "./socket/config.hpp" 2
+# 245 "E:\\socket\\netlib2/socket/config.hpp" 2
 
-# 1 "./socket/gfunction.hpp" 1
-# 16 "./socket/gfunction.hpp"
+# 1 "E:\\socket\\netlib2/socket/gfunction.hpp" 1
+# 16 "E:\\socket\\netlib2/socket/gfunction.hpp"
 namespace SocketLib{
-# 114 "./socket/gfunction.hpp"
+# 114 "E:\\socket\\netlib2/socket/gfunction.hpp"
 inline std::string g_getlastmsg(s_int32_t error)
 {
  char buff[1024] = { 0 };
@@ -139052,10 +137858,10 @@ inline void g_openudperr(int fd)
 
 
 }
-# 246 "./socket/config.hpp" 2
+# 246 "E:\\socket\\netlib2/socket/config.hpp" 2
 
-# 1 "./socket/error.hpp" 1
-# 42 "./socket/error.hpp"
+# 1 "E:\\socket\\netlib2/socket/error.hpp" 1
+# 42 "E:\\socket\\netlib2/socket/error.hpp"
 namespace SocketLib{
 namespace detail
 {
@@ -139087,7 +137893,7 @@ namespace detail
   {19,"operation time out"}
  };
 }
-# 84 "./socket/error.hpp"
+# 84 "E:\\socket\\netlib2/socket/error.hpp"
 class SocketError
 {
 public:
@@ -139134,10 +137940,10 @@ inline SocketError::operator bool()const
 }
 
 }
-# 247 "./socket/config.hpp" 2
+# 247 "E:\\socket\\netlib2/socket/config.hpp" 2
 
-# 1 "./socket/mutexlock.hpp" 1
-# 17 "./socket/mutexlock.hpp"
+# 1 "E:\\socket\\netlib2/socket/mutexlock.hpp" 1
+# 17 "E:\\socket\\netlib2/socket/mutexlock.hpp"
 namespace SocketLib{
 
 
@@ -139166,7 +137972,7 @@ private:
 
  CRITICAL_SECTION _cs;
 };
-# 76 "./socket/mutexlock.hpp"
+# 76 "E:\\socket\\netlib2/socket/mutexlock.hpp"
 class ScopedLock
 {
 public:
@@ -139186,10 +137992,10 @@ private:
 };
 
 }
-# 248 "./socket/config.hpp" 2
+# 248 "E:\\socket\\netlib2/socket/config.hpp" 2
 
-# 1 "./socket/lock_dispatcher.hpp" 1
-# 17 "./socket/lock_dispatcher.hpp"
+# 1 "E:\\socket\\netlib2/socket/lock_dispatcher.hpp" 1
+# 17 "E:\\socket\\netlib2/socket/lock_dispatcher.hpp"
 namespace SocketLib{
 
 
@@ -139229,9 +138035,9 @@ LockType& LockDispatcher<LockType>::GetLock(s_uint32_t idx)
 }
 
 }
-# 249 "./socket/config.hpp" 2
+# 249 "E:\\socket\\netlib2/socket/config.hpp" 2
 
-# 1 "./base/slist.hpp" 1
+# 1 "E:\\socket\\netlib2/base/slist.hpp" 1
 
 
 
@@ -139378,9 +138184,9 @@ inline void slist<T>::join(slist<T>& other) {
 }
 
 }
-# 250 "./socket/config.hpp" 2
+# 250 "E:\\socket\\netlib2/socket/config.hpp" 2
 
-# 1 "./base/svector.hpp" 1
+# 1 "E:\\socket\\netlib2/base/svector.hpp" 1
 
 
 
@@ -139463,13 +138269,13 @@ public:
 };
 
 }
-# 251 "./socket/config.hpp" 2
-# 17 "./socket/socket.hpp" 2
+# 251 "E:\\socket\\netlib2/socket/config.hpp" 2
+# 17 "E:\\socket\\netlib2/socket/socket.hpp" 2
 
-# 1 "./socket/pro_hdr.hpp" 1
-# 17 "./socket/pro_hdr.hpp"
-# 1 "./socket/config.hpp" 1
-# 17 "./socket/pro_hdr.hpp" 2
+# 1 "E:\\socket\\netlib2/socket/pro_hdr.hpp" 1
+# 17 "E:\\socket\\netlib2/socket/pro_hdr.hpp"
+# 1 "E:\\socket\\netlib2/socket/config.hpp" 1
+# 17 "E:\\socket\\netlib2/socket/pro_hdr.hpp" 2
 
 namespace SocketLib{
 
@@ -139570,10 +138376,10 @@ typedef struct _icmp_mask_hdr_t : public icmp_hdr_t
 }icmp_mask_hdr_t;
 
 }
-# 18 "./socket/socket.hpp" 2
+# 18 "E:\\socket\\netlib2/socket/socket.hpp" 2
 
-# 1 "./socket/hdr_helper.hpp" 1
-# 18 "./socket/hdr_helper.hpp"
+# 1 "E:\\socket\\netlib2/socket/hdr_helper.hpp" 1
+# 18 "E:\\socket\\netlib2/socket/hdr_helper.hpp"
 namespace SocketLib{
 
 class HdrHelper
@@ -139628,7 +138434,7 @@ public:
 
  IpHdrHelper(void* pBuf) :_pBuf(pBuf)
  {
-  (void)( (!!(_pBuf)) || (_wassert(L"_pBuf", L"./socket/hdr_helper.hpp", (unsigned)(72)), 0) );
+  ((void)0);
  }
 
 
@@ -139784,7 +138590,7 @@ class IcmpHdrHelper : public HdrHelper
 public:
  IcmpHdrHelper(void* pBuf) :_pBuf(pBuf)
  {
-  (void)( (!!(_pBuf)) || (_wassert(L"_pBuf", L"./socket/hdr_helper.hpp", (unsigned)(228)), 0) );
+  ((void)0);
  }
 
  s_uint8_t GetType()const
@@ -139979,12 +138785,12 @@ public:
 };
 
 }
-# 19 "./socket/socket.hpp" 2
+# 19 "E:\\socket\\netlib2/socket/socket.hpp" 2
 
-# 1 "./socket/address.hpp" 1
-# 17 "./socket/address.hpp"
-# 1 "./socket/config.hpp" 1
-# 17 "./socket/address.hpp" 2
+# 1 "E:\\socket\\netlib2/socket/address.hpp" 1
+# 17 "E:\\socket\\netlib2/socket/address.hpp"
+# 1 "E:\\socket\\netlib2/socket/config.hpp" 1
+# 17 "E:\\socket\\netlib2/socket/address.hpp" 2
 
 namespace SocketLib{
 
@@ -140264,17 +139070,17 @@ protected:
 
 
 }
-# 20 "./socket/socket.hpp" 2
+# 20 "E:\\socket\\netlib2/socket/socket.hpp" 2
 
-# 1 "./socket/endpoint.hpp" 1
-# 17 "./socket/endpoint.hpp"
-# 1 "./socket/config.hpp" 1
-# 17 "./socket/endpoint.hpp" 2
+# 1 "E:\\socket\\netlib2/socket/endpoint.hpp" 1
+# 17 "E:\\socket\\netlib2/socket/endpoint.hpp"
+# 1 "E:\\socket\\netlib2/socket/config.hpp" 1
+# 17 "E:\\socket\\netlib2/socket/endpoint.hpp" 2
 
-# 1 "./socket/util.hpp" 1
-# 17 "./socket/util.hpp"
-# 1 "./socket/config.hpp" 1
-# 17 "./socket/util.hpp" 2
+# 1 "E:\\socket\\netlib2/socket/util.hpp" 1
+# 17 "E:\\socket\\netlib2/socket/util.hpp"
+# 1 "E:\\socket\\netlib2/socket/config.hpp" 1
+# 17 "E:\\socket\\netlib2/socket/util.hpp" 2
 
 namespace SocketLib{
 
@@ -140359,7 +139165,7 @@ namespace detail
    if (pStrAddr) ConvertToSockAddr(pStrAddr, pSockAddr); else p->sin6_addr = in6addr_any;
    return true;
   }
-  (void)( (!!(0)) || (_wassert(L"0", L"./socket/util.hpp", (unsigned)(101)), 0) );
+  ((void)0);
   return false;
  }
 
@@ -140458,7 +139264,7 @@ namespace detail
 }
 
 }
-# 18 "./socket/endpoint.hpp" 2
+# 18 "E:\\socket\\netlib2/socket/endpoint.hpp" 2
 
 namespace SocketLib{
 
@@ -140753,10 +139559,10 @@ public:
 
 
 }
-# 21 "./socket/socket.hpp" 2
+# 21 "E:\\socket\\netlib2/socket/socket.hpp" 2
 
-# 1 "./socket/protocol.hpp" 1
-# 18 "./socket/protocol.hpp"
+# 1 "E:\\socket\\netlib2/socket/protocol.hpp" 1
+# 18 "E:\\socket\\netlib2/socket/protocol.hpp"
 namespace SocketLib{
 
 class Tcp
@@ -140852,21 +139658,21 @@ protected:
 };
 
 }
-# 22 "./socket/socket.hpp" 2
+# 22 "E:\\socket\\netlib2/socket/socket.hpp" 2
 
-# 1 "./socket/socket_tcp.hpp" 1
-# 17 "./socket/socket_tcp.hpp"
-# 1 "./socket/config.hpp" 1
-# 17 "./socket/socket_tcp.hpp" 2
+# 1 "E:\\socket\\netlib2/socket/socket_tcp.hpp" 1
+# 17 "E:\\socket\\netlib2/socket/socket_tcp.hpp"
+# 1 "E:\\socket\\netlib2/socket/config.hpp" 1
+# 17 "E:\\socket\\netlib2/socket/socket_tcp.hpp" 2
 
-# 1 "./socket/socket_stream.hpp" 1
-# 17 "./socket/socket_stream.hpp"
-# 1 "./socket/basic_socket.hpp" 1
-# 17 "./socket/basic_socket.hpp"
-# 1 "./socket/io_object.hpp" 1
-# 17 "./socket/io_object.hpp"
-# 1 "./socket/config.hpp" 1
-# 17 "./socket/io_object.hpp" 2
+# 1 "E:\\socket\\netlib2/socket/socket_stream.hpp" 1
+# 17 "E:\\socket\\netlib2/socket/socket_stream.hpp"
+# 1 "E:\\socket\\netlib2/socket/basic_socket.hpp" 1
+# 17 "E:\\socket\\netlib2/socket/basic_socket.hpp"
+# 1 "E:\\socket\\netlib2/socket/io_object.hpp" 1
+# 17 "E:\\socket\\netlib2/socket/io_object.hpp"
+# 1 "E:\\socket\\netlib2/socket/config.hpp" 1
+# 17 "E:\\socket\\netlib2/socket/io_object.hpp" 2
 
 namespace SocketLib{
 
@@ -140973,12 +139779,12 @@ inline void* SocketIoObject<IoObjectService>::GetData()
 
 
 }
-# 17 "./socket/basic_socket.hpp" 2
+# 17 "E:\\socket\\netlib2/socket/basic_socket.hpp" 2
 
-# 1 "./socket/socket_service.hpp" 1
-# 17 "./socket/socket_service.hpp"
-# 1 "./socket/config.hpp" 1
-# 17 "./socket/socket_service.hpp" 2
+# 1 "E:\\socket\\netlib2/socket/socket_service.hpp" 1
+# 17 "E:\\socket\\netlib2/socket/socket_service.hpp"
+# 1 "E:\\socket\\netlib2/socket/config.hpp" 1
+# 17 "E:\\socket\\netlib2/socket/socket_service.hpp" 2
 
 namespace SocketLib{
 
@@ -141133,12 +139939,12 @@ inline void BaseSocketService<Protocol, IoServiceType>::Cancel(Impl& impl, Socke
 
 
 }
-# 18 "./socket/basic_socket.hpp" 2
+# 18 "E:\\socket\\netlib2/socket/basic_socket.hpp" 2
 
-# 1 "./socket/option.hpp" 1
-# 17 "./socket/option.hpp"
-# 1 "./socket/config.hpp" 1
-# 17 "./socket/option.hpp" 2
+# 1 "E:\\socket\\netlib2/socket/option.hpp" 1
+# 17 "E:\\socket\\netlib2/socket/option.hpp"
+# 1 "E:\\socket\\netlib2/socket/config.hpp" 1
+# 17 "E:\\socket\\netlib2/socket/option.hpp" 2
 
 namespace SocketLib{
 
@@ -141401,7 +140207,7 @@ struct Opts
 
 
 }
-# 19 "./socket/basic_socket.hpp" 2
+# 19 "E:\\socket\\netlib2/socket/basic_socket.hpp" 2
 
 namespace SocketLib{
 
@@ -141575,7 +140381,7 @@ inline typename BasicSocket<Protocol, SocketService>::EndPoint BasicSocket<Proto
 }
 
 }
-# 17 "./socket/socket_stream.hpp" 2
+# 17 "E:\\socket\\netlib2/socket/socket_stream.hpp" 2
 
 namespace SocketLib{
 
@@ -141633,11 +140439,11 @@ inline s_int32_t StreamSocket<Protocol, SocketService>::SendSome(const s_byte_t*
 
 
 }
-# 18 "./socket/socket_tcp.hpp" 2
+# 18 "E:\\socket\\netlib2/socket/socket_tcp.hpp" 2
 
 
-# 1 "./socket/stream_service.hpp" 1
-# 18 "./socket/stream_service.hpp"
+# 1 "E:\\socket\\netlib2/socket/stream_service.hpp" 1
+# 18 "E:\\socket\\netlib2/socket/stream_service.hpp"
 namespace SocketLib{
 
 template<typename Protocol, typename IoServiceType>
@@ -141710,7 +140516,7 @@ inline TcpSocketService<Protocol, IoServiceType>::TcpSocketService(IoServiceType
 }
 
 }
-# 20 "./socket/socket_tcp.hpp" 2
+# 20 "E:\\socket\\netlib2/socket/socket_tcp.hpp" 2
 
 namespace SocketLib{
 
@@ -141772,12 +140578,12 @@ inline void TcpSocket<IoServiceType>::AsyncSendSome(const std::tr1::function< vo
 }
 
 }
-# 23 "./socket/socket.hpp" 2
+# 23 "E:\\socket\\netlib2/socket/socket.hpp" 2
 
-# 1 "./socket/socket_acceptor.hpp" 1
-# 19 "./socket/socket_acceptor.hpp"
-# 1 "./socket/acceptor_service.hpp" 1
-# 18 "./socket/acceptor_service.hpp"
+# 1 "E:\\socket\\netlib2/socket/socket_acceptor.hpp" 1
+# 19 "E:\\socket\\netlib2/socket/socket_acceptor.hpp"
+# 1 "E:\\socket\\netlib2/socket/acceptor_service.hpp" 1
+# 18 "E:\\socket\\netlib2/socket/acceptor_service.hpp"
 namespace SocketLib{
 
 template<typename Protocol, typename IoServiceType>
@@ -141827,7 +140633,7 @@ inline void TcpAcceptorService<Protocol, IoServiceType>::AsyncAccept(Impl& impl_
 }
 
 }
-# 19 "./socket/socket_acceptor.hpp" 2
+# 19 "E:\\socket\\netlib2/socket/socket_acceptor.hpp" 2
 
 namespace SocketLib{
 
@@ -141938,12 +140744,12 @@ inline void TcpAcceptor<IoServiceType>::AsyncAccept(const AcceptHandler& handler
 }
 
 }
-# 24 "./socket/socket.hpp" 2
+# 24 "E:\\socket\\netlib2/socket/socket.hpp" 2
 
-# 1 "./socket/socket_connector.hpp" 1
-# 19 "./socket/socket_connector.hpp"
-# 1 "./socket/connector_service.hpp" 1
-# 18 "./socket/connector_service.hpp"
+# 1 "E:\\socket\\netlib2/socket/socket_connector.hpp" 1
+# 19 "E:\\socket\\netlib2/socket/socket_connector.hpp"
+# 1 "E:\\socket\\netlib2/socket/connector_service.hpp" 1
+# 18 "E:\\socket\\netlib2/socket/connector_service.hpp"
 namespace SocketLib{
 
 template<typename Protocol, typename IoServiceType>
@@ -141981,7 +140787,7 @@ inline void TcpConnectorService<Protocol, IoServiceType>::AsyncConnect(Impl& imp
 
 
 }
-# 19 "./socket/socket_connector.hpp" 2
+# 19 "E:\\socket\\netlib2/socket/socket_connector.hpp" 2
 
 namespace SocketLib{
 
@@ -142096,14 +140902,14 @@ inline void TcpConnector<IoServiceType>::AsyncSendSome(const std::tr1::function<
 }
 
 }
-# 25 "./socket/socket.hpp" 2
+# 25 "E:\\socket\\netlib2/socket/socket.hpp" 2
 
-# 1 "./socket/service.hpp" 1
-# 17 "./socket/service.hpp"
-# 1 "./socket/win_iocp.hpp" 1
-# 17 "./socket/win_iocp.hpp"
-# 1 "./socket/config.hpp" 1
-# 17 "./socket/win_iocp.hpp" 2
+# 1 "E:\\socket\\netlib2/socket/service.hpp" 1
+# 17 "E:\\socket\\netlib2/socket/service.hpp"
+# 1 "E:\\socket\\netlib2/socket/win_iocp.hpp" 1
+# 17 "E:\\socket\\netlib2/socket/win_iocp.hpp"
+# 1 "E:\\socket\\netlib2/socket/config.hpp" 1
+# 17 "E:\\socket\\netlib2/socket/win_iocp.hpp" 2
 
 
 namespace SocketLib{
@@ -142354,8 +141160,8 @@ inline s_int32_t IocpService::ServiceCount()const
 }
 
 
-# 1 "./socket/winsock_init.hpp" 1
-# 17 "./socket/winsock_init.hpp"
+# 1 "E:\\socket\\netlib2/socket/winsock_init.hpp" 1
+# 17 "E:\\socket\\netlib2/socket/winsock_init.hpp"
 class WinSockBase
 {
 protected:
@@ -142470,13 +141276,13 @@ inline LockDispatcher<>* WinSockInit<Major, Minor>::GetLockDispatcher()const
 }
 
 static const WinSockInit<>& gWinSockInstance = WinSockInit<>();
-# 142 "./socket/winsock_init.hpp"
+# 142 "E:\\socket\\netlib2/socket/winsock_init.hpp"
 static LPFN_ACCEPTEX gAcceptEx = gWinSockInstance.GetAcceptEx();
 static LPFN_CONNECTEX gConnectEx = gWinSockInstance.GetConnectEx();
-# 266 "./socket/win_iocp.hpp" 2
+# 266 "E:\\socket\\netlib2/socket/win_iocp.hpp" 2
 
-# 1 "./socket/win_access.hpp" 1
-# 83 "./socket/win_access.hpp"
+# 1 "E:\\socket\\netlib2/socket/win_access.hpp" 1
+# 83 "E:\\socket\\netlib2/socket/win_access.hpp"
 inline void IocpService::Access::Construct(IocpService& service, Impl& impl, s_uint16_t type)
 {
  impl._fd = (SOCKET)(~0);
@@ -143227,15 +142033,15 @@ inline IocpService::Operation* IocpService::OperationAlloc<T>::Alloc(Operation* 
  }
  return ptr;
 }
-# 267 "./socket/win_iocp.hpp" 2
+# 267 "E:\\socket\\netlib2/socket/win_iocp.hpp" 2
 
 }
-# 17 "./socket/service.hpp" 2
+# 17 "E:\\socket\\netlib2/socket/service.hpp" 2
 
-# 1 "./socket/linux_epoll.hpp" 1
-# 17 "./socket/linux_epoll.hpp"
-# 1 "./socket/config.hpp" 1
-# 17 "./socket/linux_epoll.hpp" 2
+# 1 "E:\\socket\\netlib2/socket/linux_epoll.hpp" 1
+# 17 "E:\\socket\\netlib2/socket/linux_epoll.hpp"
+# 1 "E:\\socket\\netlib2/socket/config.hpp" 1
+# 17 "E:\\socket\\netlib2/socket/linux_epoll.hpp" 2
 
 # 1 "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\map" 1 3
 
@@ -143478,15 +142284,6 @@ public:
 
  reference operator*() const
   {
-
-  const auto _Mycont = static_cast<const _Mytree *>(this->_Getcont());
-  if (_Mycont == 0
-   || this->_Ptr == nullptr_t{}
-   || this->_Ptr == _Mycont->_Myhead)
-   {
-   _Debug_message(L"map/set iterator not dereferencable", L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xtree", 238);
-   { (void)( (!!(("Standard C++ Libraries Out of Range" && 0))) || (1 != _CrtDbgReportW(2, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xtree", 239, 0, L"%ls", L"\"Standard C++ Libraries Out of Range\" && 0")) || (__debugbreak(), 0) ); ::_invalid_parameter(L"\"out of range\"", L__FUNCTION__, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xtree", 239, 0); };
-   }
 # 249 "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xtree" 3
   return (_Mytree::_Myval(this->_Ptr));
   }
@@ -143498,20 +142295,7 @@ public:
 
  _Myiter& operator++()
   {
-
-  if (this->_Getcont() == 0
-   || this->_Ptr == nullptr_t{}
-   || _Mytree::_Isnil(this->_Ptr))
-   {
-   _Debug_message(L"map/set iterator not incrementable", L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xtree", 264);
-   { (void)( (!!(("Standard C++ Libraries Out of Range" && 0))) || (1 != _CrtDbgReportW(2, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xtree", 265, 0, L"%ls", L"\"Standard C++ Libraries Out of Range\" && 0")) || (__debugbreak(), 0) ); ::_invalid_parameter(L"\"out of range\"", L__FUNCTION__, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xtree", 265, 0); };
-   }
-
-
-
-
-
-
+# 273 "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xtree" 3
   ++static_cast<_Mybase&>(*this);
   return (*this);
   }
@@ -143525,22 +142309,10 @@ public:
 
  _Myiter& operator--()
   {
-
-  if (this->_Getcont() == 0
-   || this->_Ptr == nullptr_t{})
-   {
-   _Debug_message(L"map/set iterator not decrementable", L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xtree", 290);
-   { (void)( (!!(("Standard C++ Libraries Out of Range" && 0))) || (1 != _CrtDbgReportW(2, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xtree", 291, 0, L"%ls", L"\"Standard C++ Libraries Out of Range\" && 0")) || (__debugbreak(), 0) ); ::_invalid_parameter(L"\"out of range\"", L__FUNCTION__, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xtree", 291, 0); };
-   }
-
-  _Nodeptr _Ptrsav = this->_Ptr;
+# 310 "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xtree" 3
   --static_cast<_Mybase&>(*this);
-  if (_Ptrsav == this->_Ptr)
-   {
-   _Debug_message(L"map/set iterator not decrementable", L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xtree", 298);
-   { (void)( (!!(("Standard C++ Libraries Out of Range" && 0))) || (1 != _CrtDbgReportW(2, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xtree", 299, 0, L"%ls", L"\"Standard C++ Libraries Out of Range\" && 0")) || (__debugbreak(), 0) ); ::_invalid_parameter(L"\"out of range\"", L__FUNCTION__, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xtree", 299, 0); };
-   }
-# 313 "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xtree" 3
+
+
   return (*this);
   }
 
@@ -143553,17 +142325,7 @@ public:
 
  bool operator==(const _Myiter& _Right) const
   {
-
-  if (this->_Getcont() != _Right._Getcont())
-   {
-   _Debug_message(L"map/set iterators incompatible", L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xtree", 328);
-   { (void)( (!!(("Standard C++ Libraries Invalid Argument" && 0))) || (1 != _CrtDbgReportW(2, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xtree", 329, 0, L"%ls", L"\"Standard C++ Libraries Invalid Argument\" && 0")) || (__debugbreak(), 0) ); ::_invalid_parameter(L"\"invalid argument\"", L__FUNCTION__, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xtree", 329, 0); };
-   }
-
-
-
-
-
+# 336 "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xtree" 3
   return (this->_Ptr == _Right._Ptr);
   }
 
@@ -143945,73 +142707,28 @@ public:
   {
   _Construct();
   }
-# 740 "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xtree" 3
+
+
  void _Construct()
   {
   _Myhead() = _Buyheadnode();
-  try {
-  _Alloc_proxy();
-  } catch (...) {
-  _Freeheadnode(_Myhead());
-  throw;
-  }
   }
 
  ~_Tree_comp_alloc() noexcept
   {
   _Freeheadnode(_Myhead());
-  _Free_proxy();
   }
 
  void _Copy_alloc(const _Alty& _Al)
   {
-  _Free_proxy();
   _Pocca(_Getal(), _Al);
-  _Alloc_proxy();
   }
 
  void _Move_alloc(_Alty& _Al)
   {
-  _Free_proxy();
   _Pocma(_Getal(), _Al);
-  _Alloc_proxy();
   }
-
- void _Alloc_proxy()
-  {
-  typename _Alty::template rebind<_Container_proxy>::other
-   _Alproxy(_Getal());
-  _Myproxy() = _Unfancy(_Alproxy.allocate(1));
-  _Alproxy.construct(_Myproxy(), _Container_proxy());
-  _Myproxy()->_Mycont = &_Get_data();
-  }
-
- void _Free_proxy()
-  {
-  typename _Alty::template rebind<_Container_proxy>::other
-   _Alproxy(_Getal());
-  _Orphan_all();
-  _Alproxy.destroy(_Myproxy());
-  _Alproxy.deallocate(_Alproxy.address(*_Myproxy()), 1);
-  _Myproxy() = 0;
-  }
-
- _Iterator_base12 **_Getpfirst() const
-  {
-  return (_Get_data()._Getpfirst());
-  }
-
- _Container_proxy * & _Myproxy() noexcept
-  {
-  return (_Get_data()._Myproxy);
-  }
-
- _Container_proxy * const & _Myproxy() const noexcept
-  {
-  return (_Get_data()._Myproxy);
-  }
-
-
+# 806 "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xtree" 3
  void _Orphan_all()
   {
   _Get_data()._Orphan_all();
@@ -144454,7 +143171,7 @@ public:
  template<class _Iter>
   void insert(_Iter _First, _Iter _Last)
   {
-  _Debug_range(_First, _Last, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xtree", 1248);
+                             ;
   for (; _First != _Last; ++_First)
    emplace_hint(end(), *_First);
   }
@@ -144466,17 +143183,9 @@ public:
 
  iterator erase(const_iterator _Where)
   {
-
-  if (_Where._Getcont() != &this->_Get_data()
-   || this->_Isnil(_Where._Mynode()))
-   _Debug_message(L"map/set erase iterator outside range", L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xtree", 1263);
+# 1269 "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xtree" 3
   _Nodeptr _Erasednode = _Where._Mynode();
   ++_Where;
-  _Orphan_ptr(_Erasednode);
-
-
-
-
 
 
   _Nodeptr _Fixnode;
@@ -144675,7 +143384,7 @@ public:
  void clear() noexcept
   {
 
-  this->_Orphan_ptr(nullptr_t{});
+
 
 
   _Erase(_Root());
@@ -144689,7 +143398,7 @@ public:
   {
   iterator _Where = lower_bound(_Keyval);
   return (_Where == end()
-   || _Debug_lt_pred(this->_Getcomp(), _Keyval, this->_Key(_Where._Mynode()), L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xtree", 1484)
+   || this->_Getcomp()(_Keyval, this->_Key(_Where._Mynode()))
 
      ? end() : _Where);
   }
@@ -144698,7 +143407,7 @@ public:
   {
   const_iterator _Where = lower_bound(_Keyval);
   return (_Where == end()
-   || _Debug_lt_pred(this->_Getcomp(), _Keyval, this->_Key(_Where._Mynode()), L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xtree", 1493)
+   || this->_Getcomp()(_Keyval, this->_Key(_Where._Mynode()))
 
      ? end() : _Where);
   }
@@ -144710,7 +143419,7 @@ public:
   {
   iterator _Where = lower_bound(_Keyval);
   return (_Where == end()
-   || _Debug_lt_pred(this->_Getcomp(), _Keyval, this->_Key(_Where._Mynode()), L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xtree", 1505)
+   || this->_Getcomp()(_Keyval, this->_Key(_Where._Mynode()))
 
      ? end() : _Where);
   }
@@ -144722,7 +143431,7 @@ public:
   {
   const_iterator _Where = lower_bound(_Keyval);
   return (_Where == end()
-   || _Debug_lt_pred(this->_Getcomp(), _Keyval, this->_Key(_Where._Mynode()), L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xtree", 1517)
+   || this->_Getcomp()(_Keyval, this->_Key(_Where._Mynode()))
 
      ? end() : _Where);
   }
@@ -144868,8 +143577,8 @@ protected:
   try {
 
 
-  if (_Where._Getcont() != &this->_Get_data())
-   _Debug_message(L"map/set insert iterator outside range", L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xtree", 1663);
+
+
 
 
   if (size() == 0)
@@ -144879,7 +143588,7 @@ protected:
    {
    if (_Where == begin())
     {
-    if (!_Debug_lt_pred(this->_Getcomp(), this->_Key(_Where._Mynode()), this->_Kfn(_Val), L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xtree", 1674))
+    if (!this->_Getcomp()(this->_Key(_Where._Mynode()), this->_Kfn(_Val)))
 
      return (_Insert_at(true, _Where._Mynode(),
       ::std:: forward<_Valty>(_Val), _Newnode));
@@ -144887,14 +143596,14 @@ protected:
     }
    else if (_Where == end())
     {
-    if (!_Debug_lt_pred(this->_Getcomp(), this->_Kfn(_Val), this->_Key(_Rmost()), L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xtree", 1682))
+    if (!this->_Getcomp()(this->_Kfn(_Val), this->_Key(_Rmost())))
 
      return (_Insert_at(false, _Rmost(),
       ::std:: forward<_Valty>(_Val), _Newnode));
     }
-   else if (!_Debug_lt_pred(this->_Getcomp(), this->_Key(_Where._Mynode()), this->_Kfn(_Val), L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xtree", 1687)
+   else if (!this->_Getcomp()(this->_Key(_Where._Mynode()), this->_Kfn(_Val))
 
-    && !_Debug_lt_pred(this->_Getcomp(), this->_Kfn(_Val), this->_Key((--(_Next = _Where))._Mynode()), L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xtree", 1690))
+    && !this->_Getcomp()(this->_Kfn(_Val), this->_Key((--(_Next = _Where))._Mynode())))
 
 
     {
@@ -144905,10 +143614,10 @@ protected:
      return (_Insert_at(true, _Where._Mynode(),
       ::std:: forward<_Valty>(_Val), _Newnode));
     }
-   else if (!_Debug_lt_pred(this->_Getcomp(), this->_Kfn(_Val), this->_Key(_Where._Mynode()), L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xtree", 1700)
+   else if (!this->_Getcomp()(this->_Kfn(_Val), this->_Key(_Where._Mynode()))
 
     && (++(_Next = _Where) == end()
-     || !_Debug_lt_pred(this->_Getcomp(), this->_Key(_Next._Mynode()), this->_Kfn(_Val), L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xtree", 1703)))
+     || !this->_Getcomp()(this->_Key(_Next._Mynode()), this->_Kfn(_Val))))
 
     {
     if (this->_Isnil(this->_Right(_Where._Mynode())))
@@ -144925,21 +143634,21 @@ protected:
    {
    if (_Where == begin())
     {
-    if (_Debug_lt_pred(this->_Getcomp(), this->_Kfn(_Val), this->_Key(_Where._Mynode()), L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xtree", 1720))
+    if (this->_Getcomp()(this->_Kfn(_Val), this->_Key(_Where._Mynode())))
 
      return (_Insert_at(true, _Where._Mynode(),
       ::std:: forward<_Valty>(_Val), _Newnode));
     }
    else if (_Where == end())
     {
-    if (_Debug_lt_pred(this->_Getcomp(), this->_Key(_Rmost()), this->_Kfn(_Val), L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xtree", 1727))
+    if (this->_Getcomp()(this->_Key(_Rmost()), this->_Kfn(_Val)))
 
      return (_Insert_at(false, _Rmost(),
       ::std:: forward<_Valty>(_Val), _Newnode));
     }
-   else if (_Debug_lt_pred(this->_Getcomp(), this->_Kfn(_Val), this->_Key(_Where._Mynode()), L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xtree", 1732)
+   else if (this->_Getcomp()(this->_Kfn(_Val), this->_Key(_Where._Mynode()))
 
-    && _Debug_lt_pred(this->_Getcomp(), this->_Key((--(_Next = _Where))._Mynode()), this->_Kfn(_Val), L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xtree", 1735))
+    && this->_Getcomp()(this->_Key((--(_Next = _Where))._Mynode()), this->_Kfn(_Val)))
 
 
     {
@@ -144950,10 +143659,10 @@ protected:
      return (_Insert_at(true, _Where._Mynode(),
       ::std:: forward<_Valty>(_Val), _Newnode));
     }
-   else if (_Debug_lt_pred(this->_Getcomp(), this->_Key(_Where._Mynode()), this->_Kfn(_Val), L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xtree", 1745)
+   else if (this->_Getcomp()(this->_Key(_Where._Mynode()), this->_Kfn(_Val))
 
     && (++(_Next = _Where) == end()
-     || _Debug_lt_pred(this->_Getcomp(), this->_Kfn(_Val), this->_Key(_Next._Mynode()), L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xtree", 1748)))
+     || this->_Getcomp()(this->_Kfn(_Val), this->_Key(_Next._Mynode()))))
 
     {
     if (this->_Isnil(this->_Right(_Where._Mynode())))
@@ -144987,11 +143696,11 @@ protected:
    {
    _Wherenode = _Trynode;
    if (_Leftish)
-    _Addleft = !_Debug_lt_pred(this->_Getcomp(), this->_Key(_Trynode), this->_Kfn(_Val), L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xtree", 1783);
+    _Addleft = !this->_Getcomp()(this->_Key(_Trynode), this->_Kfn(_Val));
 
 
    else
-    _Addleft = _Debug_lt_pred(this->_Getcomp(), this->_Kfn(_Val), this->_Key(_Trynode), L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xtree", 1787);
+    _Addleft = this->_Getcomp()(this->_Kfn(_Val), this->_Key(_Trynode));
 
 
    _Trynode = _Addleft ? this->_Left(_Trynode)
@@ -145012,7 +143721,7 @@ protected:
    else
     --_Where;
 
-   if (_Debug_lt_pred(this->_Getcomp(), this->_Key(_Where._Mynode()), this->_Kfn(_Val), L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xtree", 1808))
+   if (this->_Getcomp()(this->_Key(_Where._Mynode()), this->_Kfn(_Val)))
 
 
     return (_Pairib(_Insert_at(_Addleft, _Wherenode,
@@ -145200,12 +143909,12 @@ protected:
   _Nodeptr _Hinode = this->_Myhead();
 
   while (!this->_Isnil(_Pnode))
-   if (_Debug_lt_pred(this->_Getcomp(), this->_Key(_Pnode), _Keyval, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xtree", 1994))
+   if (this->_Getcomp()(this->_Key(_Pnode), _Keyval))
     _Pnode = this->_Right(_Pnode);
    else
     {
     if (this->_Isnil(_Hinode)
-      && _Debug_lt_pred(this->_Getcomp(), _Keyval, this->_Key(_Pnode), L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xtree", 2000))
+      && this->_Getcomp()(_Keyval, this->_Key(_Pnode)))
 
      _Hinode = _Pnode;
     _Lonode = _Pnode;
@@ -145215,7 +143924,7 @@ protected:
   _Pnode = this->_Isnil(_Hinode) ? _Root()
    : this->_Left(_Hinode);
   while (!this->_Isnil(_Pnode))
-   if (_Debug_lt_pred(this->_Getcomp(), _Keyval, this->_Key(_Pnode), L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xtree", 2009))
+   if (this->_Getcomp()(_Keyval, this->_Key(_Pnode)))
     {
     _Hinode = _Pnode;
     _Pnode = this->_Left(_Pnode);
@@ -145253,7 +143962,7 @@ protected:
 
  bool _Compare(const key_type& _Left, const key_type& _Right) const
   {
-  return (_Debug_lt_pred(this->_Getcomp(), _Left, _Right, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xtree", 2047));
+  return (this->_Getcomp()(_Left, _Right));
   }
 
  template<class _Ty1,
@@ -145353,25 +144062,7 @@ protected:
 
   return (_Wherenode);
   }
-
-
- void _Orphan_ptr(_Nodeptr _Ptr)
-  {
-  _Lockit _Lock(3);
-  const_iterator **_Pnext = (const_iterator **)this->_Getpfirst();
-  if (_Pnext != 0)
-   while (*_Pnext != 0)
-    if ((*_Pnext)->_Ptr == this->_Myhead()
-     || _Ptr != nullptr_t{} && (*_Pnext)->_Ptr != _Ptr)
-     _Pnext = (const_iterator **)(*_Pnext)->_Getpnext();
-    else
-     {
-     (*_Pnext)->_Clrcont();
-     *_Pnext = *(const_iterator **)(*_Pnext)->_Getpnext();
-     }
-  }
-
-
+# 2166 "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\xtree" 3
  void _Tidy()
   {
   erase(begin(), end());
@@ -145634,7 +144325,7 @@ public:
   {
   iterator _Where = _Mybase::lower_bound(_Keyval);
   if (_Where == _Mybase::end()
-   || _Debug_lt_pred(_Mybase::_Getcomp(), _Keyval, _Mybase::_Key(_Where._Mynode()), L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\map", 212))
+   || _Mybase::_Getcomp()(_Keyval, _Mybase::_Key(_Where._Mynode())))
 
    return (_Pairib(
     _Mybase::emplace_hint(_Where,
@@ -145686,7 +144377,7 @@ public:
   {
   iterator _Where = _Mybase::lower_bound(_Keyval);
   if (_Where == _Mybase::end()
-   || _Debug_lt_pred(_Mybase::_Getcomp(), _Keyval, _Mybase::_Key(_Where._Mynode()), L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\map", 264))
+   || _Mybase::_Getcomp()(_Keyval, _Mybase::_Key(_Where._Mynode())))
 
    return (_Pairib(
     _Mybase::emplace_hint(_Where,
@@ -145974,7 +144665,7 @@ template<class _Kty,
 
 #pragma warning(pop)
 #pragma pack(pop)
-# 18 "./socket/linux_epoll.hpp" 2
+# 18 "E:\\socket\\netlib2/socket/linux_epoll.hpp" 2
 
 # 1 "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\vector" 1 3
 
@@ -146042,16 +144733,6 @@ public:
 
  reference operator*() const
   {
-
-  const auto _Mycont = static_cast<const _Myvec *>(this->_Getcont());
-  if (_Mycont == 0
-   || _Ptr == _Tptr()
-   || _Ptr < _Mycont->_Myfirst
-   || _Mycont->_Mylast <= _Ptr)
-   {
-   _Debug_message(L"vector iterator not dereferencable", L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\vector", 73);
-   { (void)( (!!(("Standard C++ Libraries Out of Range" && 0))) || (1 != _CrtDbgReportW(2, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\vector", 74, 0, L"%ls", L"\"Standard C++ Libraries Out of Range\" && 0")) || (__debugbreak(), 0) ); ::_invalid_parameter(L"\"out of range\"", L__FUNCTION__, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\vector", 74, 0); };
-   }
 # 84 "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\vector" 3
                                     ;
 
@@ -146065,15 +144746,6 @@ public:
 
  _Myiter& operator++()
   {
-
-  const auto _Mycont = static_cast<const _Myvec *>(this->_Getcont());
-  if (_Mycont == 0
-   || _Ptr == nullptr_t{}
-   || _Mycont->_Mylast <= _Ptr)
-   {
-   _Debug_message(L"vector iterator not incrementable", L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\vector", 102);
-   { (void)( (!!(("Standard C++ Libraries Out of Range" && 0))) || (1 != _CrtDbgReportW(2, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\vector", 103, 0, L"%ls", L"\"Standard C++ Libraries Out of Range\" && 0")) || (__debugbreak(), 0) ); ::_invalid_parameter(L"\"out of range\"", L__FUNCTION__, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\vector", 103, 0); };
-   }
 # 113 "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\vector" 3
   ++_Ptr;
   return (*this);
@@ -146088,15 +144760,6 @@ public:
 
  _Myiter& operator--()
   {
-
-  const auto _Mycont = static_cast<const _Myvec *>(this->_Getcont());
-  if (_Mycont == 0
-   || _Ptr == nullptr_t{}
-   || _Ptr <= _Mycont->_Myfirst)
-   {
-   _Debug_message(L"vector iterator not decrementable", L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\vector", 132);
-   { (void)( (!!(("Standard C++ Libraries Out of Range" && 0))) || (1 != _CrtDbgReportW(2, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\vector", 133, 0, L"%ls", L"\"Standard C++ Libraries Out of Range\" && 0")) || (__debugbreak(), 0) ); ::_invalid_parameter(L"\"out of range\"", L__FUNCTION__, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\vector", 133, 0); };
-   }
 # 143 "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\vector" 3
   --_Ptr;
   return (*this);
@@ -146111,18 +144774,6 @@ public:
 
  _Myiter& operator+=(difference_type _Off)
   {
-
-  if (_Off != 0)
-   {
-   const auto _Mycont = static_cast<const _Myvec *>(this->_Getcont());
-   if (_Mycont == 0
-    || _Ptr + _Off < _Mycont->_Myfirst
-    || _Mycont->_Mylast < _Ptr + _Off)
-    {
-    _Debug_message(L"vector iterator + offset out of range", L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\vector", 164);
-    { (void)( (!!(("Standard C++ Libraries Out of Range" && 0))) || (1 != _CrtDbgReportW(2, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\vector", 165, 0, L"%ls", L"\"Standard C++ Libraries Out of Range\" && 0")) || (__debugbreak(), 0) ); ::_invalid_parameter(L"\"out of range\"", L__FUNCTION__, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\vector", 165, 0); };
-    }
-   }
 # 179 "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\vector" 3
   _Ptr += _Off;
   return (*this);
@@ -146187,17 +144838,12 @@ public:
   {
   return (!(*this < _Right));
   }
-
-
- void _Compat(const _Myiter& _Right) const
+# 260 "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\vector" 3
+ void _Compat(const _Myiter&) const
   {
-  if (this->_Getcont() != _Right._Getcont())
-   {
-   _Debug_message(L"vector iterators incompatible", L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\vector", 248);
-   { (void)( (!!(("Standard C++ Libraries Invalid Argument" && 0))) || (1 != _CrtDbgReportW(2, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\vector", 249, 0, L"%ls", L"\"Standard C++ Libraries Invalid Argument\" && 0")) || (__debugbreak(), 0) ); ::_invalid_parameter(L"\"invalid argument\"", L__FUNCTION__, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\vector", 249, 0); };
-   }
   }
-# 265 "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\vector" 3
+
+
  _Tptr _Ptr;
  };
 
@@ -146449,11 +145095,11 @@ public:
 
  typedef _Vector_iterator<_Vector_val<_Val_types> > iterator;
  typedef _Vector_const_iterator<_Vector_val<_Val_types> > const_iterator;
-# 542 "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\vector" 3
+
+
  _Vector_alloc()
   : _Mypair(_Zero_then_variadic_args_t())
   {
-  _Alloc_proxy();
   }
 
  template<class _Any_alloc,
@@ -146462,63 +145108,18 @@ public:
   : _Mypair(_One_then_variadic_args_t(),
    ::std:: forward<_Any_alloc>(_Al))
   {
-  _Alloc_proxy();
-  }
-
- ~_Vector_alloc() noexcept
-  {
-  _Free_proxy();
   }
 
  void _Copy_alloc(const _Alty& _Al)
   {
-  _Free_proxy();
   _Pocca(_Getal(), _Al);
-  _Alloc_proxy();
   }
 
  void _Move_alloc(_Alty& _Al)
   {
-  _Free_proxy();
   _Pocma(_Getal(), _Al);
-  _Alloc_proxy();
   }
-
- void _Alloc_proxy()
-  {
-  typename _Alty::template rebind<_Container_proxy>::other
-   _Alproxy(_Getal());
-  _Myproxy() = _Unfancy(_Alproxy.allocate(1));
-  _Alproxy.construct(_Myproxy(), _Container_proxy());
-  _Myproxy()->_Mycont = &_Get_data();
-  }
-
- void _Free_proxy()
-  {
-  typename _Alty::template rebind<_Container_proxy>::other
-   _Alproxy(_Getal());
-  _Orphan_all();
-  _Alproxy.destroy(_Myproxy());
-  _Alproxy.deallocate(_Alproxy.address(*_Myproxy()), 1);
-  _Myproxy() = 0;
-  }
-
- _Iterator_base12 **_Getpfirst() const
-  {
-  return (_Get_data()._Getpfirst());
-  }
-
- _Container_proxy * & _Myproxy() noexcept
-  {
-  return (_Get_data()._Myproxy);
-  }
-
- _Container_proxy * const & _Myproxy() const noexcept
-  {
-  return (_Get_data()._Myproxy);
-  }
-
-
+# 611 "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\vector" 3
  void _Orphan_all()
   {
   _Get_data()._Orphan_all();
@@ -146848,8 +145449,8 @@ public:
   size_type _Off = (_Where)._Ptr - this->_Myfirst();
 
 
-  if (size() < _Off)
-   _Debug_message(L"vector emplace iterator outside range", L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\vector", 941);
+
+
 
 
   emplace_back(::std:: forward<_Valty>(_Val)...);
@@ -147123,33 +145724,13 @@ public:
 
  const_reference operator[](size_type _Pos) const
   {
-
-  if (size() <= _Pos)
-   {
-   _Debug_message(L"vector subscript out of range", L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\vector", 1218);
-   { (void)( (!!(("Standard C++ Libraries Out of Range" && 0))) || (1 != _CrtDbgReportW(2, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\vector", 1219, 0, L"%ls", L"\"Standard C++ Libraries Out of Range\" && 0")) || (__debugbreak(), 0) ); ::_invalid_parameter(L"\"out of range\"", L__FUNCTION__, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\vector", 1219, 0); };
-   }
-
-
-
-
-
+# 1226 "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\vector" 3
   return (*(this->_Myfirst() + _Pos));
   }
 
  reference operator[](size_type _Pos)
   {
-
-  if (size() <= _Pos)
-   {
-   _Debug_message(L"vector subscript out of range", L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\vector", 1234);
-   { (void)( (!!(("Standard C++ Libraries Out of Range" && 0))) || (1 != _CrtDbgReportW(2, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\vector", 1235, 0, L"%ls", L"\"Standard C++ Libraries Out of Range\" && 0")) || (__debugbreak(), 0) ); ::_invalid_parameter(L"\"out of range\"", L__FUNCTION__, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\vector", 1235, 0); };
-   }
-
-
-
-
-
+# 1242 "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\vector" 3
   return (*(this->_Myfirst() + _Pos));
   }
 
@@ -147205,20 +145786,14 @@ public:
    ++this->_Mylast();
    }
   }
-
-
+# 1312 "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\vector" 3
  void pop_back()
   {
-  if (empty())
-   _Debug_message(L"vector empty before pop", L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\vector", 1302);
-  else
-   {
-   _Orphan_range(this->_Mylast() - 1, this->_Mylast());
-   this->_Getal().destroy(_Unfancy(this->_Mylast() - 1));
-   --this->_Mylast();
-   }
+  this->_Getal().destroy(_Unfancy(this->_Mylast() - 1));
+  --this->_Mylast();
   }
-# 1319 "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\vector" 3
+
+
  template<class _Iter>
   typename enable_if<_Is_iterator<_Iter>::value,
    void>::type
@@ -147287,8 +145862,8 @@ public:
   size_type _Off = (_Where)._Ptr - this->_Myfirst();
 
 
-  if (size() < _Off)
-   _Debug_message(L"vector insert iterator outside range", L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\vector", 1388);
+
+
 
 
   if (_First != _Last)
@@ -147313,14 +145888,7 @@ public:
    _Iter _First, _Iter _Last,
     forward_iterator_tag)
   {
-
-  if (_Where._Getcont() != &this->_Get_data()
-   || (_Where)._Ptr < this->_Myfirst()
-   || this->_Mylast() < (_Where)._Ptr)
-   _Debug_message(L"vector insert iterator outside range", L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\vector", 1417);
-  _Debug_range(_First, _Last, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\vector", 1418);
-
-
+# 1421 "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\vector" 3
   size_type _Count = ::std:: distance(_First, _Last);
   if (_Count == 0)
    ;
@@ -147367,21 +145935,17 @@ public:
    _Orphan_range((_Where)._Ptr, this->_Mylast());
    }
   }
-
-
+# 1483 "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\vector" 3
  iterator erase(const_iterator _Where)
   {
-  if (_Where._Getcont() != &this->_Get_data()
-   || (_Where)._Ptr < this->_Myfirst()
-   || this->_Mylast() <= (_Where)._Ptr)
-   _Debug_message(L"vector erase iterator outside range", L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\vector", 1474);
-  _Move_unchecked((_Where)._Ptr + 1, this->_Mylast(), (_Where)._Ptr);
+  _Move_unchecked((_Where)._Ptr + 1, this->_Mylast(),
+   (_Where)._Ptr);
   _Destroy(this->_Mylast() - 1, this->_Mylast());
-  _Orphan_range((_Where)._Ptr, this->_Mylast());
   --this->_Mylast();
   return (_Make_iter(_Where));
   }
-# 1493 "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\vector" 3
+
+
  iterator erase(const_iterator _First_arg,
   const_iterator _Last_arg)
   {
@@ -147394,18 +145958,9 @@ public:
 
    if (_First != _Last)
     {
-
-    if (_Last < _First || _First._Getcont() != &this->_Get_data()
-     || (_First)._Ptr < this->_Myfirst()
-     || this->_Mylast() < (_Last)._Ptr)
-     _Debug_message(L"vector erase iterator outside range", L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\vector", 1509);
+# 1515 "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\vector" 3
     pointer _Ptr = _Move_unchecked((_Last)._Ptr, this->_Mylast(),
      (_First)._Ptr);
-    _Orphan_range((_First)._Ptr, this->_Mylast());
-
-
-
-
 
 
     _Destroy(_Ptr, this->_Mylast());
@@ -147420,7 +145975,7 @@ public:
   pointer _Ptr = this->_Mylast() - _Count;
 
 
-  _Orphan_range(_Ptr, this->_Mylast());
+
 
 
   _Destroy(_Ptr, this->_Mylast());
@@ -147556,10 +146111,10 @@ protected:
   size_type _Count, const value_type& _Val)
   {
 
-  if (_Where._Getcont() != &this->_Get_data()
-   || (_Where)._Ptr < this->_Myfirst()
-   || this->_Mylast() < (_Where)._Ptr)
-   _Debug_message(L"vector insert iterator outside range", L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\vector", 1670);
+
+
+
+
 
 
   size_type _Off = (_Where)._Ptr - this->_Myfirst();
@@ -147661,29 +146216,10 @@ protected:
   {
   _Xout_of_range("invalid vector<T> subscript");
   }
-
-
- void _Orphan_range(pointer _First, pointer _Last) const
+# 1792 "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\vector" 3
+ void _Orphan_range(pointer, pointer) const
   {
-  _Lockit _Lock(3);
-  const_iterator **_Pnext = (const_iterator **)this->_Getpfirst();
-  if (_Pnext != 0)
-   {
-   while (*_Pnext != 0)
-    if ((*_Pnext)->_Ptr < _First || _Last < (*_Pnext)->_Ptr)
-     _Pnext = (const_iterator **)(*_Pnext)->_Getpnext();
-    else
-     {
-     (*_Pnext)->_Clrcont();
-     *_Pnext = *(const_iterator **)(*_Pnext)->_Getpnext();
-     }
-   }
   }
-
-
-
-
-
 
  };
 
@@ -147788,17 +146324,9 @@ public:
 
  int _Valid(_Sizet _Inc) const
   {
-
-  const auto _Cont = static_cast<const _Mycont *>(this->_Getcont());
-  _Sizet _Mysize = _Cont->_Mysize;
-
-  _Inc += _Myoff;
-  _Inc += _VBITS * (_Myptr - _Cont->_Myvec.data());
-  return (_Inc < _Mysize ? -1 : _Inc == _Mysize ? 0 : +1);
-
-
-
-
+# 1908 "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\vector" 3
+  (void) _Inc;
+  return (-1);
 
   }
 
@@ -147850,20 +146378,7 @@ public:
 
  const _Vbase *_Getptr() const
   {
-
-  if (this->_Getcont() == 0
-   || this->_Myptr == 0
-   || 0 <= this->_Valid(0))
-   {
-   _Debug_message(L"vector<bool> iterator not dereferencable", L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\vector", 1966);
-   { (void)( (!!(("Standard C++ Libraries Out of Range" && 0))) || (1 != _CrtDbgReportW(2, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\vector", 1967, 0, L"%ls", L"\"Standard C++ Libraries Out of Range\" && 0")) || (__debugbreak(), 0) ); ::_invalid_parameter(L"\"out of range\"", L__FUNCTION__, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\vector", 1967, 0); };
-   }
-
-
-
-
-
-
+# 1975 "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\vector" 3
   return (this->_Myptr);
   }
 
@@ -148024,32 +146539,19 @@ public:
   {
   return (!(*this < _Right));
   }
-
-
- void _Compat(const _Mytype& _Right) const
+# 2150 "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\vector" 3
+ void _Compat(const _Mytype&) const
   {
-  if (this->_Getcont() != _Right._Getcont())
-   _Debug_message(L"vector<bool> iterators incompatible", L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\vector", 2140);
   }
-# 2155 "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\vector" 3
+
+
  void _Dec()
   {
   if (this->_Myoff != 0)
    --this->_Myoff;
   else
    {
-
-   if (this->_Getcont() == 0 || 0 < this->_Valid((size_type)-1))
-    {
-    _Debug_message(L"vector<bool> iterator not decrementable", L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\vector", 2164);
-    { (void)( (!!(("Standard C++ Libraries Out of Range" && 0))) || (1 != _CrtDbgReportW(2, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\vector", 2165, 0, L"%ls", L"\"Standard C++ Libraries Out of Range\" && 0")) || (__debugbreak(), 0) ); ::_invalid_parameter(L"\"out of range\"", L__FUNCTION__, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\vector", 2165, 0); };
-    }
-
-
-
-
-
-
+# 2173 "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\vector" 3
    this->_Myoff = _VBITS - 1;
    --this->_Myptr;
    }
@@ -148061,18 +146563,7 @@ public:
    ++this->_Myoff;
   else
    {
-
-   if (this->_Getcont() == 0 || 0 < this->_Valid(1))
-    {
-    _Debug_message(L"vector<bool> iterator not incrementable", L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\vector", 2187);
-    { (void)( (!!(("Standard C++ Libraries Out of Range" && 0))) || (1 != _CrtDbgReportW(2, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\vector", 2188, 0, L"%ls", L"\"Standard C++ Libraries Out of Range\" && 0")) || (__debugbreak(), 0) ); ::_invalid_parameter(L"\"out of range\"", L__FUNCTION__, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\vector", 2188, 0); };
-    }
-
-
-
-
-
-
+# 2196 "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\vector" 3
    this->_Myoff = 0;
    ++this->_Myptr;
    }
@@ -148257,27 +146748,16 @@ public:
   {
   _Free_proxy();
   }
-# 2391 "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\vector" 3
+
+
  void _Alloc_proxy()
   {
-  typename _Alty::template rebind<_Container_proxy>::other
-   _Alproxy(_Myvec._Getal());
-  this->_Myproxy = _Unfancy(_Alproxy.allocate(1));
-  _Alproxy.construct(this->_Myproxy, _Container_proxy());
-  this->_Myproxy->_Mycont = this;
   }
 
  void _Free_proxy()
   {
-  typename _Alty::template rebind<_Container_proxy>::other
-   _Alproxy(_Myvec._Getal());
-  this->_Orphan_all();
-  _Alproxy.destroy(this->_Myproxy);
-  _Alproxy.deallocate(_Alproxy.address(*this->_Myproxy), 1);
-  this->_Myproxy = 0;
   }
-
-
+# 2411 "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\vector" 3
  static size_type _Nw(size_type _Count)
   {
   return ((_Count + _VBITS - 1) / _VBITS);
@@ -148683,7 +147163,7 @@ public:
    _Iter _First, _Iter _Last,
    forward_iterator_tag)
   {
-  _Debug_range(_First, _Last, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\vector", 2816);
+                             ;
   size_type _Count = ::std:: distance(_First, _Last);
   size_type _Off = _Insert_x(_Where, _Count);
   ::std:: copy(_First, _Last, begin() + _Off);
@@ -148693,15 +147173,8 @@ public:
   {
   iterator _Where = _Make_iter(_Where_arg);
   size_type _Off = _Where - begin();
-
-
-  if (end() <= _Where)
-   _Debug_message(L"vector<bool> erase iterator outside range", L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\vector", 2829);
+# 2834 "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\vector" 3
   ::std:: copy(_Where + 1, end(), _Where);
-  _Orphan_range(_Off, this->_Mysize);
-
-
-
 
 
   _Trim(this->_Mysize - 1);
@@ -148717,17 +147190,9 @@ public:
 
   if (_First != _Last)
    {
-
-   if (_Last < _First || end() < _Last)
-    _Debug_message(L"vector<bool> erase iterator outside range", L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\vector", 2852);
+# 2859 "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\vector" 3
    iterator _Next = ::std:: copy(_Last, end(), _First);
-   size_type _Newsize = _Next - begin();
-   _Orphan_range(_Newsize, this->_Mysize);
-   _Trim(_Newsize);
-
-
-
-
+   _Trim(_Next - begin());
 
    }
   return (begin() + _Off);
@@ -148783,9 +147248,9 @@ public:
   size_type _Off = _Where - begin();
 
 
-  if (end() < _Where)
-   _Debug_message(L"vector<bool> insert iterator outside range", L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\vector", 2917);
-  bool _Realloc = capacity() - size() < _Count;
+
+
+
 
 
   if (_Count == 0)
@@ -148805,40 +147270,15 @@ public:
     }
 
 
-   _Orphan_range(_Realloc ? 0 : _Off, this->_Mysize);
+
 
    }
   return (_Off);
   }
-
-
- void _Orphan_range(size_type _Offlo, size_type _Offhi) const
+# 2969 "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\vector" 3
+ void _Orphan_range(size_type, size_type) const
   {
-  typedef _Vb_iter_base<_Alty> _Myiterbase;
-
-  _Lockit _Lock(3);
-  auto _Base = const_cast<_Vbase *>(this->_Myvec.data());
-
-  const_iterator **_Pnext = (const_iterator **)this->_Getpfirst();
-  if (_Pnext != 0)
-   while (*_Pnext != 0)
-    {
-    size_type _Off = _VBITS * ((*_Pnext)->_Myptr - _Base)
-     + (*_Pnext)->_Myoff;
-    if (_Off < _Offlo || _Offhi < _Off)
-     _Pnext = (const_iterator **)(*_Pnext)->_Getpnext();
-    else
-     {
-     (*_Pnext)->_Clrcont();
-     *_Pnext = *(const_iterator **)(*_Pnext)->_Getpnext();
-     }
-    }
   }
-
-
-
-
-
 
 
  void _Trim(size_type _Size)
@@ -148900,7 +147340,7 @@ template<class _Alloc>
 
 #pragma warning(pop)
 #pragma pack(pop)
-# 19 "./socket/linux_epoll.hpp" 2
+# 19 "E:\\socket\\netlib2/socket/linux_epoll.hpp" 2
 
 # 1 "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm" 1 3
 
@@ -148932,40 +147372,7 @@ template<class _Iter1,
   _Rechecked(_Dest2, _Src.second)
   ));
  }
-
-
-template<class _Iter1,
- class _Iter2> inline
- pair<decltype(_Unchecked(::std:: declval<_Iter1>())), decltype(_Unchecked(::std:: declval<_Iter2>()))>
-  _Unchecked_both(pair<_Iter1, _Iter2> _Src)
- {
- return (pair<decltype(_Unchecked(::std:: declval<_Iter1>())), decltype(_Unchecked(::std:: declval<_Iter2>()))>(
-  _Unchecked(_Src.first),
-  _Unchecked(_Src.second)));
- }
-
-template<class _Iter1,
- class _Iter2> inline
- pair<decltype(_Unchecked(::std:: declval<_Iter1>())), _Iter2>
-  _Unchecked_first(pair<_Iter1, _Iter2> _Src)
- {
- return (pair<decltype(_Unchecked(::std:: declval<_Iter1>())), _Iter2>(
-  _Unchecked(_Src.first),
-  _Src.second));
- }
-
-template<class _Iter1,
- class _Iter2> inline
- pair<_Iter1, decltype(_Unchecked(::std:: declval<_Iter2>()))>
-  _Unchecked_second(pair<_Iter1, _Iter2> _Src)
- {
- return (pair<_Iter1, decltype(_Unchecked(::std:: declval<_Iter2>()))>(
-  _Src.first,
-  _Unchecked(_Src.second)));
- }
-
-
-
+# 64 "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm" 3
 template<class _InIt,
  class _Fn1> inline
  void _For_each_unchecked(_InIt _First, _InIt _Last, _Fn1& _Func)
@@ -148978,7 +147385,7 @@ template<class _InIt,
  class _Fn1> inline
  _Fn1 for_each(_InIt _First, _InIt _Last, _Fn1 _Func)
  {
- _Debug_range_ptr(_First, _Last, _Func, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 76);
+                                       ;
  _For_each_unchecked(_Unchecked(_First), _Unchecked(_Last), _Func);
  return (_Func);
  }
@@ -148998,7 +147405,7 @@ template<class _InIt,
  class _Pr> inline
  _InIt find_if(_InIt _First, _InIt _Last, _Pr _Pred)
  {
- _Debug_range_ptr(_First, _Last, _Pred, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 96);
+                                       ;
  return (_Rechecked(_First,
   _Find_if_unchecked(_Unchecked(_First), _Unchecked(_Last), _Pred)));
  }
@@ -149019,8 +147426,8 @@ template<class _FwdIt,
  class _Pr> inline
  _FwdIt adjacent_find(_FwdIt _First, _FwdIt _Last, _Pr _Pred)
  {
- _Debug_range(_First, _Last, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 117);
- _Debug_pointer_if(_First != _Last && ::std:: next(_First) != _Last, _Pred, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 118);
+                            ;
+                                                                        ;
  return (_Rechecked(_First,
   _Adjacent_find_unchecked(_Unchecked(_First), _Unchecked(_Last), _Pred)));
  }
@@ -149051,7 +147458,7 @@ template<class _InIt,
  typename iterator_traits<_InIt>::difference_type
   count_if(_InIt _First, _InIt _Last, _Pr _Pred)
  {
- _Debug_range_ptr(_First, _Last, _Pred, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 149);
+                                       ;
  return (_Count_if_unchecked(_Unchecked(_First), _Unchecked(_Last), _Pred));
  }
 
@@ -149090,7 +147497,7 @@ template<class _InIt1,
   _Mismatch_no_deprecate1(_InIt1 _First1, _InIt1 _Last1,
    _InIt2 _First2, _Pr& _Pred, random_access_iterator_tag, random_access_iterator_tag)
  {
- static_cast<void>((_First2) + ((_Last1) - (_First1)));
+                                             ;
  return (_Mismatch_unchecked(_First1, _Last1, _Unchecked(_First2), _Pred));
  }
 
@@ -149101,8 +147508,8 @@ template<class _InIt1,
   _Mismatch_no_deprecate(_InIt1 _First1, _InIt1 _Last1,
    _InIt2 _First2, _Pr& _Pred)
  {
- _Debug_range_ptr(_First1, _Last1, _First2, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 199);
- _Debug_pointer_if(_First1 != _Last1, _Pred, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 200);
+                                           ;
+                                            ;
  return (_Rechecked_both(_First1, _First2,
   _Mismatch_no_deprecate1(_Unchecked(_First1), _Unchecked(_Last1),
    _First2, _Pred, _Iter_cat_t<_InIt1>(), _Iter_cat_t<_InIt2>())));
@@ -149115,26 +147522,10 @@ template<class _InIt1,
   mismatch(_InIt1 _First1, _InIt1 _Last1,
    _InIt2 _First2, _Pr _Pred)
  {
- struct _Unchecked_iterators { static void __declspec(deprecated("Call to 'std::" "mismatch" "' with parameters that may be unsafe - " "this call relies on the caller to check that the passed values are correct. " "To disable this warning, use -D_SCL_SECURE_NO_WARNINGS. " "See documentation on how to use Visual C++ 'Checked Iterators'")) _Deprecate(false_type) { } static void _Deprecate(true_type) { } }; (_Unchecked_iterators::_Deprecate(_Is_checked(_First2)));
+ struct _Unchecked_iterators { static void _Deprecate(false_type) { } static void _Deprecate(true_type) { } }; (_Unchecked_iterators::_Deprecate(_Is_checked(_First2)));
  return (_Mismatch_no_deprecate(_First1, _Last1, _First2, _Pred));
  }
-
-
-template<class _InIt1,
- class _InTy,
- size_t _InSize,
- class _Pr,
- class = enable_if_t<!is_same<_InTy *, _Pr>::value>> inline
- pair<_InIt1, _InTy *>
-  mismatch(_InIt1 _First1, _InIt1 _Last1,
-   _InTy (&_First2)[_InSize], _Pr _Pred)
- {
- return (_Unchecked_second(_Mismatch_no_deprecate(_First1, _Last1,
-  _Array_iterator<_InTy, _InSize>(_First2), _Pred)));
- }
-
-
-
+# 233 "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm" 3
 template<class _InIt1,
  class _InIt2> inline
  pair<_InIt1, _InIt2>
@@ -149144,21 +147535,7 @@ template<class _InIt1,
  return (::std:: mismatch(_First1, _Last1, _First2,
   equal_to<>()));
  }
-
-
-template<class _InIt1,
- class _InTy,
- size_t _InSize> inline
- pair<_InIt1, _InTy *>
-  mismatch(_InIt1 _First1, _InIt1 _Last1,
-   _InTy (&_First2)[_InSize])
- {
- return (::std:: mismatch(_First1, _Last1, _First2,
-  equal_to<>()));
- }
-
-
-
+# 257 "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm" 3
 template<class _InIt1,
  class _InIt2,
  class _Pr> inline
@@ -149183,9 +147560,9 @@ template<class _InIt1,
   mismatch(_InIt1 _First1, _InIt1 _Last1,
    _InIt2 _First2, _InIt2 _Last2, _Pr _Pred)
  {
- _Debug_range(_First1, _Last1, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 281);
- _Debug_range(_First2, _Last2, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 282);
- _Debug_pointer_if(_First1 != _Last1 && _First2 != _Last2, _Pred, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 283);
+                              ;
+                              ;
+                                                                 ;
  return (_Rechecked_both(_First1, _First2,
   _Mismatch_unchecked(_Unchecked(_First1), _Unchecked(_Last1),
    _Unchecked(_First2), _Unchecked(_Last2), _Pred)));
@@ -149217,7 +147594,7 @@ template<class _InIt,
  class _Pr> inline
  bool all_of(_InIt _First, _InIt _Last, _Pr _Pred)
  {
- _Debug_range_ptr(_First, _Last, _Pred, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 315);
+                                       ;
  return (_All_of_unchecked(_Unchecked(_First), _Unchecked(_Last), _Pred));
  }
 
@@ -149236,7 +147613,7 @@ template<class _InIt,
  class _Pr> inline
  bool any_of(_InIt _First, _InIt _Last, _Pr _Pred)
  {
- _Debug_range_ptr(_First, _Last, _Pred, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 334);
+                                       ;
  return (_Any_of_unchecked(_Unchecked(_First), _Unchecked(_Last), _Pred));
  }
 
@@ -149255,7 +147632,7 @@ template<class _InIt,
  class _Pr> inline
  bool none_of(_InIt _First, _InIt _Last, _Pr _Pred)
  {
- _Debug_range_ptr(_First, _Last, _Pred, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 353);
+                                       ;
  return (_None_of_unchecked(_Unchecked(_First), _Unchecked(_Last), _Pred));
  }
 
@@ -149274,7 +147651,7 @@ template<class _InIt,
  class _Pr> inline
  _InIt find_if_not(_InIt _First, _InIt _Last, _Pr _Pred)
  {
- _Debug_range_ptr(_First, _Last, _Pred, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 372);
+                                       ;
  return (_Rechecked(_First,
   _Find_if_not_unchecked(_Unchecked(_First), _Unchecked(_Last), _Pred)));
  }
@@ -149289,7 +147666,7 @@ template<class _InIt,
  for (; _First != _Last; ++_First)
   if (_Pred(*_First))
    {
-   _Debug_pointer(_Dest, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 387);
+                        ;
    *_Dest++ = *_First;
    }
 
@@ -149302,7 +147679,7 @@ template<class _InIt,
  _OutIt _Copy_if_no_deprecate(_InIt _First, _InIt _Last, _OutIt _Dest,
   _Pr& _Pred)
  {
- _Debug_range_ptr(_First, _Last, _Pred, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 400);
+                                       ;
  return (_Rechecked(_Dest,
   _Copy_if_unchecked(_Unchecked(_First), _Unchecked(_Last),
   _Unchecked_idl0(_Dest), _Pred)));
@@ -149314,25 +147691,10 @@ template<class _InIt,
  _OutIt copy_if(_InIt _First, _InIt _Last, _OutIt _Dest,
   _Pr _Pred)
  {
- struct _Unchecked_iterators { static void __declspec(deprecated("Call to 'std::" "copy_if" "' with parameters that may be unsafe - " "this call relies on the caller to check that the passed values are correct. " "To disable this warning, use -D_SCL_SECURE_NO_WARNINGS. " "See documentation on how to use Visual C++ 'Checked Iterators'")) _Deprecate(false_type) { } static void _Deprecate(true_type) { } }; (_Unchecked_iterators::_Deprecate(_Is_checked(_Dest)));
+ struct _Unchecked_iterators { static void _Deprecate(false_type) { } static void _Deprecate(true_type) { } }; (_Unchecked_iterators::_Deprecate(_Is_checked(_Dest)));
  return (_Copy_if_no_deprecate(_First, _Last, _Dest, _Pred));
  }
-
-
-template<class _InIt,
- class _OutTy,
- size_t _OutSize,
- class _Pr> inline
- _OutTy *copy_if(_InIt _First, _InIt _Last, _OutTy (&_Dest)[_OutSize],
-  _Pr _Pred)
- {
- return (_Unchecked(
-  _Copy_if_no_deprecate(_First, _Last,
-   _Array_iterator<_OutTy, _OutSize>(_Dest), _Pred)));
- }
-
-
-
+# 431 "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm" 3
 template<class _InIt,
  class _OutIt1,
  class _OutIt2,
@@ -149344,12 +147706,12 @@ template<class _InIt,
  for (; _First != _Last; ++_First)
   if (_Pred(*_First))
    {
-   _Debug_pointer(_Dest1, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 442);
+                         ;
    *_Dest1++ = *_First;
    }
   else
    {
-   _Debug_pointer(_Dest2, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 447);
+                         ;
    *_Dest2++ = *_First;
    }
 
@@ -149364,7 +147726,7 @@ template<class _InIt,
   _Partition_copy_no_deprecate(_InIt _First, _InIt _Last,
    _OutIt1 _Dest1, _OutIt2 _Dest2, _Pr& _Pred)
  {
- _Debug_range_ptr(_First, _Last, _Pred, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 462);
+                                       ;
  return (_Rechecked_both(_Dest1, _Dest2,
   _Partition_copy_unchecked(_Unchecked(_First), _Unchecked(_Last),
   _Unchecked_idl0(_Dest1), _Unchecked_idl0(_Dest2), _Pred)));
@@ -149378,62 +147740,12 @@ template<class _InIt,
   partition_copy(_InIt _First, _InIt _Last,
    _OutIt1 _Dest1, _OutIt2 _Dest2, _Pr _Pred)
  {
- struct _Unchecked_iterators { static void __declspec(deprecated("Call to 'std::" "partition_copy" "' with parameters that may be unsafe - " "this call relies on the caller to check that the passed values are correct. " "To disable this warning, use -D_SCL_SECURE_NO_WARNINGS. " "See documentation on how to use Visual C++ 'Checked Iterators'")) _Deprecate(false_type) { } static void _Deprecate(true_type) { } };
+ struct _Unchecked_iterators { static void _Deprecate(false_type) { } static void _Deprecate(true_type) { } };
  (_Unchecked_iterators::_Deprecate(_Is_checked(_Dest1)));
  (_Unchecked_iterators::_Deprecate(_Is_checked(_Dest2)));
  return (_Partition_copy_no_deprecate(_First, _Last, _Dest1, _Dest2, _Pred));
  }
-
-
-template<class _InIt,
- class _OutTy1,
- size_t _OutSize1,
- class _OutIt2,
- class _Pr> inline
- pair<_OutTy1 *, _OutIt2>
-  partition_copy(_InIt _First, _InIt _Last,
-   _OutTy1 (&_Dest1)[_OutSize1], _OutIt2 _Dest2, _Pr _Pred)
- {
- struct _Unchecked_iterators { static void __declspec(deprecated("Call to 'std::" "partition_copy" "' with parameters that may be unsafe - " "this call relies on the caller to check that the passed values are correct. " "To disable this warning, use -D_SCL_SECURE_NO_WARNINGS. " "See documentation on how to use Visual C++ 'Checked Iterators'")) _Deprecate(false_type) { } static void _Deprecate(true_type) { } }; (_Unchecked_iterators::_Deprecate(_Is_checked(_Dest2)));
- return (_Unchecked_first(
-  _Partition_copy_no_deprecate(_First, _Last,
-   _Array_iterator<_OutTy1, _OutSize1>(_Dest1), _Dest2, _Pred)));
- }
-
-template<class _InIt,
- class _OutIt1,
- class _OutTy2,
- size_t _OutSize2,
- class _Pr> inline
- pair<_OutIt1, _OutTy2 *>
-  partition_copy(_InIt _First, _InIt _Last,
-   _OutIt1 _Dest1, _OutTy2 (&_Dest2)[_OutSize2], _Pr _Pred)
- {
- struct _Unchecked_iterators { static void __declspec(deprecated("Call to 'std::" "partition_copy" "' with parameters that may be unsafe - " "this call relies on the caller to check that the passed values are correct. " "To disable this warning, use -D_SCL_SECURE_NO_WARNINGS. " "See documentation on how to use Visual C++ 'Checked Iterators'")) _Deprecate(false_type) { } static void _Deprecate(true_type) { } }; (_Unchecked_iterators::_Deprecate(_Is_checked(_Dest1)));
- return (_Unchecked_second(
-  _Partition_copy_no_deprecate(_First, _Last,
-   _Dest1, _Array_iterator<_OutTy2, _OutSize2>(_Dest2), _Pred)));
- }
-
-template<class _InIt,
- class _OutTy1,
- size_t _OutSize1,
- class _OutTy2,
- size_t _OutSize2,
- class _Pr> inline
- pair<_OutTy1 *, _OutTy2 *>
-  partition_copy(_InIt _First, _InIt _Last,
-   _OutTy1 (&_Dest1)[_OutSize1], _OutTy2 (&_Dest2)[_OutSize2],
-   _Pr _Pred)
- {
- return (_Unchecked_both(
-  _Partition_copy_no_deprecate(_First, _Last,
-    _Array_iterator<_OutTy1, _OutSize1>(_Dest1),
-    _Array_iterator<_OutTy2, _OutSize2>(_Dest2), _Pred)));
- }
-
-
-
+# 532 "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm" 3
 template<class _InIt,
  class _Pr> inline
  bool _Is_partitioned_unchecked(_InIt _First, _InIt _Last, _Pr& _Pred)
@@ -149451,7 +147763,7 @@ template<class _InIt,
  class _Pr> inline
  bool is_partitioned(_InIt _First, _InIt _Last, _Pr _Pred)
  {
- _Debug_range_ptr(_First, _Last, _Pred, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 549);
+                                       ;
  return (_Is_partitioned_unchecked(_Unchecked(_First), _Unchecked(_Last),
   _Pred));
  }
@@ -149484,7 +147796,7 @@ template<class _FwdIt,
  class _Pr> inline
  _FwdIt partition_point(_FwdIt _First, _FwdIt _Last, _Pr _Pred)
  {
- _Debug_range_ptr(_First, _Last, _Pred, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 582);
+                                       ;
  return (_Rechecked(_First,
   _Partition_point_unchecked(_Unchecked(_First), _Unchecked(_Last), _Pred)));
  }
@@ -149539,9 +147851,9 @@ template<class _FwdIt1,
  _FwdIt1 search(_FwdIt1 _First1, _FwdIt1 _Last1,
   _FwdIt2 _First2, _FwdIt2 _Last2, _Pr _Pred)
  {
- _Debug_range(_First1, _Last1, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 637);
- _Debug_range(_First2, _Last2, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 638);
- _Debug_pointer_if(_First1 != _Last1 && _First2 != _Last2, _Pred, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 639);
+                              ;
+                              ;
+                                                                 ;
  return (_Rechecked(_First1,
   _Search_unchecked(_Unchecked(_First1), _Unchecked(_Last1),
    _Unchecked(_First2), _Unchecked(_Last2), _Pred,
@@ -149643,7 +147955,7 @@ template<class _FwdIt,
  _FwdIt search_n(_FwdIt _First, _FwdIt _Last,
   _Diff _Count, const _Ty& _Val, _Pr _Pred)
  {
- _Debug_range_ptr(_First, _Last, _Pred, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 741);
+                                       ;
  return (_Rechecked(_First,
   _Search_n_unchecked(_Unchecked(_First), _Unchecked(_Last), _Count, _Val,
    _Pred, _Iter_cat_t<_FwdIt>())));
@@ -149673,7 +147985,7 @@ template<class _FwdIt1,
 
  if (0 < _Count2)
   {
-  _Debug_pointer_if(_Count2 <= _Count1, _Pred, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 771);
+                                              ;
   for (; _Count2 <= _Count1; ++_First1, (void)--_Count1)
    {
    _FwdIt1 _Mid1 = _First1;
@@ -149697,8 +148009,8 @@ template<class _FwdIt1,
  _FwdIt1 find_end(_FwdIt1 _First1, _FwdIt1 _Last1,
   _FwdIt2 _First2, _FwdIt2 _Last2, _Pr _Pred)
  {
- _Debug_range(_First1, _Last1, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 795);
- _Debug_range(_First2, _Last2, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 796);
+                              ;
+                              ;
  return (_Rechecked(_First1,
   _Find_end_unchecked(_Unchecked(_First1), _Unchecked(_Last1),
    _Unchecked(_First2), _Unchecked(_Last2), _Pred)));
@@ -149734,9 +148046,9 @@ template<class _FwdIt1,
  _FwdIt1 find_first_of(_FwdIt1 _First1, _FwdIt1 _Last1,
   _FwdIt2 _First2, _FwdIt2 _Last2, _Pr _Pred)
  {
- _Debug_range(_First1, _Last1, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 832);
- _Debug_range(_First2, _Last2, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 833);
- _Debug_pointer_if(_First1 != _Last1 && _First2 != _Last2, _Pred, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 834);
+                              ;
+                              ;
+                                                                 ;
  return (_Rechecked(_First1,
   _Find_first_of_unchecked(_Unchecked(_First1), _Unchecked(_Last1),
    _Unchecked(_First2), _Unchecked(_Last2), _Pred)));
@@ -149779,7 +148091,7 @@ template<class _FwdIt1,
   _FwdIt2 _Dest,
   random_access_iterator_tag, random_access_iterator_tag)
  {
- static_cast<void>((_Dest) + ((_Last1) - (_First1)));
+                                           ;
  return (_Rechecked(_Dest,
   _Swap_ranges_unchecked(_First1, _Last1, _Unchecked(_Dest))));
  }
@@ -149789,26 +148101,12 @@ template<class _FwdIt1,
  _FwdIt2 swap_ranges(_FwdIt1 _First1, _FwdIt1 _Last1,
   _FwdIt2 _Dest)
  {
- struct _Unchecked_iterators { static void __declspec(deprecated("Call to 'std::" "swap_ranges" "' with parameters that may be unsafe - " "this call relies on the caller to check that the passed values are correct. " "To disable this warning, use -D_SCL_SECURE_NO_WARNINGS. " "See documentation on how to use Visual C++ 'Checked Iterators'")) _Deprecate(false_type) { } static void _Deprecate(true_type) { } }; (_Unchecked_iterators::_Deprecate(_Is_checked(_Dest)));
- _Debug_range_ptr(_First1, _Last1, _Dest, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 888);
+ struct _Unchecked_iterators { static void _Deprecate(false_type) { } static void _Deprecate(true_type) { } }; (_Unchecked_iterators::_Deprecate(_Is_checked(_Dest)));
+                                         ;
  return (_Swap_ranges1(_Unchecked(_First1), _Unchecked(_Last1),
   _Dest, _Iter_cat_t<_FwdIt1>(), _Iter_cat_t<_FwdIt2>()));
  }
-
-
-template<class _FwdIt1,
- class _OutTy,
- size_t _OutSize> inline
- _OutTy *swap_ranges(_FwdIt1 _First1, _FwdIt1 _Last1,
-  _OutTy (&_Dest)[_OutSize])
- {
- return (_Unchecked(
-  ::std:: swap_ranges(_First1, _Last1,
-  _Array_iterator<_OutTy, _OutSize>(_Dest))));
- }
-
-
-
+# 907 "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm" 3
 template<class _InIt,
  class _OutIt,
  class _Fn1> inline
@@ -149838,7 +148136,7 @@ template<class _InIt,
   _OutIt _Dest, _Fn1& _Func,
   random_access_iterator_tag, random_access_iterator_tag)
  {
- static_cast<void>((_Dest) + ((_Last) - (_First)));
+                                         ;
  return (_Rechecked(_Dest,
   _Transform_unchecked(_First, _Last, _Unchecked(_Dest), _Func)));
  }
@@ -149849,8 +148147,8 @@ template<class _InIt,
  _OutIt _Transform_no_deprecate(_InIt _First, _InIt _Last,
   _OutIt _Dest, _Fn1& _Func)
  {
- _Debug_range_ptr(_First, _Last, _Dest, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 947);
- _Debug_pointer_if(_First != _Last, _Func, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 948);
+                                       ;
+                                          ;
  return (_Transform_no_deprecate1(_Unchecked(_First), _Unchecked(_Last),
   _Dest, _Func, _Iter_cat_t<_InIt>(), _Iter_cat_t<_OutIt>()));
  }
@@ -149861,25 +148159,10 @@ template<class _InIt,
  _OutIt transform(_InIt _First, _InIt _Last,
   _OutIt _Dest, _Fn1 _Func)
  {
- struct _Unchecked_iterators { static void __declspec(deprecated("Call to 'std::" "transform" "' with parameters that may be unsafe - " "this call relies on the caller to check that the passed values are correct. " "To disable this warning, use -D_SCL_SECURE_NO_WARNINGS. " "See documentation on how to use Visual C++ 'Checked Iterators'")) _Deprecate(false_type) { } static void _Deprecate(true_type) { } }; (_Unchecked_iterators::_Deprecate(_Is_checked(_Dest)));
+ struct _Unchecked_iterators { static void _Deprecate(false_type) { } static void _Deprecate(true_type) { } }; (_Unchecked_iterators::_Deprecate(_Is_checked(_Dest)));
  return (_Transform_no_deprecate(_First, _Last, _Dest, _Func));
  }
-
-
-template<class _InIt,
- class _OutTy,
- size_t _OutSize,
- class _Fn1> inline
- _OutTy *transform(_InIt _First, _InIt _Last,
-  _OutTy (&_Dest)[_OutSize], _Fn1 _Func)
- {
- return (_Unchecked(
-  _Transform_no_deprecate(_First, _Last,
-   _Array_iterator<_OutTy, _OutSize>(_Dest), _Func)));
- }
-
-
-
+# 978 "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm" 3
 template<class _InIt1,
  class _InIt2,
  class _OutIt,
@@ -149912,7 +148195,7 @@ template<class _InIt1,
   _InIt2 _First2, _OutIt _Dest, _Fn2& _Func,
   random_access_iterator_tag, random_access_iterator_tag)
  {
- static_cast<void>((_Dest) + ((_Last1) - (_First1)));
+                                           ;
  return (_Rechecked(_Dest,
   _Transform_unchecked(_First1, _Last1, _First2, _Unchecked(_Dest), _Func)));
  }
@@ -149938,7 +148221,7 @@ template<class _InIt1,
   _InIt2 _First2, _OutIt _Dest, _Fn2& _Func,
   random_access_iterator_tag, random_access_iterator_tag)
  {
- static_cast<void>((_First2) + ((_Last1) - (_First1)));
+                                             ;
  return (_Transform_no_deprecate2(_First1, _Last1,
   _Unchecked(_First2), _Dest, _Func,
   _Iter_cat_t<_InIt1>(), _Iter_cat_t<_OutIt>()));
@@ -149951,9 +148234,9 @@ template<class _InIt1,
  _OutIt _Transform_no_deprecate(_InIt1 _First1, _InIt1 _Last1,
   _InIt2 _First2, _OutIt _Dest, _Fn2& _Func)
  {
- _Debug_range_ptr(_First1, _Last1, _First2, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 1049);
- _Debug_pointer_if(_First1 != _Last1, _Dest, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 1050);
- _Debug_pointer_if(_First1 != _Last1, _Func, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 1051);
+                                           ;
+                                            ;
+                                            ;
  return (_Transform_no_deprecate1(_Unchecked(_First1), _Unchecked(_Last1),
   _First2, _Dest, _Func,
   _Iter_cat_t<_InIt1>(), _Iter_cat_t<_InIt2>()));
@@ -149966,57 +148249,12 @@ template<class _InIt1,
  _OutIt transform(_InIt1 _First1, _InIt1 _Last1,
   _InIt2 _First2, _OutIt _Dest, _Fn2 _Func)
  {
- struct _Unchecked_iterators { static void __declspec(deprecated("Call to 'std::" "transform" "' with parameters that may be unsafe - " "this call relies on the caller to check that the passed values are correct. " "To disable this warning, use -D_SCL_SECURE_NO_WARNINGS. " "See documentation on how to use Visual C++ 'Checked Iterators'")) _Deprecate(false_type) { } static void _Deprecate(true_type) { } };
+ struct _Unchecked_iterators { static void _Deprecate(false_type) { } static void _Deprecate(true_type) { } };
  (_Unchecked_iterators::_Deprecate(_Is_checked(_First2)));
  (_Unchecked_iterators::_Deprecate(_Is_checked(_Dest)));
  return (_Transform_no_deprecate(_First1, _Last1, _First2, _Dest, _Func));
  }
-
-
-template<class _InIt1,
- class _InTy,
- size_t _InSize,
- class _OutIt,
- class _Fn2> inline
- _OutIt transform(_InIt1 _First1, _InIt1 _Last1,
-  _InTy (&_First2)[_InSize], _OutIt _Dest, _Fn2 _Func)
- {
- struct _Unchecked_iterators { static void __declspec(deprecated("Call to 'std::" "transform" "' with parameters that may be unsafe - " "this call relies on the caller to check that the passed values are correct. " "To disable this warning, use -D_SCL_SECURE_NO_WARNINGS. " "See documentation on how to use Visual C++ 'Checked Iterators'")) _Deprecate(false_type) { } static void _Deprecate(true_type) { } }; (_Unchecked_iterators::_Deprecate(_Is_checked(_Dest)));
- return (_Transform_no_deprecate(_First1, _Last1,
-  _Array_iterator<_InTy, _InSize>(_First2), _Dest, _Func));
- }
-
-template<class _InIt1,
- class _InIt2,
- class _OutTy,
- size_t _OutSize,
- class _Fn2> inline
- _OutTy *transform(_InIt1 _First1, _InIt1 _Last1,
-  _InIt2 _First2, _OutTy (&_Dest)[_OutSize], _Fn2 _Func)
- {
- struct _Unchecked_iterators { static void __declspec(deprecated("Call to 'std::" "transform" "' with parameters that may be unsafe - " "this call relies on the caller to check that the passed values are correct. " "To disable this warning, use -D_SCL_SECURE_NO_WARNINGS. " "See documentation on how to use Visual C++ 'Checked Iterators'")) _Deprecate(false_type) { } static void _Deprecate(true_type) { } }; (_Unchecked_iterators::_Deprecate(_Is_checked(_First2)));
- return (_Unchecked(
-  _Transform_no_deprecate(_First1, _Last1,
-   _First2, _Array_iterator<_OutTy, _OutSize>(_Dest), _Func)));
- }
-
-template<class _InIt1,
- class _InTy,
- size_t _InSize,
- class _OutTy,
- size_t _OutSize,
- class _Fn2> inline
- _OutTy *transform(_InIt1 _First1, _InIt1 _Last1,
-  _InTy (&_First2)[_InSize], _OutTy (&_Dest)[_OutSize], _Fn2 _Func)
- {
- return (_Unchecked(
-  _Transform_no_deprecate(_First1, _Last1,
-   _Array_iterator<_InTy, _InSize>(_First2),
-   _Array_iterator<_OutTy, _OutSize>(_Dest), _Func)));
- }
-
-
-
+# 1115 "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm" 3
 template<class _FwdIt,
  class _Ty> inline
  void _Replace_unchecked(_FwdIt _First, _FwdIt _Last,
@@ -150032,7 +148270,7 @@ template<class _FwdIt,
  void replace(_FwdIt _First, _FwdIt _Last,
   const _Ty& _Oldval, const _Ty& _Newval)
  {
- _Debug_range(_First, _Last, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 1130);
+                            ;
  _Replace_unchecked(_Unchecked(_First), _Unchecked(_Last),
   _Oldval, _Newval);
  }
@@ -150053,7 +148291,7 @@ template<class _FwdIt,
  class _Ty> inline
  void replace_if(_FwdIt _First, _FwdIt _Last, _Pr _Pred, const _Ty& _Val)
  {
- _Debug_range_ptr(_First, _Last, _Pred, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 1151);
+                                       ;
  _Replace_if_unchecked(_Unchecked(_First), _Unchecked(_Last),
   _Pred, _Val);
  }
@@ -150089,7 +148327,7 @@ template<class _InIt,
   _OutIt _Dest, const _Ty& _Oldval, const _Ty& _Newval,
   random_access_iterator_tag, random_access_iterator_tag)
  {
- static_cast<void>((_Dest) + ((_Last) - (_First)));
+                                         ;
  return (_Rechecked(_Dest,
   _Replace_copy_unchecked(_First, _Last, _Unchecked(_Dest),
   _Oldval, _Newval)));
@@ -150101,28 +148339,13 @@ template<class _InIt,
  _OutIt replace_copy(_InIt _First, _InIt _Last,
   _OutIt _Dest, const _Ty& _Oldval, const _Ty& _Newval)
  {
- struct _Unchecked_iterators { static void __declspec(deprecated("Call to 'std::" "replace_copy" "' with parameters that may be unsafe - " "this call relies on the caller to check that the passed values are correct. " "To disable this warning, use -D_SCL_SECURE_NO_WARNINGS. " "See documentation on how to use Visual C++ 'Checked Iterators'")) _Deprecate(false_type) { } static void _Deprecate(true_type) { } }; (_Unchecked_iterators::_Deprecate(_Is_checked(_Dest)));
- _Debug_range_ptr(_First, _Last, _Dest, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 1200);
+ struct _Unchecked_iterators { static void _Deprecate(false_type) { } static void _Deprecate(true_type) { } }; (_Unchecked_iterators::_Deprecate(_Is_checked(_Dest)));
+                                       ;
  return (_Replace_copy1(_Unchecked(_First), _Unchecked(_Last),
   _Dest, _Oldval, _Newval,
   _Iter_cat_t<_InIt>(), _Iter_cat_t<_OutIt>()));
  }
-
-
-template<class _InIt,
- class _OutTy,
- size_t _OutSize,
- class _Ty> inline
- _OutTy *replace_copy(_InIt _First, _InIt _Last,
-  _OutTy (&_Dest)[_OutSize], const _Ty& _Oldval, const _Ty& _Newval)
- {
- return (_Unchecked(
-  ::std:: replace_copy(_First, _Last,
-   _Array_iterator<_OutTy, _OutSize>(_Dest), _Oldval, _Newval)));
- }
-
-
-
+# 1221 "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm" 3
 template<class _InIt,
  class _OutIt,
  class _Pr,
@@ -150155,7 +148378,7 @@ template<class _InIt,
   _OutIt _Dest, _Pr& _Pred, const _Ty& _Val,
   random_access_iterator_tag, random_access_iterator_tag)
  {
- static_cast<void>((_Dest) + ((_Last) - (_First)));
+                                         ;
  return (_Rechecked(_Dest,
   _Replace_copy_if_unchecked(_First, _Last, _Unchecked(_Dest), _Pred, _Val)));
  }
@@ -150167,8 +148390,8 @@ template<class _InIt,
  _OutIt _Replace_copy_if_no_deprecate(_InIt _First, _InIt _Last,
   _OutIt _Dest, _Pr& _Pred, const _Ty& _Val)
  {
- _Debug_range_ptr(_First, _Last, _Dest, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 1265);
- _Debug_pointer_if(_First != _Last, _Pred, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 1266);
+                                       ;
+                                          ;
  return (_Replace_copy_if_no_deprecate1(_Unchecked(_First), _Unchecked(_Last),
   _Dest, _Pred, _Val,
   _Iter_cat_t<_InIt>(), _Iter_cat_t<_OutIt>()));
@@ -150181,26 +148404,10 @@ template<class _InIt,
  _OutIt replace_copy_if(_InIt _First, _InIt _Last,
   _OutIt _Dest, _Pr _Pred, const _Ty& _Val)
  {
- struct _Unchecked_iterators { static void __declspec(deprecated("Call to 'std::" "replace_copy_if" "' with parameters that may be unsafe - " "this call relies on the caller to check that the passed values are correct. " "To disable this warning, use -D_SCL_SECURE_NO_WARNINGS. " "See documentation on how to use Visual C++ 'Checked Iterators'")) _Deprecate(false_type) { } static void _Deprecate(true_type) { } }; (_Unchecked_iterators::_Deprecate(_Is_checked(_Dest)));
+ struct _Unchecked_iterators { static void _Deprecate(false_type) { } static void _Deprecate(true_type) { } }; (_Unchecked_iterators::_Deprecate(_Is_checked(_Dest)));
  return (_Replace_copy_if_no_deprecate(_First, _Last, _Dest, _Pred, _Val));
  }
-
-
-template<class _InIt,
- class _OutTy,
- size_t _OutSize,
- class _Pr,
- class _Ty> inline
- _OutTy *replace_copy_if(_InIt _First, _InIt _Last,
-  _OutTy (&_Dest)[_OutSize], _Pr _Pred, const _Ty& _Val)
- {
- return (_Unchecked(
-  _Replace_copy_if_no_deprecate(_First, _Last,
-   _Array_iterator<_OutTy, _OutSize>(_Dest), _Pred, _Val)));
- }
-
-
-
+# 1299 "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm" 3
 template<class _FwdIt,
  class _Fn0> inline
  void _Generate_unchecked(_FwdIt _First, _FwdIt _Last, _Fn0& _Func)
@@ -150213,7 +148420,7 @@ template<class _FwdIt,
  class _Fn0> inline
  void generate(_FwdIt _First, _FwdIt _Last, _Fn0 _Func)
  {
- _Debug_range_ptr(_First, _Last, _Func, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 1311);
+                                       ;
  _Generate_unchecked(_Unchecked(_First), _Unchecked(_Last), _Func);
  }
 
@@ -150236,20 +148443,7 @@ template<class _OutIt,
  return (_Rechecked(_Dest,
   _Generate_n_unchecked(_Unchecked_n(_Dest, _Count), _Count, _Func)));
  }
-
-
-template<class _OutTy,
- size_t _OutSize,
- class _Diff,
- class _Fn0> inline
- _OutTy *generate_n(_OutTy (&_Dest)[_OutSize], _Diff _Count, _Fn0 _Func)
- {
- _Debug_array_size2(_Dest, _Count, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 1342);
- return (_Generate_n_unchecked(_Dest, _Count, _Func));
- }
-
-
-
+# 1348 "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm" 3
 template<class _InIt,
  class _OutIt,
  class _Ty> inline
@@ -150259,7 +148453,7 @@ template<class _InIt,
  for (; _First != _Last; ++_First)
   if (!(*_First == _Val))
    {
-   _Debug_pointer(_Dest, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 1357);
+                        ;
    *_Dest++ = *_First;
    }
 
@@ -150272,28 +148466,13 @@ template<class _InIt,
  _OutIt remove_copy(_InIt _First, _InIt _Last,
   _OutIt _Dest, const _Ty& _Val)
  {
- struct _Unchecked_iterators { static void __declspec(deprecated("Call to 'std::" "remove_copy" "' with parameters that may be unsafe - " "this call relies on the caller to check that the passed values are correct. " "To disable this warning, use -D_SCL_SECURE_NO_WARNINGS. " "See documentation on how to use Visual C++ 'Checked Iterators'")) _Deprecate(false_type) { } static void _Deprecate(true_type) { } }; (_Unchecked_iterators::_Deprecate(_Is_checked(_Dest)));
- _Debug_range(_First, _Last, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 1371);
+ struct _Unchecked_iterators { static void _Deprecate(false_type) { } static void _Deprecate(true_type) { } }; (_Unchecked_iterators::_Deprecate(_Is_checked(_Dest)));
+                            ;
  return (_Rechecked(_Dest,
   _Remove_copy_unchecked(_Unchecked(_First), _Unchecked(_Last),
   _Unchecked_idl0(_Dest), _Val)));
  }
-
-
-template<class _InIt,
- class _OutTy,
- size_t _OutSize,
- class _Ty> inline
- _OutTy *remove_copy(_InIt _First, _InIt _Last,
-  _OutTy (&_Dest)[_OutSize], const _Ty& _Val)
- {
- return (_Unchecked(
-  ::std:: remove_copy(_First, _Last,
-   _Array_iterator<_OutTy, _OutSize>(_Dest), _Val)));
- }
-
-
-
+# 1392 "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm" 3
 template<class _InIt,
  class _OutIt,
  class _Pr> inline
@@ -150303,7 +148482,7 @@ template<class _InIt,
  for (; _First != _Last; ++_First)
   if (!_Pred(*_First))
    {
-   _Debug_pointer(_Dest, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 1401);
+                        ;
    *_Dest++ = *_First;
    }
 
@@ -150316,7 +148495,7 @@ template<class _InIt,
  _OutIt _Remove_copy_if_no_deprecate(_InIt _First, _InIt _Last,
   _OutIt _Dest, _Pr& _Pred)
  {
- _Debug_range_ptr(_First, _Last, _Pred, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 1414);
+                                       ;
  return (_Rechecked(_Dest,
   _Remove_copy_if_unchecked(_Unchecked(_First), _Unchecked(_Last),
   _Unchecked_idl0(_Dest), _Pred)));
@@ -150328,25 +148507,10 @@ template<class _InIt,
  _OutIt remove_copy_if(_InIt _First, _InIt _Last,
   _OutIt _Dest, _Pr _Pred)
  {
- struct _Unchecked_iterators { static void __declspec(deprecated("Call to 'std::" "remove_copy_if" "' with parameters that may be unsafe - " "this call relies on the caller to check that the passed values are correct. " "To disable this warning, use -D_SCL_SECURE_NO_WARNINGS. " "See documentation on how to use Visual C++ 'Checked Iterators'")) _Deprecate(false_type) { } static void _Deprecate(true_type) { } }; (_Unchecked_iterators::_Deprecate(_Is_checked(_Dest)));
+ struct _Unchecked_iterators { static void _Deprecate(false_type) { } static void _Deprecate(true_type) { } }; (_Unchecked_iterators::_Deprecate(_Is_checked(_Dest)));
  return (_Remove_copy_if_no_deprecate(_First, _Last, _Dest, _Pred));
  }
-
-
-template<class _InIt,
- class _OutTy,
- size_t _OutSize,
- class _Pr> inline
- _OutTy *remove_copy_if(_InIt _First, _InIt _Last,
-  _OutTy (&_Dest)[_OutSize], _Pr _Pred)
- {
- return (_Unchecked(
-  _Remove_copy_if_no_deprecate(_First, _Last,
-   _Array_iterator<_OutTy, _OutSize>(_Dest), _Pred)));
- }
-
-
-
+# 1445 "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm" 3
 template<class _FwdIt,
  class _Ty> inline
  _FwdIt _Remove_unchecked(_FwdIt _First, _FwdIt _Last, const _Ty& _Val)
@@ -150367,7 +148531,7 @@ template<class _FwdIt,
  class _Ty> inline
  _FwdIt remove(_FwdIt _First, _FwdIt _Last, const _Ty& _Val)
  {
- _Debug_range(_First, _Last, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 1465);
+                            ;
  return (_Rechecked(_First,
   _Remove_unchecked(_Unchecked(_First), _Unchecked(_Last), _Val)));
  }
@@ -150393,7 +148557,7 @@ template<class _FwdIt,
  class _Pr> inline
  _FwdIt remove_if(_FwdIt _First, _FwdIt _Last, _Pr _Pred)
  {
- _Debug_range(_First, _Last, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 1491);
+                            ;
  return (_Rechecked(_First,
   _Remove_if_unchecked(_Unchecked(_First), _Unchecked(_Last), _Pred)));
  }
@@ -150420,8 +148584,8 @@ template<class _FwdIt,
  class _Pr> inline
  _FwdIt unique(_FwdIt _First, _FwdIt _Last, _Pr _Pred)
  {
- _Debug_range(_First, _Last, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 1518);
- _Debug_pointer_if(_First != _Last && ::std:: next(_First) != _Last, _Pred, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 1519);
+                            ;
+                                                                        ;
  return (_Rechecked(_First,
   _Unique_unchecked(_Unchecked(_First), _Unchecked(_Last), _Pred)));
  }
@@ -150482,8 +148646,8 @@ template<class _InIt,
  _OutIt _Unique_copy_no_deprecate(_InIt _First, _InIt _Last,
   _OutIt _Dest, _Pr& _Pred)
  {
- _Debug_range_ptr(_First, _Last, _Dest, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 1580);
- _Debug_pointer_if(_First != _Last, _Pred, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 1581);
+                                       ;
+                                          ;
  return (_Rechecked(_Dest,
   _Unique_copy_unchecked(_Unchecked(_First), _Unchecked(_Last),
    _Unchecked_idl0(_Dest), _Pred, _Iter_cat_t<_InIt>())));
@@ -150495,25 +148659,10 @@ template<class _InIt,
  _OutIt unique_copy(_InIt _First, _InIt _Last,
   _OutIt _Dest, _Pr _Pred)
  {
- struct _Unchecked_iterators { static void __declspec(deprecated("Call to 'std::" "unique_copy" "' with parameters that may be unsafe - " "this call relies on the caller to check that the passed values are correct. " "To disable this warning, use -D_SCL_SECURE_NO_WARNINGS. " "See documentation on how to use Visual C++ 'Checked Iterators'")) _Deprecate(false_type) { } static void _Deprecate(true_type) { } }; (_Unchecked_iterators::_Deprecate(_Is_checked(_Dest)));
+ struct _Unchecked_iterators { static void _Deprecate(false_type) { } static void _Deprecate(true_type) { } }; (_Unchecked_iterators::_Deprecate(_Is_checked(_Dest)));
  return (_Unique_copy_no_deprecate(_First, _Last, _Dest, _Pred));
  }
-
-
-template<class _InIt,
- class _OutTy,
- size_t _OutSize,
- class _Pr> inline
- _OutTy *unique_copy(_InIt _First, _InIt _Last,
-  _OutTy (&_Dest)[_OutSize], _Pr _Pred)
- {
- return (_Unchecked(
-  _Unique_copy_no_deprecate(_First, _Last,
-   _Array_iterator<_OutTy, _OutSize>(_Dest), _Pred)));
- }
-
-
-
+# 1612 "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm" 3
 template<class _InIt,
  class _OutIt> inline
  _OutIt unique_copy(_InIt _First, _InIt _Last, _OutIt _Dest)
@@ -150521,20 +148670,7 @@ template<class _InIt,
  return (::std:: unique_copy(_First, _Last, _Dest,
   equal_to<>()));
  }
-
-
-template<class _InIt,
- class _OutTy,
- size_t _OutSize> inline
- _OutTy *unique_copy(_InIt _First, _InIt _Last,
-  _OutTy (&_Dest)[_OutSize])
- {
- return (::std:: unique_copy(_First, _Last, _Dest,
-  equal_to<>()));
- }
-
-
-
+# 1633 "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm" 3
 template<class _BidIt,
  class _OutIt> inline
  _OutIt _Reverse_copy_unchecked(_BidIt _First, _BidIt _Last,
@@ -150561,7 +148697,7 @@ template<class _BidIt,
   _OutIt _Dest,
   random_access_iterator_tag, random_access_iterator_tag)
  {
- static_cast<void>((_Dest) + ((_Last) - (_First)));
+                                         ;
  return (_Rechecked(_Dest,
   _Reverse_copy_unchecked(_First, _Last, _Unchecked(_Dest))));
  }
@@ -150571,26 +148707,12 @@ template<class _BidIt,
  _OutIt reverse_copy(_BidIt _First, _BidIt _Last,
   _OutIt _Dest)
  {
- struct _Unchecked_iterators { static void __declspec(deprecated("Call to 'std::" "reverse_copy" "' with parameters that may be unsafe - " "this call relies on the caller to check that the passed values are correct. " "To disable this warning, use -D_SCL_SECURE_NO_WARNINGS. " "See documentation on how to use Visual C++ 'Checked Iterators'")) _Deprecate(false_type) { } static void _Deprecate(true_type) { } }; (_Unchecked_iterators::_Deprecate(_Is_checked(_Dest)));
- _Debug_range_ptr(_First, _Last, _Dest, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 1670);
+ struct _Unchecked_iterators { static void _Deprecate(false_type) { } static void _Deprecate(true_type) { } }; (_Unchecked_iterators::_Deprecate(_Is_checked(_Dest)));
+                                       ;
  return (_Reverse_copy1(_Unchecked(_First), _Unchecked(_Last),
   _Dest, _Iter_cat_t<_BidIt>(), _Iter_cat_t<_OutIt>()));
  }
-
-
-template<class _BidIt,
- class _OutTy,
- size_t _OutSize> inline
- _OutTy *reverse_copy(_BidIt _First, _BidIt _Last,
-  _OutTy (&_Dest)[_OutSize])
- {
- return (_Unchecked(
-  ::std:: reverse_copy(_First, _Last,
-   _Array_iterator<_OutTy, _OutSize>(_Dest))));
- }
-
-
-
+# 1689 "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm" 3
 template<class _FwdIt,
  class _OutIt> inline
  _OutIt _Rotate_copy_unchecked(_FwdIt _First, _FwdIt _Mid, _FwdIt _Last,
@@ -150614,7 +148736,7 @@ template<class _FwdIt,
  _OutIt _Rotate_copy1(_FwdIt _First, _FwdIt _Mid, _FwdIt _Last,
   _OutIt _Dest, random_access_iterator_tag, random_access_iterator_tag)
  {
- static_cast<void>((_Dest) + ((_Last) - (_First)));
+                                         ;
  return (_Rechecked(_Dest,
   _Rotate_copy_unchecked(_First, _Mid, _Last, _Unchecked(_Dest))));
  }
@@ -150624,8 +148746,8 @@ template<class _FwdIt,
  _OutIt rotate_copy(_FwdIt _First, _FwdIt _Mid, _FwdIt _Last,
   _OutIt _Dest)
  {
- _Debug_range(_First, _Mid, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 1722);
- _Debug_range(_Mid, _Last, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 1723);
+                           ;
+                          ;
  return (_Rotate_copy1(_Unchecked(_First), _Unchecked(_Mid),
   _Unchecked(_Last), _Dest, _Iter_cat_t<_FwdIt>(), _Iter_cat_t<_OutIt>()));
  }
@@ -150642,18 +148764,7 @@ template<class _RanIt,
  for (_Iter_diff_t<_RanIt> _Index = 2; ++_Next != _Last; ++_Index)
   {
   _Iter_diff_t<_RanIt> _Off = _Func(_Index);
-
-
-  if (_Off < 0 || _Index <= _Off)
-   {
-   _Debug_message(L"random value out of range", L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 1744);
-   { (void)( (!!(("Standard C++ Libraries Out of Range" && 0))) || (1 != _CrtDbgReportW(2, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 1745, 0, L"%ls", L"\"Standard C++ Libraries Out of Range\" && 0")) || (__debugbreak(), 0) ); ::_invalid_parameter(L"\"out of range\"", L__FUNCTION__, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 1745, 0); };
-   }
-
-
-
-
-
+# 1752 "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm" 3
   ::std:: iter_swap(_Next, _First + _Off);
   }
  }
@@ -150662,7 +148773,7 @@ template<class _RanIt,
  class _Fn1> inline
  void _Random_shuffle1(_RanIt _First, _RanIt _Last, _Fn1& _Func)
  {
- _Debug_range(_First, _Last, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 1760);
+                            ;
  _Random_shuffle_unchecked(_Unchecked(_First), _Unchecked(_Last), _Func);
  }
 
@@ -150761,7 +148872,7 @@ template<class _FwdIt,
  class _Pr> inline
  _FwdIt partition(_FwdIt _First, _FwdIt _Last, _Pr _Pred)
  {
- _Debug_range_ptr(_First, _Last, _Pred, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 1859);
+                                       ;
  return (_Rechecked(_First,
   _Partition_unchecked(_Unchecked(_First), _Unchecked(_Last), _Pred,
    _Iter_cat_t<_FwdIt>())));
@@ -150854,27 +148965,9 @@ template<class _BidIt,
  class _Pr> inline
  _BidIt stable_partition(_BidIt _First, _BidIt _Last, _Pr _Pred)
  {
- _Debug_range_ptr(_First, _Last, _Pred, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 1952);
+                                       ;
  return (_Rechecked(_First,
   _Stable_partition_unchecked(_Unchecked(_First), _Unchecked(_Last), _Pred)));
- }
-
-
-
-template<class _RanIt,
- class _Pr> inline
- void _Debug_heap(_RanIt _First, _RanIt _Last, _Pr& _Pred)
- {
- if (_First != _Last)
-  for (_RanIt _Root = _First; ++_First != _Last; ++_Root)
-   {
-   if (_Debug_lt_pred(_Pred, *_Root, *_First, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 1966))
-    _Debug_message(L"invalid heap", L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 1967);
-   else if (++_First == _Last)
-    break;
-   else if (_Debug_lt_pred(_Pred, *_Root, *_First, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 1970))
-    _Debug_message(L"invalid heap", L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 1971);
-   }
  }
 # 1983 "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm" 3
 template<class _RanIt,
@@ -150885,7 +148978,7 @@ template<class _RanIt,
   _Diff _Top, _Ty&& _Val, _Pr& _Pred)
  {
  for (_Diff _Idx = (_Hole - 1) / 2;
-  _Top < _Hole && _Debug_lt_pred(_Pred, *(_First + _Idx), _Val, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 1991);
+  _Top < _Hole && _Pred(*(_First + _Idx), _Val);
   _Idx = (_Hole - 1) / 2)
   {
   *(_First + _Hole) = ::std:: move(*(_First + _Idx));
@@ -150912,7 +149005,7 @@ template<class _RanIt,
  class _Pr> inline
  void push_heap(_RanIt _First, _RanIt _Last, _Pr _Pred)
  {
- _Debug_range_ptr(_First, _Last, _Pred, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 2018);
+                                       ;
  _Push_heap_unchecked(_Unchecked(_First), _Unchecked(_Last), _Pred);
  }
 
@@ -150941,7 +149034,7 @@ template<class _RanIt,
  while (_Idx < _Max_sequence_non_leaf)
   {
   _Idx = 2 * _Idx + 2;
-  if (_Debug_lt_pred(_Pred, *(_First + _Idx), *(_First + (_Idx - 1)), L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 2047))
+  if (_Pred(*(_First + _Idx), *(_First + (_Idx - 1))))
    --_Idx;
   *(_First + _Hole) = ::std:: move(*(_First + _Idx));
   _Hole = _Idx;
@@ -150986,8 +149079,8 @@ template<class _RanIt,
  class _Pr> inline
  void pop_heap(_RanIt _First, _RanIt _Last, _Pr _Pred)
  {
- _Debug_range_ptr(_First, _Last, _Pred, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 2092);
- _Debug_heap(_Unchecked(_First), _Unchecked(_Last), _Pred);
+                                       ;
+                                       ;
  _Pop_heap_unchecked(_Unchecked(_First), _Unchecked(_Last), _Pred);
  }
 
@@ -151020,7 +149113,7 @@ template<class _RanIt,
  class _Pr> inline
  void make_heap(_RanIt _First, _RanIt _Last, _Pr _Pred)
  {
- _Debug_range(_First, _Last, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 2126);
+                            ;
  _Make_heap_unchecked(_Unchecked(_First), _Unchecked(_Last), _Pred);
  }
 
@@ -151044,9 +149137,9 @@ template<class _RanIt,
  class _Pr> inline
  void sort_heap(_RanIt _First, _RanIt _Last, _Pr _Pred)
  {
- _Debug_range(_First, _Last, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 2150);
- _Debug_pointer_if(2 <= _Last - _First, _Pred, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 2151);
- _Debug_heap(_Unchecked(_First), _Unchecked(_Last), _Pred);
+                            ;
+                                              ;
+                                       ;
  _Sort_heap_unchecked(_Unchecked(_First), _Unchecked(_Last), _Pred);
  }
 
@@ -151090,7 +149183,7 @@ template<class _FwdIt,
  _FwdIt lower_bound(_FwdIt _First, _FwdIt _Last,
   const _Ty& _Val, _Pr _Pred)
  {
- _Debug_range(_First, _Last, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 2196);
+                            ;
  return (_Rechecked(_First,
   _Lower_bound_unchecked(_Unchecked(_First), _Unchecked(_Last), _Val, _Pred)));
  }
@@ -151136,7 +149229,7 @@ template<class _FwdIt,
  _FwdIt upper_bound(_FwdIt _First, _FwdIt _Last,
   const _Ty& _Val, _Pr _Pred)
  {
- _Debug_range(_First, _Last, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 2242);
+                            ;
  return (_Rechecked(_First,
   _Upper_bound_unchecked(_Unchecked(_First), _Unchecked(_Last), _Val, _Pred)));
  }
@@ -151165,7 +149258,7 @@ template<class _FwdIt,
   _FwdIt _Mid = _First;
   ::std:: advance(_Mid, _Count2);
 
-  if (_Debug_lt_pred(_Pred, *_Mid, _Val, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 2271))
+  if (_Pred(*_Mid, _Val))
    {
    _First = ++_Mid;
    _Count -= _Count2 + 1;
@@ -151191,7 +149284,7 @@ template<class _FwdIt,
   equal_range(_FwdIt _First, _FwdIt _Last,
    const _Ty& _Val, _Pr _Pred)
  {
- _Debug_range(_First, _Last, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 2297);
+                            ;
  return (_Rechecked_both(_First, _Last,
   _Equal_range_unchecked(_Unchecked(_First), _Unchecked(_Last), _Val, _Pred)));
  }
@@ -151223,7 +149316,7 @@ template<class _FwdIt,
  bool binary_search(_FwdIt _First, _FwdIt _Last,
   const _Ty& _Val, _Pr _Pred)
  {
- _Debug_range(_First, _Last, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 2329);
+                            ;
  return (_Binary_search_unchecked(_Unchecked(_First), _Unchecked(_Last),
   _Val, _Pred));
  }
@@ -151248,7 +149341,7 @@ template<class _InIt1,
  if (_First1 != _Last1 && _First2 != _Last2)
   for (; ; )
    {
-   if (_Debug_lt_pred(_Pred, *_First2, *_First1, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 2354))
+   if (_Pred(*_First2, *_First1))
     {
     *_Dest++ = *_First2++;
     if (_First2 == _Last2)
@@ -151288,7 +149381,7 @@ template<class _InIt1,
   _OutIt _Dest, _Pr& _Pred, random_access_iterator_tag,
   random_access_iterator_tag, random_access_iterator_tag)
  {
- static_cast<void>((_Dest) + ((_Last1 - _First1) + (_Last2 - _First2)));
+                                                                     ;
  return (_Rechecked(_Dest,
   _Merge_unchecked(_First1, _Last1, _First2, _Last2, _Unchecked(_Dest), _Pred)));
  }
@@ -151301,9 +149394,9 @@ template<class _InIt1,
   _InIt2 _First2, _InIt2 _Last2,
   _OutIt _Dest, _Pr& _Pred)
  {
- _Debug_order(_First1, _Last1, _Pred, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 2407);
- _Debug_order(_First2, _Last2, _Pred, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 2408);
- _Debug_pointer_if(_First1 != _Last1 || _First2 != _Last2, _Dest, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 2409);
+                                          ;
+                                          ;
+                                                                 ;
  return (_Merge_no_deprecate1(_Unchecked(_First1), _Unchecked(_Last1),
   _Unchecked(_First2), _Unchecked(_Last2),
   _Dest, _Pred,
@@ -151318,28 +149411,10 @@ template<class _InIt1,
   _InIt2 _First2, _InIt2 _Last2,
   _OutIt _Dest, _Pr _Pred)
  {
- struct _Unchecked_iterators { static void __declspec(deprecated("Call to 'std::" "merge" "' with parameters that may be unsafe - " "this call relies on the caller to check that the passed values are correct. " "To disable this warning, use -D_SCL_SECURE_NO_WARNINGS. " "See documentation on how to use Visual C++ 'Checked Iterators'")) _Deprecate(false_type) { } static void _Deprecate(true_type) { } }; (_Unchecked_iterators::_Deprecate(_Is_checked(_Dest)));
+ struct _Unchecked_iterators { static void _Deprecate(false_type) { } static void _Deprecate(true_type) { } }; (_Unchecked_iterators::_Deprecate(_Is_checked(_Dest)));
  return (_Merge_no_deprecate(_First1, _Last1, _First2, _Last2, _Dest, _Pred));
  }
-
-
-template<class _InIt1,
- class _InIt2,
- class _OutTy,
- size_t _OutSize,
- class _Pr> inline
- _OutTy *merge(_InIt1 _First1, _InIt1 _Last1,
-  _InIt2 _First2, _InIt2 _Last2,
-  _OutTy (&_Dest)[_OutSize], _Pr _Pred)
- {
- return (_Unchecked(
-  _Merge_no_deprecate(_First1, _Last1,
-   _First2, _Last2,
-   _Array_iterator<_OutTy, _OutSize>(_Dest), _Pred)));
- }
-
-
-
+# 2446 "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm" 3
 template<class _InIt1,
  class _InIt2,
  class _OutIt> inline
@@ -151350,22 +149425,7 @@ template<class _InIt1,
  return (::std:: merge(_First1, _Last1, _First2, _Last2, _Dest,
   less<>()));
  }
-
-
-template<class _InIt1,
- class _InIt2,
- class _OutTy,
- size_t _OutSize> inline
- _OutTy *merge(_InIt1 _First1, _InIt1 _Last1,
-  _InIt2 _First2, _InIt2 _Last2,
-  _OutTy (&_Dest)[_OutSize])
- {
- return (::std:: merge(_First1, _Last1, _First2, _Last2, _Dest,
-  less<>()));
- }
-
-
-
+# 2472 "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm" 3
 template<class _BidIt1,
  class _BidIt2,
  class _BidIt3,
@@ -151377,7 +149437,7 @@ template<class _BidIt1,
  if (_First1 != _Last1 && _First2 != _Last2)
   for (; ; )
    {
-   if (_Debug_lt_pred(_Pred, *--_Last2, *--_Last1, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 2483))
+   if (_Pred(*--_Last2, *--_Last1))
     {
     *--_Dest = ::std:: move(*_Last1);
     ++_Last2;
@@ -151410,7 +149470,7 @@ template<class _InIt1,
  if (_First1 != _Last1 && _First2 != _Last2)
   for (; ; )
    {
-   if (_Debug_lt_pred(_Pred, *_First2, *_First1, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 2516))
+   if (_Pred(*_First2, *_First1))
     {
     *_Dest++ = ::std:: move(*_First2++);
     if (_First2 == _Last2)
@@ -151442,7 +149502,7 @@ template<class _BidIt,
   ;
  else if (_Count1 + _Count2 == 2)
   {
-  if (_Debug_lt_pred(_Pred, *_Mid, *_First, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 2548))
+  if (_Pred(*_Mid, *_First))
    ::std:: iter_swap(_First, _Mid);
   }
  else if (_Count1 <= _Count2 && _Count1 <= _Tempbuf._Maxlen())
@@ -151504,8 +149564,8 @@ template<class _BidIt,
  class _Pr> inline
  void inplace_merge(_BidIt _First, _BidIt _Mid, _BidIt _Last, _Pr _Pred)
  {
- _Debug_order(_First, _Mid, _Pred, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 2610);
- _Debug_order(_Mid, _Last, _Pred, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 2611);
+                                       ;
+                                      ;
  _Inplace_merge_unchecked(
   _Unchecked(_First), _Unchecked(_Mid), _Unchecked(_Last), _Pred);
  }
@@ -151528,7 +149588,7 @@ template<class _BidIt,
    _BidIt _Next1 = _Next;
    _Iter_value_t<_BidIt> _Val = ::std:: move(*_Next);
 
-   if (_Debug_lt_pred(_Pred, _Val, *_First, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 2634))
+   if (_Pred(_Val, *_First))
     {
     _Move_backward_unchecked(_First, _Next, ++_Next1);
     *_First = ::std:: move(_Val);
@@ -151536,7 +149596,7 @@ template<class _BidIt,
    else
     {
     for (_BidIt _First1 = _Next1;
-     _Debug_lt_pred(_Pred, _Val, *--_First1, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 2642);
+     _Pred(_Val, *--_First1);
      _Next1 = _First1)
      *_Next1 = ::std:: move(*_First1);
     *_Next1 = ::std:: move(_Val);
@@ -151548,12 +149608,12 @@ template<class _RanIt,
  class _Pr> inline
  void _Med3_unchecked(_RanIt _First, _RanIt _Mid, _RanIt _Last, _Pr& _Pred)
  {
- if (_Debug_lt_pred(_Pred, *_Mid, *_First, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 2654))
+ if (_Pred(*_Mid, *_First))
   ::std:: iter_swap(_Mid, _First);
- if (_Debug_lt_pred(_Pred, *_Last, *_Mid, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 2656))
+ if (_Pred(*_Last, *_Mid))
   {
   ::std:: iter_swap(_Last, _Mid);
-  if (_Debug_lt_pred(_Pred, *_Mid, *_First, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 2659))
+  if (_Pred(*_Mid, *_First))
    ::std:: iter_swap(_Mid, _First);
   }
  }
@@ -151585,11 +149645,11 @@ template<class _RanIt,
  _RanIt _Plast = _Pfirst + 1;
 
  while (_First < _Pfirst
-  && !_Debug_lt_pred(_Pred, *(_Pfirst - 1), *_Pfirst, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 2691)
+  && !_Pred(*(_Pfirst - 1), *_Pfirst)
   && !_Pred(*_Pfirst, *(_Pfirst - 1)))
   --_Pfirst;
  while (_Plast < _Last
-  && !_Debug_lt_pred(_Pred, *_Plast, *_Pfirst, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 2695)
+  && !_Pred(*_Plast, *_Pfirst)
   && !_Pred(*_Pfirst, *_Plast))
   ++_Plast;
 
@@ -151599,14 +149659,14 @@ template<class _RanIt,
  for (; ; )
   {
   for (; _Gfirst < _Last; ++_Gfirst)
-   if (_Debug_lt_pred(_Pred, *_Pfirst, *_Gfirst, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 2705))
+   if (_Pred(*_Pfirst, *_Gfirst))
     ;
    else if (_Pred(*_Gfirst, *_Pfirst))
     break;
    else if (_Plast++ != _Gfirst)
     ::std:: iter_swap(_Plast - 1, _Gfirst);
   for (; _First < _Glast; --_Glast)
-   if (_Debug_lt_pred(_Pred, *(_Glast - 1), *_Pfirst, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 2712))
+   if (_Pred(*(_Glast - 1), *_Pfirst))
     ;
    else if (_Pred(*_Pfirst, *(_Glast - 1)))
     break;
@@ -151677,7 +149737,7 @@ template<class _RanIt,
  class _Pr> inline
  void sort(_RanIt _First, _RanIt _Last, _Pr _Pred)
  {
- _Debug_range(_First, _Last, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 2783);
+                            ;
  _Sort_unchecked(_Unchecked(_First), _Unchecked(_Last), _Pred);
  }
 
@@ -151793,7 +149853,7 @@ template<class _BidIt,
  class _Pr> inline
  void stable_sort(_BidIt _First, _BidIt _Last, _Pr _Pred)
  {
- _Debug_range(_First, _Last, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 2899);
+                            ;
  _Stable_sort_unchecked(_Unchecked(_First), _Unchecked(_Last), _Pred);
  }
 
@@ -151814,7 +149874,7 @@ template<class _RanIt,
   return;
  _Make_heap_unchecked(_First, _Mid, _Pred);
  for (_RanIt _Next = _Mid; _Next < _Last; ++_Next)
-  if (_Debug_lt_pred(_Pred, *_Next, *_First, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 2920))
+  if (_Pred(*_Next, *_First))
    {
    _Iter_value_t<_RanIt> _Val = ::std:: move(*_Next);
    _Pop_heap_hole_unchecked(_First, _Mid, _Next, ::std:: move(_Val), _Pred);
@@ -151826,9 +149886,9 @@ template<class _RanIt,
  class _Pr> inline
  void partial_sort(_RanIt _First, _RanIt _Mid, _RanIt _Last, _Pr _Pred)
  {
- _Debug_range(_First, _Mid, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 2932);
- _Debug_range(_Mid, _Last, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 2933);
- _Debug_pointer_if(2 <= _Last - _First, _Pred, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 2934);
+                           ;
+                          ;
+                                              ;
  _Partial_sort_unchecked(
   _Unchecked(_First), _Unchecked(_Mid), _Unchecked(_Last), _Pred);
  }
@@ -151855,7 +149915,7 @@ template<class _InIt,
   _Make_heap_unchecked(_First2, _Mid2, _Pred);
 
   for (; _First1 != _Last1; ++_First1)
-   if (_Debug_lt_pred(_Pred, *_First1, *_First2, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 2961))
+   if (_Pred(*_First1, *_First2))
     _Pop_heap_hole_by_index(_First2, _Iter_diff_t<_RanIt>(0), _Iter_diff_t<_RanIt>(_Mid2 - _First2),
      _Iter_value_t<_InIt>(*_First1), _Pred);
 
@@ -151871,8 +149931,8 @@ template<class _InIt,
  _RanIt partial_sort_copy(_InIt _First1, _InIt _Last1,
   _RanIt _First2, _RanIt _Last2, _Pr _Pred)
  {
- _Debug_range(_First1, _Last1, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 2977);
- _Debug_range(_First2, _Last2, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 2978);
+                              ;
+                              ;
  return (_Rechecked(_First2,
   _Partial_sort_copy_unchecked(
    _Unchecked(_First1), _Unchecked(_Last1),
@@ -151917,9 +149977,9 @@ template<class _RanIt,
  class _Pr> inline
  void nth_element(_RanIt _First, _RanIt _Nth, _RanIt _Last, _Pr _Pred)
  {
- _Debug_range(_First, _Nth, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 3023);
- _Debug_range(_Nth, _Last, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 3024);
- _Debug_pointer_if(2 <= _Last - _First, _Pred, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 3025);
+                           ;
+                          ;
+                                              ;
  _Nth_element_unchecked(
   _Unchecked(_First), _Unchecked(_Nth), _Unchecked(_Last), _Pred);
  }
@@ -151939,7 +149999,7 @@ template<class _InIt1,
   _InIt2 _First2, _InIt2 _Last2, _Pr& _Pred)
  {
  for (; _First1 != _Last1 && _First2 != _Last2; )
-  if (_Debug_lt_pred(_Pred, *_First2, *_First1, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 3045))
+  if (_Pred(*_First2, *_First1))
    return (false);
   else if (_Pred(*_First1, *_First2))
    ++_First1;
@@ -151958,8 +150018,8 @@ template<class _InIt1,
  bool includes(_InIt1 _First1, _InIt1 _Last1,
   _InIt2 _First2, _InIt2 _Last2, _Pr _Pred)
  {
- _Debug_order(_First1, _Last1, _Pred, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 3064);
- _Debug_order(_First2, _Last2, _Pred, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 3065);
+                                          ;
+                                          ;
  return (_Includes_unchecked(_Unchecked(_First1), _Unchecked(_Last1),
   _Unchecked(_First2), _Unchecked(_Last2), _Pred));
  }
@@ -151983,7 +150043,7 @@ template<class _InIt1,
   _InIt2 _First2, _InIt2 _Last2, _OutIt _Dest, _Pr& _Pred)
  {
  for (; _First1 != _Last1 && _First2 != _Last2; )
-  if (_Debug_lt_pred(_Pred, *_First1, *_First2, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 3089))
+  if (_Pred(*_First1, *_First2))
    {
    *_Dest++ = *_First1;
    ++_First1;
@@ -152010,9 +150070,9 @@ template<class _InIt1,
  _OutIt _Set_union_no_deprecate(_InIt1 _First1, _InIt1 _Last1,
   _InIt2 _First2, _InIt2 _Last2, _OutIt _Dest, _Pr& _Pred)
  {
- _Debug_order(_First1, _Last1, _Pred, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 3116);
- _Debug_order(_First2, _Last2, _Pred, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 3117);
- _Debug_pointer_if(_First1 != _Last1 || _First2 != _Last2, _Dest, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 3118);
+                                          ;
+                                          ;
+                                                                 ;
  return (_Rechecked(_Dest,
   _Set_union_no_deprecate1(_Unchecked(_First1), _Unchecked(_Last1),
   _Unchecked(_First2), _Unchecked(_Last2),
@@ -152026,27 +150086,10 @@ template<class _InIt1,
  _OutIt set_union(_InIt1 _First1, _InIt1 _Last1,
   _InIt2 _First2, _InIt2 _Last2, _OutIt _Dest, _Pr _Pred)
  {
- struct _Unchecked_iterators { static void __declspec(deprecated("Call to 'std::" "set_union" "' with parameters that may be unsafe - " "this call relies on the caller to check that the passed values are correct. " "To disable this warning, use -D_SCL_SECURE_NO_WARNINGS. " "See documentation on how to use Visual C++ 'Checked Iterators'")) _Deprecate(false_type) { } static void _Deprecate(true_type) { } }; (_Unchecked_iterators::_Deprecate(_Is_checked(_Dest)));
+ struct _Unchecked_iterators { static void _Deprecate(false_type) { } static void _Deprecate(true_type) { } }; (_Unchecked_iterators::_Deprecate(_Is_checked(_Dest)));
  return (_Set_union_no_deprecate(_First1, _Last1, _First2, _Last2, _Dest, _Pred));
  }
-
-
-template<class _InIt1,
- class _InIt2,
- class _OutTy,
- size_t _OutSize,
- class _Pr> inline
- _OutTy *set_union(_InIt1 _First1, _InIt1 _Last1,
-  _InIt2 _First2, _InIt2 _Last2, _OutTy (&_Dest)[_OutSize], _Pr _Pred)
- {
- return (_Unchecked(
-  _Set_union_no_deprecate(_First1, _Last1,
-   _First2, _Last2,
-   _Array_iterator<_OutTy, _OutSize>(_Dest), _Pred)));
- }
-
-
-
+# 3153 "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm" 3
 template<class _InIt1,
  class _InIt2,
  class _OutIt> inline
@@ -152056,21 +150099,7 @@ template<class _InIt1,
  return (::std:: set_union(_First1, _Last1, _First2, _Last2, _Dest,
   less<>()));
  }
-
-
-template<class _InIt1,
- class _InIt2,
- class _OutTy,
- size_t _OutSize> inline
- _OutTy *set_union(_InIt1 _First1, _InIt1 _Last1,
-  _InIt2 _First2, _InIt2 _Last2, _OutTy (&_Dest)[_OutSize])
- {
- return (::std:: set_union(_First1, _Last1, _First2, _Last2, _Dest,
-  less<>()));
- }
-
-
-
+# 3177 "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm" 3
 template<class _InIt1,
  class _InIt2,
  class _OutIt,
@@ -152079,13 +150108,13 @@ template<class _InIt1,
   _InIt2 _First2, _InIt2 _Last2, _OutIt _Dest, _Pr& _Pred)
  {
  for (; _First1 != _Last1 && _First2 != _Last2; )
-  if (_Debug_lt_pred(_Pred, *_First1, *_First2, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 3185))
+  if (_Pred(*_First1, *_First2))
    ++_First1;
   else if (_Pred(*_First2, *_First1))
    ++_First2;
   else
    {
-   _Debug_pointer(_Dest, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 3191);
+                        ;
    *_Dest++ = *_First1++;
    ++_First2;
    }
@@ -152100,8 +150129,8 @@ template<class _InIt1,
  _OutIt _Set_intersection_no_deprecate(_InIt1 _First1, _InIt1 _Last1,
   _InIt2 _First2, _InIt2 _Last2, _OutIt _Dest, _Pr& _Pred)
  {
- _Debug_order(_First1, _Last1, _Pred, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 3206);
- _Debug_order(_First2, _Last2, _Pred, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 3207);
+                                          ;
+                                          ;
  return (_Rechecked(_Dest,
   _Set_intersection_no_deprecate1(_Unchecked(_First1), _Unchecked(_Last1),
   _Unchecked(_First2), _Unchecked(_Last2),
@@ -152115,27 +150144,10 @@ template<class _InIt1,
  _OutIt set_intersection(_InIt1 _First1, _InIt1 _Last1,
   _InIt2 _First2, _InIt2 _Last2, _OutIt _Dest, _Pr _Pred)
  {
- struct _Unchecked_iterators { static void __declspec(deprecated("Call to 'std::" "set_intersection" "' with parameters that may be unsafe - " "this call relies on the caller to check that the passed values are correct. " "To disable this warning, use -D_SCL_SECURE_NO_WARNINGS. " "See documentation on how to use Visual C++ 'Checked Iterators'")) _Deprecate(false_type) { } static void _Deprecate(true_type) { } }; (_Unchecked_iterators::_Deprecate(_Is_checked(_Dest)));
+ struct _Unchecked_iterators { static void _Deprecate(false_type) { } static void _Deprecate(true_type) { } }; (_Unchecked_iterators::_Deprecate(_Is_checked(_Dest)));
  return (_Set_intersection_no_deprecate(_First1, _Last1, _First2, _Last2, _Dest, _Pred));
  }
-
-
-template<class _InIt1,
- class _InIt2,
- class _OutTy,
- size_t _OutSize,
- class _Pr> inline
- _OutTy *set_intersection(_InIt1 _First1, _InIt1 _Last1,
-  _InIt2 _First2, _InIt2 _Last2, _OutTy (&_Dest)[_OutSize], _Pr _Pred)
- {
- return (_Unchecked(
-  _Set_intersection_no_deprecate(_First1, _Last1,
-   _First2, _Last2,
-   _Array_iterator<_OutTy, _OutSize>(_Dest), _Pred)));
- }
-
-
-
+# 3242 "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm" 3
 template<class _InIt1,
  class _InIt2,
  class _OutIt> inline
@@ -152145,21 +150157,7 @@ template<class _InIt1,
  return (::std:: set_intersection(_First1, _Last1, _First2, _Last2, _Dest,
   less<>()));
  }
-
-
-template<class _InIt1,
- class _InIt2,
- class _OutTy,
- size_t _OutSize> inline
- _OutTy *set_intersection(_InIt1 _First1, _InIt1 _Last1,
-  _InIt2 _First2, _InIt2 _Last2, _OutTy (&_Dest)[_OutSize])
- {
- return (::std:: set_intersection(_First1, _Last1, _First2, _Last2, _Dest,
-  less<>()));
- }
-
-
-
+# 3266 "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm" 3
 template<class _InIt1,
  class _InIt2,
  class _OutIt,
@@ -152169,9 +150167,9 @@ template<class _InIt1,
   _OutIt _Dest, _Pr& _Pred)
  {
  for (; _First1 != _Last1 && _First2 != _Last2; )
-  if (_Debug_lt_pred(_Pred, *_First1, *_First2, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 3275))
+  if (_Pred(*_First1, *_First2))
    {
-   _Debug_pointer(_Dest, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 3277);
+                        ;
    *_Dest++ = *_First1;
    ++_First1;
    }
@@ -152194,8 +150192,8 @@ template<class _InIt1,
   _InIt2 _First2, _InIt2 _Last2,
   _OutIt _Dest, _Pr& _Pred)
  {
- _Debug_order(_First1, _Last1, _Pred, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 3300);
- _Debug_order(_First2, _Last2, _Pred, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 3301);
+                                          ;
+                                          ;
  return (_Rechecked(_Dest,
   _Set_difference_no_deprecate1(_Unchecked(_First1), _Unchecked(_Last1),
   _Unchecked(_First2), _Unchecked(_Last2),
@@ -152210,28 +150208,10 @@ template<class _InIt1,
   _InIt2 _First2, _InIt2 _Last2,
   _OutIt _Dest, _Pr _Pred)
  {
- struct _Unchecked_iterators { static void __declspec(deprecated("Call to 'std::" "set_difference" "' with parameters that may be unsafe - " "this call relies on the caller to check that the passed values are correct. " "To disable this warning, use -D_SCL_SECURE_NO_WARNINGS. " "See documentation on how to use Visual C++ 'Checked Iterators'")) _Deprecate(false_type) { } static void _Deprecate(true_type) { } }; (_Unchecked_iterators::_Deprecate(_Is_checked(_Dest)));
+ struct _Unchecked_iterators { static void _Deprecate(false_type) { } static void _Deprecate(true_type) { } }; (_Unchecked_iterators::_Deprecate(_Is_checked(_Dest)));
  return (_Set_difference_no_deprecate(_First1, _Last1, _First2, _Last2, _Dest, _Pred));
  }
-
-
-template<class _InIt1,
- class _InIt2,
- class _OutTy,
- size_t _OutSize,
- class _Pr> inline
- _OutTy *set_difference(_InIt1 _First1, _InIt1 _Last1,
-  _InIt2 _First2, _InIt2 _Last2,
-  _OutTy (&_Dest)[_OutSize], _Pr _Pred)
- {
- return (_Unchecked(
-  _Set_difference_no_deprecate(_First1, _Last1,
-   _First2, _Last2,
-   _Array_iterator<_OutTy, _OutSize>(_Dest), _Pred)));
- }
-
-
-
+# 3338 "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm" 3
 template<class _InIt1,
  class _InIt2,
  class _OutIt> inline
@@ -152242,22 +150222,7 @@ template<class _InIt1,
  return (::std:: set_difference(_First1, _Last1, _First2, _Last2, _Dest,
   less<>()));
  }
-
-
-template<class _InIt1,
- class _InIt2,
- class _OutTy,
- size_t _OutSize> inline
- _OutTy *set_difference(_InIt1 _First1, _InIt1 _Last1,
-  _InIt2 _First2, _InIt2 _Last2,
-  _OutTy (&_Dest)[_OutSize])
- {
- return (::std:: set_difference(_First1, _Last1, _First2, _Last2, _Dest,
-  less<>()));
- }
-
-
-
+# 3364 "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm" 3
 template<class _InIt1,
  class _InIt2,
  class _OutIt,
@@ -152267,15 +150232,15 @@ template<class _InIt1,
   _OutIt _Dest, _Pr& _Pred)
  {
  for (; _First1 != _Last1 && _First2 != _Last2; )
-  if (_Debug_lt_pred(_Pred, *_First1, *_First2, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 3373))
+  if (_Pred(*_First1, *_First2))
    {
-   _Debug_pointer(_Dest, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 3375);
+                        ;
    *_Dest++ = *_First1;
    ++_First1;
    }
   else if (_Pred(*_First2, *_First1))
    {
-   _Debug_pointer(_Dest, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 3381);
+                        ;
    *_Dest++ = *_First2;
    ++_First2;
    }
@@ -152296,8 +150261,8 @@ template<class _InIt1,
   _InIt2 _First2, _InIt2 _Last2,
   _OutIt _Dest, _Pr& _Pred)
  {
- _Debug_order(_First1, _Last1, _Pred, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 3402);
- _Debug_order(_First2, _Last2, _Pred, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 3403);
+                                          ;
+                                          ;
  return (_Rechecked(_Dest,
   _Set_symmetric_difference_no_deprecate1(
   _Unchecked(_First1), _Unchecked(_Last1),
@@ -152313,29 +150278,11 @@ template<class _InIt1,
   _InIt2 _First2, _InIt2 _Last2,
   _OutIt _Dest, _Pr _Pred)
  {
- struct _Unchecked_iterators { static void __declspec(deprecated("Call to 'std::" "set_symmetric_difference" "' with parameters that may be unsafe - " "this call relies on the caller to check that the passed values are correct. " "To disable this warning, use -D_SCL_SECURE_NO_WARNINGS. " "See documentation on how to use Visual C++ 'Checked Iterators'")) _Deprecate(false_type) { } static void _Deprecate(true_type) { } }; (_Unchecked_iterators::_Deprecate(_Is_checked(_Dest)));
+ struct _Unchecked_iterators { static void _Deprecate(false_type) { } static void _Deprecate(true_type) { } }; (_Unchecked_iterators::_Deprecate(_Is_checked(_Dest)));
  return (_Set_symmetric_difference_no_deprecate(
   _First1, _Last1, _First2, _Last2, _Dest, _Pred));
  }
-
-
-template<class _InIt1,
- class _InIt2,
- class _OutTy,
- size_t _OutSize,
- class _Pr> inline
- _OutTy *set_symmetric_difference(_InIt1 _First1, _InIt1 _Last1,
-  _InIt2 _First2, _InIt2 _Last2,
-  _OutTy (&_Dest)[_OutSize], _Pr _Pred)
- {
- return (_Unchecked(
-  _Set_symmetric_difference_no_deprecate(_First1, _Last1,
-   _First2, _Last2,
-   _Array_iterator<_OutTy, _OutSize>(_Dest), _Pred)));
- }
-
-
-
+# 3442 "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm" 3
 template<class _InIt1,
  class _InIt2,
  class _OutIt> inline
@@ -152346,22 +150293,7 @@ template<class _InIt1,
  return (::std:: set_symmetric_difference(_First1, _Last1, _First2, _Last2,
   _Dest, less<>()));
  }
-
-
-template<class _InIt1,
- class _InIt2,
- class _OutTy,
- size_t _OutSize> inline
- _OutTy *set_symmetric_difference(_InIt1 _First1, _InIt1 _Last1,
-  _InIt2 _First2, _InIt2 _Last2,
-  _OutTy (&_Dest)[_OutSize])
- {
- return (::std:: set_symmetric_difference(_First1, _Last1, _First2, _Last2,
-  _Dest, less<>()));
- }
-
-
-
+# 3468 "C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm" 3
 template<class _FwdIt,
  class _Pr> inline
  _FwdIt _Max_element_unchecked(_FwdIt _First, _FwdIt _Last, _Pr& _Pred)
@@ -152369,7 +150301,7 @@ template<class _FwdIt,
  _FwdIt _Found = _First;
  if (_First != _Last)
   for (; ++_First != _Last; )
-   if (_Debug_lt_pred(_Pred, *_Found, *_First, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 3475))
+   if (_Pred(*_Found, *_First))
     _Found = _First;
  return (_Found);
  }
@@ -152378,7 +150310,7 @@ template<class _FwdIt,
  class _Pr> inline
  _FwdIt max_element(_FwdIt _First, _FwdIt _Last, _Pr _Pred)
  {
- _Debug_range(_First, _Last, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 3484);
+                            ;
  return (_Rechecked(_First,
   _Max_element_unchecked(_Unchecked(_First), _Unchecked(_Last), _Pred)));
  }
@@ -152398,7 +150330,7 @@ template<class _FwdIt,
  _FwdIt _Found = _First;
  if (_First != _Last)
   for (; ++_First != _Last; )
-   if (_Debug_lt_pred(_Pred, *_First, *_Found, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 3504))
+   if (_Pred(*_First, *_Found))
     _Found = _First;
  return (_Found);
  }
@@ -152407,7 +150339,7 @@ template<class _FwdIt,
  class _Pr> inline
  _FwdIt min_element(_FwdIt _First, _FwdIt _Last, _Pr _Pred)
  {
- _Debug_range(_First, _Last, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 3513);
+                            ;
  return (_Rechecked(_First,
   _Min_element_unchecked(_Unchecked(_First), _Unchecked(_Last), _Pred)));
  }
@@ -152433,25 +150365,25 @@ template<class _FwdIt,
    _FwdIt _Next = _First;
    if (++_Next == _Last)
     {
-    if (_Debug_lt_pred(_Pred, *_First, *_Found.first, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 3539))
+    if (_Pred(*_First, *_Found.first))
      _Found.first = _First;
-    else if (!_Debug_lt_pred(_Pred, *_First, *_Found.second, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 3541))
+    else if (!_Pred(*_First, *_Found.second))
      _Found.second = _First;
     }
    else
     {
-    if (_Debug_lt_pred(_Pred, *_Next, *_First, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 3546))
+    if (_Pred(*_Next, *_First))
      {
-     if (_Debug_lt_pred(_Pred, *_Next, *_Found.first, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 3548))
+     if (_Pred(*_Next, *_Found.first))
       _Found.first = _Next;
-     if (!_Debug_lt_pred(_Pred, *_First, *_Found.second, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 3550))
+     if (!_Pred(*_First, *_Found.second))
       _Found.second = _First;
      }
     else
      {
-     if (_Debug_lt_pred(_Pred, *_First, *_Found.first, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 3555))
+     if (_Pred(*_First, *_Found.first))
       _Found.first = _First;
-     if (!_Debug_lt_pred(_Pred, *_Next, *_Found.second, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 3557))
+     if (!_Pred(*_Next, *_Found.second))
       _Found.second = _Next;
      }
     _First = _Next;
@@ -152466,7 +150398,7 @@ template<class _FwdIt,
  pair<_FwdIt, _FwdIt>
   minmax_element(_FwdIt _First, _FwdIt _Last, _Pr _Pred)
  {
- _Debug_range(_First, _Last, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 3572);
+                            ;
  return (_Rechecked_both(_First, _Last,
   _Minmax_element_unchecked(_Unchecked(_First), _Unchecked(_Last), _Pred)));
  }
@@ -152484,9 +150416,9 @@ template<class _Ty,
  class _Pr> inline
  constexpr const _Ty& (max)(const _Ty& _Left, const _Ty& _Right,
   _Pr _Pred)
-  noexcept(noexcept(_Debug_lt_pred(_Pred, _Left, _Right, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 3590)))
+  noexcept(noexcept(_Pred(_Left, _Right)))
  {
- return (_Debug_lt_pred(_Pred, _Left, _Right, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 3592) ? _Right : _Left);
+ return (_Pred(_Left, _Right) ? _Right : _Left);
  }
 
 template<class _Ty,
@@ -152504,9 +150436,9 @@ template<class _Ty> inline
 
 
  constexpr const _Ty& (max)(const _Ty& _Left, const _Ty& _Right)
-  noexcept(noexcept(_Debug_lt(_Left, _Right, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 3610)))
+  noexcept(noexcept(((_Left) < (_Right))))
  {
- return (_Debug_lt(_Left, _Right, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 3612) ? _Right : _Left);
+ return (((_Left) < (_Right)) ? _Right : _Left);
  }
 
 template<class _Ty> inline
@@ -152521,9 +150453,9 @@ template<class _Ty,
  class _Pr> inline
  constexpr const _Ty& (min)(const _Ty& _Left, const _Ty& _Right,
   _Pr _Pred)
-  noexcept(noexcept(_Debug_lt_pred(_Pred, _Right, _Left, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 3627)))
+  noexcept(noexcept(_Pred(_Right, _Left)))
  {
- return (_Debug_lt_pred(_Pred, _Right, _Left, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 3629) ? _Right : _Left);
+ return (_Pred(_Right, _Left) ? _Right : _Left);
  }
 
 template<class _Ty,
@@ -152541,9 +150473,9 @@ template<class _Ty> inline
 
 
  constexpr const _Ty& (min)(const _Ty& _Left, const _Ty& _Right)
-  noexcept(noexcept(_Debug_lt(_Right, _Left, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 3647)))
+  noexcept(noexcept(((_Right) < (_Left))))
  {
- return (_Debug_lt(_Right, _Left, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 3649) ? _Right : _Left);
+ return (((_Right) < (_Left)) ? _Right : _Left);
  }
 
 template<class _Ty> inline
@@ -152605,10 +150537,10 @@ template<class _BidIt,
  for (; ; )
   {
   _BidIt _Next1 = _Next;
-  if (_Debug_lt_pred(_Pred, *--_Next, *_Next1, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 3711))
+  if (_Pred(*--_Next, *_Next1))
    {
    _BidIt _Mid = _Last;
-   for (; !_Debug_lt_pred(_Pred, *_Next, *--_Mid, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 3714); )
+   for (; !_Pred(*_Next, *--_Mid); )
     ;
    ::std:: iter_swap(_Next, _Mid);
    _Reverse_unchecked(_Next1, _Last);
@@ -152627,7 +150559,7 @@ template<class _BidIt,
  class _Pr> inline
  bool next_permutation(_BidIt _First, _BidIt _Last, _Pr _Pred)
  {
- _Debug_range_ptr(_First, _Last, _Pred, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 3733);
+                                       ;
  return (_Next_permutation_unchecked(_Unchecked(_First), _Unchecked(_Last), _Pred));
  }
 
@@ -152650,10 +150582,10 @@ template<class _BidIt,
  for (; ; )
   {
   _BidIt _Next1 = _Next;
-  if (_Debug_lt_pred(_Pred, *_Next1, *--_Next, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 3756))
+  if (_Pred(*_Next1, *--_Next))
    {
    _BidIt _Mid = _Last;
-   for (; !_Debug_lt_pred(_Pred, *--_Mid, *_Next, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 3759); )
+   for (; !_Pred(*--_Mid, *_Next); )
     ;
    ::std:: iter_swap(_Next, _Mid);
    _Reverse_unchecked(_Next1, _Last);
@@ -152672,7 +150604,7 @@ template<class _BidIt,
  class _Pr> inline
  bool prev_permutation(_BidIt _First, _BidIt _Last, _Pr _Pred)
  {
- _Debug_range_ptr(_First, _Last, _Pred, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 3778);
+                                       ;
  return (_Prev_permutation_unchecked(_Unchecked(_First), _Unchecked(_Last), _Pred));
  }
 
@@ -152692,7 +150624,7 @@ template<class _RanIt,
 
  if (2 <= _Size)
   for (_Iter_diff_t<_RanIt> _Off = 0; ++_Off < _Size; )
-   if (_Debug_lt_pred(_Pred, *(_First + (_Off - 1) / 2), *(_First + _Off), L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 3799))
+   if (_Pred(*(_First + (_Off - 1) / 2), *(_First + _Off)))
 
     return (_First + _Off);
  return (_Last);
@@ -152702,7 +150634,7 @@ template<class _RanIt,
  class _Pr> inline
  _RanIt is_heap_until(_RanIt _First, _RanIt _Last, _Pr _Pred)
  {
- _Debug_range(_First, _Last, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 3808);
+                            ;
  return (_Rechecked(_First,
   _Is_heap_until_unchecked(_Unchecked(_First), _Unchecked(_Last), _Pred)));
  }
@@ -152711,7 +150643,7 @@ template<class _RanIt,
  class _Pr> inline
  bool is_heap(_RanIt _First, _RanIt _Last, _Pr _Pred)
  {
- _Debug_range(_First, _Last, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 3817);
+                            ;
  return (_Is_heap_until_unchecked(_Unchecked(_First), _Unchecked(_Last), _Pred) == _Unchecked(_Last));
  }
 
@@ -152735,7 +150667,7 @@ template<class _FwdIt,
  {
  if (_First != _Last)
   for (_FwdIt _Next = _First; ++_Next != _Last; ++_First)
-   if (_Debug_lt_pred(_Pred, *_Next, *_First, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 3841))
+   if (_Pred(*_Next, *_First))
     return (_Next);
  return (_Last);
  }
@@ -152744,7 +150676,7 @@ template<class _FwdIt,
  class _Pr> inline
  _FwdIt is_sorted_until(_FwdIt _First, _FwdIt _Last, _Pr _Pred)
  {
- _Debug_range(_First, _Last, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 3850);
+                            ;
  return (_Rechecked(_First,
   _Is_sorted_until_unchecked(_Unchecked(_First), _Unchecked(_Last), _Pred)));
  }
@@ -152753,7 +150685,7 @@ template<class _FwdIt,
  class _Pr> inline
  bool is_sorted(_FwdIt _First, _FwdIt _Last, _Pr _Pred)
  {
- _Debug_range(_First, _Last, L"C:\\Program Files (x86)\\Microsoft Visual Studio 14.0\\VC\\include\\algorithm", 3859);
+                            ;
  return (_Is_sorted_until_unchecked(_Unchecked(_First), _Unchecked(_Last), _Pred) == _Unchecked(_Last));
  }
 
@@ -152774,13 +150706,13 @@ template<class _FwdIt> inline
 
 #pragma warning(pop)
 #pragma pack(pop)
-# 20 "./socket/linux_epoll.hpp" 2
-# 18 "./socket/service.hpp" 2
+# 20 "E:\\socket\\netlib2/socket/linux_epoll.hpp" 2
+# 18 "E:\\socket\\netlib2/socket/service.hpp" 2
 
-# 1 "./socket/win_iocp2.hpp" 1
-# 18 "./socket/win_iocp2.hpp"
-# 1 "./socket/config.hpp" 1
-# 18 "./socket/win_iocp2.hpp" 2
+# 1 "E:\\socket\\netlib2/socket/win_iocp2.hpp" 1
+# 18 "E:\\socket\\netlib2/socket/win_iocp2.hpp"
+# 1 "E:\\socket\\netlib2/socket/config.hpp" 1
+# 18 "E:\\socket\\netlib2/socket/win_iocp2.hpp" 2
 
 
 
@@ -153100,8 +151032,8 @@ inline s_int32_t IocpService2::ServiceCount()const{
 
 
 
-# 1 "./socket/iocp_access.hpp" 1
-# 119 "./socket/iocp_access.hpp"
+# 1 "E:\\socket\\netlib2/socket/iocp_access.hpp" 1
+# 119 "E:\\socket\\netlib2/socket/iocp_access.hpp"
 inline void IocpService2::Access::ConstructImpl(IocpService2& service, Impl& impl, s_uint16_t type){
  impl.Init();
  impl._core->_iocp = 0;
@@ -154024,26 +151956,26 @@ inline void IocpService2::OperationAlloc<T>::AllocOp(Operation& op, s_int32_t ty
  memset(&op,0,sizeof(wsaoverlapped_t));
  op._type = type;
 }
-# 336 "./socket/win_iocp2.hpp" 2
+# 336 "E:\\socket\\netlib2/socket/win_iocp2.hpp" 2
 
 }
-# 19 "./socket/service.hpp" 2
+# 19 "E:\\socket\\netlib2/socket/service.hpp" 2
 
 namespace SocketLib{
 
 
 typedef IocpService IoService2;
 typedef IocpService2 IoService;
-# 34 "./socket/service.hpp"
+# 34 "E:\\socket\\netlib2/socket/service.hpp"
 }
-# 26 "./socket/socket.hpp" 2
+# 26 "E:\\socket\\netlib2/socket/socket.hpp" 2
 
-# 1 "./socket/buffer.hpp" 1
+# 1 "E:\\socket\\netlib2/socket/buffer.hpp" 1
 
 
 
-# 1 "./socket/config.hpp" 1
-# 4 "./socket/buffer.hpp" 2
+# 1 "E:\\socket\\netlib2/socket/config.hpp" 1
+# 4 "E:\\socket\\netlib2/socket/buffer.hpp" 2
 
 namespace SocketLib{
 
@@ -154233,27 +152165,21 @@ inline void Buffer::Swap(Buffer& buffer) {
 }
 
 }
-# 27 "./socket/socket.hpp" 2
-# 22 "./netio/config.hpp" 2
+# 27 "E:\\socket\\netlib2/socket/socket.hpp" 2
+# 22 "E:\\socket\\netlib2/netio/config.hpp" 2
 
-# 1 "./base/tls.hpp" 1
-# 18 "./base/tls.hpp"
+# 1 "E:\\socket\\netlib2/base/tls.hpp" 1
+# 18 "E:\\socket\\netlib2/base/tls.hpp"
 # 1 "C:\\Program Files (x86)\\Windows Kits\\10\\Include\\10.0.10240.0\\ucrt\\assert.h" 1 3
 # 14 "C:\\Program Files (x86)\\Windows Kits\\10\\Include\\10.0.10240.0\\ucrt\\assert.h" 3
 #pragma pack(push, 8)
 # 14 "C:\\Program Files (x86)\\Windows Kits\\10\\Include\\10.0.10240.0\\ucrt\\assert.h" 3
  extern "C" {
-# 26 "C:\\Program Files (x86)\\Windows Kits\\10\\Include\\10.0.10240.0\\ucrt\\assert.h" 3
-    __declspec(dllimport) void __cdecl _wassert(
-               wchar_t const* _Message,
-               wchar_t const* _File,
-               unsigned _Line
-        );
 # 41 "C:\\Program Files (x86)\\Windows Kits\\10\\Include\\10.0.10240.0\\ucrt\\assert.h" 3
 }
 # 41 "C:\\Program Files (x86)\\Windows Kits\\10\\Include\\10.0.10240.0\\ucrt\\assert.h" 3
 #pragma pack(pop)
-# 18 "./base/tls.hpp" 2
+# 18 "E:\\socket\\netlib2/base/tls.hpp" 2
 
 namespace base{
 
@@ -154269,7 +152195,7 @@ public:
   _init_(){
 
    _tkey = TlsAlloc();
-   (void)( (!!(_tkey != ((DWORD)0xFFFFFFFF))) || (_wassert(L"_tkey != TLS_OUT_OF_INDEXES", L"./base/tls.hpp", (unsigned)(33)), 0) );
+   ((void)0);
   }
   ~_init_(){
    TlsFree(_tkey);
@@ -154293,17 +152219,17 @@ protected:
 private:
  static _init_ _data;
 };
-# 97 "./base/tls.hpp"
+# 97 "E:\\socket\\netlib2/base/tls.hpp"
 template<typename T, int N>
 typename tlsdata<T, N>::_init_ tlsdata<T, N>::_data;
 
 }
-# 23 "./netio/config.hpp" 2
+# 23 "E:\\socket\\netlib2/netio/config.hpp" 2
 
-# 1 "./netio/log.hpp" 1
-# 17 "./netio/log.hpp"
-# 1 "./netio/config.hpp" 1
-# 17 "./netio/log.hpp" 2
+# 1 "E:\\socket\\netlib2/netio/log.hpp" 1
+# 17 "E:\\socket\\netlib2/netio/log.hpp"
+# 1 "E:\\socket\\netlib2/netio/config.hpp" 1
+# 17 "E:\\socket\\netlib2/netio/log.hpp" 2
 
 namespace netiolib{
 
@@ -154313,10 +152239,10 @@ static void set_netio_loginterface();
 
 
 }
-# 24 "./netio/config.hpp" 2
+# 24 "E:\\socket\\netlib2/netio/config.hpp" 2
 
-# 1 "./netio/httpmsg.hpp" 1
-# 18 "./netio/httpmsg.hpp"
+# 1 "E:\\socket\\netlib2/netio/httpmsg.hpp" 1
+# 18 "E:\\socket\\netlib2/netio/httpmsg.hpp"
 namespace netiolib{
 
 struct HttpBaseMsg {
@@ -154722,7 +152648,7 @@ public:
    _flag |= E_VER;
    return true;
   }
-  (void)( (!!(0)) || (_wassert(L"0", L"./netio/httpmsg.hpp", (unsigned)(423)), 0) );
+  ((void)0);
   return false;
  }
  bool SetStatusCode(const char* status) {
@@ -154733,7 +152659,7 @@ public:
    _flag |= E_STATUS_CODE;
    return true;
   }
-  (void)( (!!(0)) || (_wassert(L"0", L"./netio/httpmsg.hpp", (unsigned)(434)), 0) );
+  ((void)0);
   return false;
  }
  bool SetStatusPhrase(const char* phrase) {
@@ -154745,7 +152671,7 @@ public:
    _flag |= E_STATUS_PHRASE;
    return true;
   }
-  (void)( (!!(0)) || (_wassert(L"0", L"./netio/httpmsg.hpp", (unsigned)(446)), 0) );
+  ((void)0);
   return false;
  }
  bool SetLocation(const char* location) {
@@ -154759,7 +152685,7 @@ public:
    _flag |= E_LOCATION;
    return true;
   }
-  (void)( (!!(0)) || (_wassert(L"0", L"./netio/httpmsg.hpp", (unsigned)(460)), 0) );
+  ((void)0);
   return false;
  }
  bool SetContentEncode(const char* encode) {
@@ -154773,7 +152699,7 @@ public:
    _flag |= E_CONT_CODING;
    return true;
   }
-  (void)( (!!(0)) || (_wassert(L"0", L"./netio/httpmsg.hpp", (unsigned)(474)), 0) );
+  ((void)0);
   return false;
  }
  bool SetContentType(const char* type) {
@@ -154787,7 +152713,7 @@ public:
    _flag |= E_CONT_TYPE;
    return true;
   }
-  (void)( (!!(0)) || (_wassert(L"0", L"./netio/httpmsg.hpp", (unsigned)(488)), 0) );
+  ((void)0);
   return false;
  }
  bool SetContentLanguage(const char* language) {
@@ -154801,7 +152727,7 @@ public:
    _flag |= E_CONT_LANGUAGE;
    return true;
   }
-  (void)( (!!(0)) || (_wassert(L"0", L"./netio/httpmsg.hpp", (unsigned)(502)), 0) );
+  ((void)0);
   return false;
  }
  bool SetBody(const char* body, int len) {
@@ -154824,7 +152750,7 @@ public:
    _flag |= E_BODY;
    return true;
   }
-  (void)( (!!(0)) || (_wassert(L"0", L"./netio/httpmsg.hpp", (unsigned)(525)), 0) );
+  ((void)0);
   return false;
 
   if (!(_flag&E_CONT_LANGUAGE)
@@ -154845,7 +152771,7 @@ public:
    _flag |= E_SERVER;
    return true;
   }
-  (void)( (!!(0)) || (_wassert(L"0", L"./netio/httpmsg.hpp", (unsigned)(546)), 0) );
+  ((void)0);
   return false;
  }
  bool SetDate(const char* date) {
@@ -154859,7 +152785,7 @@ public:
    _flag |= E_DATE;
    return true;
   }
-  (void)( (!!(0)) || (_wassert(L"0", L"./netio/httpmsg.hpp", (unsigned)(560)), 0) );
+  ((void)0);
   return false;
  }
 };
@@ -155018,8 +152944,8 @@ public:
 
 
 }
-# 25 "./netio/config.hpp" 2
-# 17 "./netio/netio.hpp" 2
+# 25 "E:\\socket\\netlib2/netio/config.hpp" 2
+# 17 "E:\\socket\\netlib2/netio/netio.hpp" 2
 
 namespace netiolib{
 
@@ -155087,7 +153013,7 @@ public:
  inline SocketLib::SocketError GetLastError()const;
  inline SocketLib::IoService& GetIoService();
  inline SocketLib::s_uint32_t LocalEndian()const;
-# 92 "./netio/netio.hpp"
+# 92 "E:\\socket\\netlib2/netio/netio.hpp"
  virtual void OnConnected(const TcpSocketPtr& clisock);
  virtual void OnConnected(const TcpConnectorPtr& clisock, SocketLib::SocketError error);
  virtual void OnConnected(HttpSocketPtr clisock);
@@ -155443,8 +153369,8 @@ protected:
 
 }
 
-# 1 "./netio/netio_impl.hpp" 1
-# 17 "./netio/netio_impl.hpp"
+# 1 "E:\\socket\\netlib2/netio/netio_impl.hpp" 1
+# 17 "E:\\socket\\netlib2/netio/netio_impl.hpp"
 namespace netiolib{
 
 template<typename NetIoType>
@@ -155605,7 +153531,7 @@ void BaseNetIo<NetIoType>::_AcceptHttpHandler(SocketLib::SocketError error, Http
  if (error)
   base::tlsdata<SocketLib::SocketError,0>::data() = error;
 }
-# 187 "./netio/netio_impl.hpp"
+# 187 "E:\\socket\\netlib2/netio/netio_impl.hpp"
 template<typename NetIoType>
 void BaseNetIo<NetIoType>::OnConnected(const TcpSocketPtr& clisock) {
 }
@@ -155649,10 +153575,10 @@ void BaseNetIo<NetIoType>::OnReceiveData(HttpConnectorPtr clisock, HttpCliRecvMs
 }
 
 }
-# 446 "./netio/netio.hpp" 2
+# 446 "E:\\socket\\netlib2/netio/netio.hpp" 2
 
-# 1 "./netio/tsocket_impl.hpp" 1
-# 17 "./netio/tsocket_impl.hpp"
+# 1 "E:\\socket\\netlib2/netio/tsocket_impl.hpp" 1
+# 17 "E:\\socket\\netlib2/netio/tsocket_impl.hpp"
 namespace netiolib{
 
 
@@ -155957,10 +153883,10 @@ TcpStreamSocket<T, SocketType>::TcpStreamSocket(BaseNetIo<NetIo>& netio)
 
 
 }
-# 447 "./netio/netio.hpp" 2
+# 447 "E:\\socket\\netlib2/netio/netio.hpp" 2
 
-# 1 "./netio/tconnector_impl.hpp" 1
-# 17 "./netio/tconnector_impl.hpp"
+# 1 "E:\\socket\\netlib2/netio/tconnector_impl.hpp" 1
+# 17 "E:\\socket\\netlib2/netio/tconnector_impl.hpp"
 namespace netiolib{
 
 template<typename ConnectorType>
@@ -156049,6 +153975,7 @@ inline SyncTcpConnector::SyncTcpConnector() {
  _readbuf = (SocketLib::s_byte_t*)malloc((4*1024));
  memset(_readbuf, 0, (4*1024));
  _readsize = 0;
+ memset(&_curheader, 0, sizeof(_curheader));
 }
 
 inline SyncTcpConnector::~SyncTcpConnector() {
@@ -156123,7 +154050,9 @@ inline SocketLib::Buffer* SyncTcpConnector::Recv() {
  if (_flag != E_STATE_START)
   return 0;
  _rcvbuffer.Clear();
- SocketLib::Buffer* reply = _CutMsgPack(_readbuf, _readsize);
+ SocketLib::Buffer* reply = 0;
+ if (_readsize>0)
+  reply = _CutMsgPack(_readbuf, _readsize);
  if (!reply) {
   SocketLib::SocketError error;
   do {
@@ -156197,10 +154126,10 @@ inline SocketLib::Buffer* SyncTcpConnector::_CutMsgPack(SocketLib::s_byte_t* buf
 }
 
 }
-# 448 "./netio/netio.hpp" 2
+# 448 "E:\\socket\\netlib2/netio/netio.hpp" 2
 
-# 1 "./netio/hsocket_impl.hpp" 1
-# 16 "./netio/hsocket_impl.hpp"
+# 1 "E:\\socket\\netlib2/netio/hsocket_impl.hpp" 1
+# 16 "E:\\socket\\netlib2/netio/hsocket_impl.hpp"
 namespace netiolib{
 
 template<typename T, typename SocketType, typename HttpMsgType>
@@ -156274,10 +154203,10 @@ HttpBaseSocket<T, SocketType, HttpMsgType>::HttpBaseSocket(BaseNetIo<NetIo>& net
 
 
 }
-# 449 "./netio/netio.hpp" 2
+# 449 "E:\\socket\\netlib2/netio/netio.hpp" 2
 
-# 1 "./netio/hconnector_impl.hpp" 1
-# 17 "./netio/hconnector_impl.hpp"
+# 1 "E:\\socket\\netlib2/netio/hconnector_impl.hpp" 1
+# 17 "E:\\socket\\netlib2/netio/hconnector_impl.hpp"
 namespace netiolib{
 
 template<typename ConnectorType>
@@ -156359,11 +154288,11 @@ void BaseHttpConnector<ConnectorType>::_ConnectHandler(const SocketLib::SocketEr
 }
 
 }
-# 450 "./netio/netio.hpp" 2
+# 450 "E:\\socket\\netlib2/netio/netio.hpp" 2
 # 1 "e:\\socket\\netlib2\\main.cpp" 2
 
 
-# 1 "./base/thread.hpp" 1
+# 1 "E:\\socket\\netlib2/base/thread.hpp" 1
 
 
 
@@ -156374,18 +154303,12 @@ void BaseHttpConnector<ConnectorType>::_ConnectHandler(const SocketLib::SocketEr
 #pragma pack(push, 8)
 # 14 "C:\\Program Files (x86)\\Windows Kits\\10\\Include\\10.0.10240.0\\ucrt\\assert.h" 3
  extern "C" {
-# 26 "C:\\Program Files (x86)\\Windows Kits\\10\\Include\\10.0.10240.0\\ucrt\\assert.h" 3
-    __declspec(dllimport) void __cdecl _wassert(
-               wchar_t const* _Message,
-               wchar_t const* _File,
-               unsigned _Line
-        );
 # 41 "C:\\Program Files (x86)\\Windows Kits\\10\\Include\\10.0.10240.0\\ucrt\\assert.h" 3
 }
 # 41 "C:\\Program Files (x86)\\Windows Kits\\10\\Include\\10.0.10240.0\\ucrt\\assert.h" 3
 #pragma pack(pop)
-# 7 "./base/thread.hpp" 2
-# 23 "./base/thread.hpp"
+# 7 "E:\\socket\\netlib2/base/thread.hpp" 2
+# 23 "E:\\socket\\netlib2/base/thread.hpp"
 # 1 "C:\\Program Files (x86)\\Windows Kits\\10\\Include\\10.0.10240.0\\ucrt\\process.h" 1 3
 # 13 "C:\\Program Files (x86)\\Windows Kits\\10\\Include\\10.0.10240.0\\ucrt\\process.h" 3
 # 1 "C:\\Program Files (x86)\\Windows Kits\\10\\Include\\10.0.10240.0\\ucrt\\corecrt_startup.h" 1 3
@@ -156866,7 +154789,7 @@ __declspec(dllimport) void __cdecl _endthreadex(
 }
 # 361 "C:\\Program Files (x86)\\Windows Kits\\10\\Include\\10.0.10240.0\\ucrt\\process.h" 3
 #pragma pack(pop)
-# 23 "./base/thread.hpp" 2
+# 23 "E:\\socket\\netlib2/base/thread.hpp" 2
 
 
 
@@ -156878,7 +154801,7 @@ public:
  virtual void run(void* param) = 0;
  virtual ~IRunnable() {}
 };
-# 138 "./base/thread.hpp"
+# 138 "E:\\socket\\netlib2/base/thread.hpp"
 namespace thread_
 {
  template<typename func_type, typename cls_type>
@@ -157056,19 +154979,19 @@ private:
 }
 # 3 "e:\\socket\\netlib2\\main.cpp" 2
 
-# 1 "./synccall/synccall.hpp" 1
+# 1 "E:\\socket\\netlib2/synccall/synccall.hpp" 1
 
 
 
 
-# 1 "./synccall/synccall_svr.hpp" 1
+# 1 "E:\\socket\\netlib2/synccall/synccall_svr.hpp" 1
 
 
 
-# 1 "./synccall/config.hpp" 1
-# 4 "./synccall/synccall_svr.hpp" 2
+# 1 "E:\\socket\\netlib2/synccall/config.hpp" 1
+# 4 "E:\\socket\\netlib2/synccall/synccall_svr.hpp" 2
 
-# 1 "./synccall/server_handler.hpp" 1
+# 1 "E:\\socket\\netlib2/synccall/server_handler.hpp" 1
 
 
 
@@ -157083,9 +155006,9 @@ struct IServerHandler {
 
 
 }
-# 5 "./synccall/synccall_svr.hpp" 2
+# 5 "E:\\socket\\netlib2/synccall/synccall_svr.hpp" 2
 
-# 1 "./synccall/synccall_client.hpp" 1
+# 1 "E:\\socket\\netlib2/synccall/synccall_client.hpp" 1
 
 
 
@@ -157224,7 +155147,7 @@ private:
 };
 
 }
-# 6 "./synccall/synccall_svr.hpp" 2
+# 6 "E:\\socket\\netlib2/synccall/synccall_svr.hpp" 2
 
 
 
@@ -157279,6 +155202,11 @@ class SyncCallSvr : public ISyncCallSvr {
  typedef std::map<base::s_uint64_t, IServerHandler*> SvrHandlerMap;
 
 public:
+ struct scinfo {
+  base::s_uint64_t id;
+  netiolib::Buffer buffer;
+ };
+
  SyncCallSvr() :_io(this) {
  }
 
@@ -157331,27 +155259,27 @@ protected:
  void OnConnected(const netiolib::TcpSocketPtr& clisock) {
   std::string ip = clisock->LocalEndpoint().Address();
   base::s_uint16_t port = clisock->LocalEndpoint().Port();
-  base::s_uint64_t* id = new base::s_uint64_t;
-  *id = UniqueId(ip, port);
-  clisock->GetSocket().SetData(id);
+  scinfo* pscinfo = new scinfo;
+  pscinfo->id = UniqueId(ip, port);
+  clisock->GetSocket().SetData(pscinfo);
  }
  void OnConnected(const netiolib::TcpConnectorPtr& clisock, SocketLib::SocketError error) {
 
  }
 
  void OnDisconnected(const netiolib::TcpSocketPtr& clisock) {
-  base::s_uint64_t* id = (base::s_uint64_t*)clisock->GetSocket().GetData();
-  delete id;
+  scinfo* pscinfo = (scinfo*)clisock->GetSocket().GetData();
+  delete pscinfo;
  }
  void OnDisconnected(const netiolib::TcpConnectorPtr& clisock) {
  }
 
  void OnReceiveData(const netiolib::TcpSocketPtr& clisock, netiolib::Buffer& buffer) {
-  base::s_uint64_t* id = (base::s_uint64_t*)clisock->GetSocket().GetData();
-  if (id) {
-   SvrHandlerMap::iterator iter = _svrhandler_map.find(*id);
+  scinfo* pscinfo = (scinfo*)clisock->GetSocket().GetData();
+  if (pscinfo) {
+   SvrHandlerMap::iterator iter = _svrhandler_map.find(pscinfo->id);
    if (iter == _svrhandler_map.end()) {
-    printf("handler is not exist,id(%lld)\n", *id);
+    printf("handler is not exist,id(%lld)\n", pscinfo->id);
     return;
    }
    unsigned int way_type = 0;
@@ -157360,22 +155288,21 @@ protected:
    buffer.Read(msg_type);
    unsigned int pack_idx = 0;
    buffer.Read(pack_idx);
+   pscinfo->buffer.Clear();
 
    if (way_type == (666)) {
-    netiolib::Buffer* reply = new netiolib::Buffer;
-    reply->Write(way_type);
-    reply->Write(msg_type);
-    reply->Write(pack_idx);
+    pscinfo->buffer.Write(way_type);
+    pscinfo->buffer.Write(msg_type);
+    pscinfo->buffer.Write(pack_idx);
     iter->second->OnOneWayDealer(msg_type, buffer);
-    clisock->Send(reply);
+    clisock->Send(pscinfo->buffer.Data(), pscinfo->buffer.Length());
    }
    else if (way_type == (999)) {
-    netiolib::Buffer* reply = new netiolib::Buffer;
-    reply->Write(way_type);
-    reply->Write(msg_type);
-    reply->Write(pack_idx);
-    iter->second->OnTwoWayDealer(msg_type, buffer, *reply);
-    clisock->Send(reply);
+    pscinfo->buffer.Write(way_type);
+    pscinfo->buffer.Write(msg_type);
+    pscinfo->buffer.Write(pack_idx);
+    iter->second->OnTwoWayDealer(msg_type, buffer, pscinfo->buffer);
+    clisock->Send(pscinfo->buffer.Data(), pscinfo->buffer.Length());
    }
    else {
     printf("error way_type(%d)\n", way_type);
@@ -157400,7 +155327,7 @@ private:
 
 
 }
-# 5 "./synccall/synccall.hpp" 2
+# 5 "E:\\socket\\netlib2/synccall/synccall.hpp" 2
 # 4 "e:\\socket\\netlib2\\main.cpp" 2
 
 
@@ -157747,7 +155674,7 @@ void httpmsg_test() {
   msg.Parse(gHttpReqStr3, strlen(gHttpReqStr3));
   msg.Parse(gHttpReqStr4, strlen(gHttpReqStr4));
   if (msg.GetFlag() != netiolib::HttpSvrRecvMsg::E_PARSE_OVER)
-   (void)( (!!(0)) || (_wassert(L"0", L"e:\\socket\\netlib2\\main.cpp", (unsigned)(349)), 0) );
+   ((void)0);
  }
  time_t end_t = clock();
  cout << "elapsed : " << ((double)(end_t-beg_t) / ((clock_t)1000)) << endl;
