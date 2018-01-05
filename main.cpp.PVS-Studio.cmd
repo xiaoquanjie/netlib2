@@ -1,1 +1,0 @@
-@call "C:\Program Files (x86)\PVS-Studio\x64\PVS-Studio.exe" --cfg "E:\socket\netlib2\main.cpp.PVS-Studio.cfg"

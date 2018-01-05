@@ -54,15 +54,14 @@ protected:
 
 class SyncCallSvr : public ISyncCallSvr {
 	friend class SyncCallIo;
-	typedef std::map<base::s_uint64_t, IServerHandler*> SvrHandlerMap;
-
 public:
 	struct scinfo {
-		base::s_uint64_t id;
+		base::s_uint16_t id;
 		netiolib::Buffer buffer;
 	};
 
 	SyncCallSvr() :_io(this) {
+		memset(_handlers, 0, sizeof(_handlers));
 	}
 
 	~SyncCallSvr() {
@@ -73,17 +72,15 @@ public:
 		}
 		_threads.clear();
 
-		for (SvrHandlerMap::iterator iter = _svrhandler_map.begin();
-			iter != _svrhandler_map.end(); ++iter) {
-			delete iter->second;
+		for (base::s_uint16_t idx = 0; idx < (sizeof(_handlers) / sizeof(IServerHandler*)); ++idx) {
+			delete _handlers[idx];
 		}
-		_svrhandler_map.clear();
 	}
 
 	bool RegisterHandler(const std::string& ip, unsigned short port, IServerHandler* handler) {
 		if (_io.ListenOne(ip, port)) {
-			base::s_uint64_t id = UniqueId(ip, port);
-			_svrhandler_map[id] = handler;
+			base::s_uint16_t id = UniqueId(ip, port);
+			_handlers[id] = handler;
 			return true;
 		}
 		else {
@@ -131,12 +128,10 @@ protected:
 
 	void OnReceiveData(const netiolib::TcpSocketPtr& clisock, netiolib::Buffer& buffer) {
 		scinfo* pscinfo = (scinfo*)clisock->GetSocket().GetData();
-		if (pscinfo) {
-			SvrHandlerMap::iterator iter = _svrhandler_map.find(pscinfo->id);
-			if (iter == _svrhandler_map.end()) {
-				printf("handler is not exist,id(%lld)\n", pscinfo->id);
-				return;
-			}
+		if (!pscinfo) {
+			return;
+		}
+		if (_handlers[pscinfo->id]) {
 			unsigned int way_type = 0;
 			buffer.Read(way_type);
 			unsigned int msg_type = 0;
@@ -144,19 +139,16 @@ protected:
 			unsigned int pack_idx = 0;
 			buffer.Read(pack_idx);
 			pscinfo->buffer.Clear();
+			pscinfo->buffer.Write(way_type);
+			pscinfo->buffer.Write(msg_type);
+			pscinfo->buffer.Write(pack_idx);
 			// don't ask why the way_the is 666 or 999
 			if (way_type == M_ONEWAY_TYPE) {
-				pscinfo->buffer.Write(way_type);
-				pscinfo->buffer.Write(msg_type);
-				pscinfo->buffer.Write(pack_idx);
-				iter->second->OnOneWayDealer(msg_type, buffer);
+				_handlers[pscinfo->id]->OnOneWayDealer(msg_type, buffer);
 				clisock->Send(pscinfo->buffer.Data(), pscinfo->buffer.Length());
 			}
 			else if (way_type == M_TWOWAY_TYPE) {
-				pscinfo->buffer.Write(way_type);
-				pscinfo->buffer.Write(msg_type);
-				pscinfo->buffer.Write(pack_idx);
-				iter->second->OnTwoWayDealer(msg_type, buffer, pscinfo->buffer);
+				_handlers[pscinfo->id]->OnTwoWayDealer(msg_type, buffer, pscinfo->buffer);
 				clisock->Send(pscinfo->buffer.Data(), pscinfo->buffer.Length());
 			}
 			else {
@@ -168,16 +160,14 @@ protected:
 		
 	}
 
-	base::s_uint64_t UniqueId(const std::string& ip, unsigned short port) {
-		base::s_uint32_t int_ip = inet_addr(ip.c_str());
-		base::s_uint64_t id = (((base::s_uint64_t)int_ip) << 17) + port;
-		return id;
+	base::s_uint16_t UniqueId(const std::string& ip, unsigned short port) {
+		return port;
 	}
 
 private:
 	SyncCallIo _io;
 	std::list<base::thread*> _threads;
-	SvrHandlerMap _svrhandler_map;
+	IServerHandler* _handlers[0xFFFF];
 };
 
 
