@@ -101,6 +101,7 @@ public:
 				_threads.push_back(pthread);
 			}
 		}
+		base::thread::sleep(1000);
 	}
 
 	void Stop() {
