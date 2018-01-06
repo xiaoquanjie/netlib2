@@ -48,6 +48,7 @@ namespace iodetail {
 			g_closehandle(_handler);
 			_handler = 0;
 			_fdcnt = 0;
+			_service = 0;
 		}
 		void Close() {
 			g_closehandle(_handler);

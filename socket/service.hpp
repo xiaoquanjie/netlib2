@@ -15,6 +15,7 @@
 #define M_SERVICE_INCLUDE
 
 #include "socket/linux_epoll.hpp"
+#include "socket/epoll_access.hpp"
 #include "socket/win_iocp.hpp"
 #include "socket/iocp_access.hpp"
 M_SOCKET_NAMESPACE_BEGIN
