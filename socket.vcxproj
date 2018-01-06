@@ -159,8 +159,6 @@
     <ClInclude Include="base\svector.hpp" />
     <ClInclude Include="base\thread.hpp" />
     <ClInclude Include="base\tls.hpp" />
-    <ClInclude Include="demo\async_client_demo.h" />
-    <ClInclude Include="demo\async_server_demo.h" />
     <ClInclude Include="netio\config.hpp" />
     <ClInclude Include="netio\hconnector_impl.hpp" />
     <ClInclude Include="netio\hsocket_impl.hpp" />
@@ -213,8 +211,8 @@
     <ClInclude Include="targetver.h" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="demo\async_client_demo.cpp" />
-    <ClCompile Include="demo\async_server_demo.cpp" />
+    <ClCompile Include="async_tcp_test.cpp" />
+    <ClCompile Include="http_test.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="synccall_test.cpp" />
   </ItemGroup>

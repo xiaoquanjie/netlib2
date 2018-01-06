@@ -16,9 +16,6 @@
     <Filter Include="socket">
       <UniqueIdentifier>{2886406b-2249-46ea-8cec-0785fec26e19}</UniqueIdentifier>
     </Filter>
-    <Filter Include="源文件\demo">
-      <UniqueIdentifier>{e780dab5-b60f-4c46-8f43-55906660816e}</UniqueIdentifier>
-    </Filter>
     <Filter Include="netio">
       <UniqueIdentifier>{622dc570-efad-4f2f-b957-cdea83f54c82}</UniqueIdentifier>
     </Filter>
@@ -132,12 +129,6 @@
     <ClInclude Include="socket\lock_dispatcher.hpp">
       <Filter>socket</Filter>
     </ClInclude>
-    <ClInclude Include="demo\async_server_demo.h">
-      <Filter>源文件\demo</Filter>
-    </ClInclude>
-    <ClInclude Include="demo\async_client_demo.h">
-      <Filter>源文件\demo</Filter>
-    </ClInclude>
     <ClInclude Include="socket\iocp_access.hpp">
       <Filter>socket</Filter>
     </ClInclude>
@@ -209,16 +200,16 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="demo\async_server_demo.cpp">
-      <Filter>源文件\demo</Filter>
-    </ClCompile>
-    <ClCompile Include="demo\async_client_demo.cpp">
-      <Filter>源文件\demo</Filter>
-    </ClCompile>
     <ClCompile Include="main.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="synccall_test.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="async_tcp_test.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="http_test.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
