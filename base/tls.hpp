@@ -24,8 +24,7 @@ template<typename T, int N = 0>
 class tlsdata
 {
 public:
-	struct _init_
-	{
+	struct _init_{
 		DWORD _tkey;
 		_init_(){
 			// 创建
@@ -37,8 +36,7 @@ public:
 		}
 	};
 
-	inline static T& data()
-	{
+	inline static T& data(){
 		T* pv = 0;
 		if (0 == (pv = (T*)TlsGetValue(_data._tkey))){
 			pv = new T;
@@ -60,8 +58,7 @@ template<typename T, int N = 0>
 class tlsdata
 {
 public:
-	struct _init_
-	{
+	struct _init_{
 		pthread_key_t _tkey;
 		_init_(){
 			// 创建
@@ -74,8 +71,7 @@ public:
 		}
 	};
 
-	inline static T& data()
-	{
+	inline static T& data(){
 		T* pv = 0;
 		if (0 == (pv = (T*)pthread_getspecific(_data._tkey))){
 			pv = new T;

@@ -120,12 +120,6 @@
     <ClInclude Include="socket\stream_service.hpp">
       <Filter>socket</Filter>
     </ClInclude>
-    <ClInclude Include="socket\win_access.hpp">
-      <Filter>socket</Filter>
-    </ClInclude>
-    <ClInclude Include="socket\win_iocp.hpp">
-      <Filter>socket</Filter>
-    </ClInclude>
     <ClInclude Include="socket\winsock_init.hpp">
       <Filter>socket</Filter>
     </ClInclude>

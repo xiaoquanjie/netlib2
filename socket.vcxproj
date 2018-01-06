@@ -202,9 +202,7 @@
     <ClInclude Include="socket\type.hpp" />
     <ClInclude Include="socket\util.hpp" />
     <ClInclude Include="socket\winsock_init.hpp" />
-    <ClInclude Include="socket\win_access.hpp" />
     <ClInclude Include="socket\win_config.hpp" />
-    <ClInclude Include="socket\win_iocp.hpp" />
     <ClInclude Include="socket\win_iocp2.hpp" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="synccall\config.hpp" />
