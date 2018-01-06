@@ -14,17 +14,16 @@
 #ifndef M_SERVICE_INCLUDE
 #define M_SERVICE_INCLUDE
 
-#include "socket/win_iocp.hpp"
 #include "socket/linux_epoll.hpp"
-#include "socket/win_iocp2.hpp"
+#include "socket/epoll_access.hpp"
+#include "socket/win_iocp.hpp"
+#include "socket/iocp_access.hpp"
 M_SOCKET_NAMESPACE_BEGIN
 
 #ifdef M_PLATFORM_WIN
-typedef IocpService		IoService2; // 不建议使用这个
-typedef IocpService2	IoService;
+typedef IocpService	IoService;
 #else
-typedef EpollService	IoService;
-typedef EpollService	IoService2;
+typedef EpollService IoService;
 #endif
 
 
