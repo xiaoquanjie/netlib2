@@ -141,9 +141,6 @@
     <ClInclude Include="socket\iocp_access.hpp">
       <Filter>socket</Filter>
     </ClInclude>
-    <ClInclude Include="socket\win_iocp2.hpp">
-      <Filter>socket</Filter>
-    </ClInclude>
     <ClInclude Include="socket\buffer.hpp">
       <Filter>socket</Filter>
     </ClInclude>
@@ -206,6 +203,9 @@
     </ClInclude>
     <ClInclude Include="synccall\synccall_svr.hpp">
       <Filter>synccall</Filter>
+    </ClInclude>
+    <ClInclude Include="socket\win_iocp.hpp">
+      <Filter>socket</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

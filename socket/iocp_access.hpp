@@ -14,6 +14,7 @@
 #ifndef M_IOCP_ACCESS_INCLUDE
 #define M_IOCP_ACCESS_INCLUDE
 
+#include "socket/win_iocp.hpp"
 #ifdef M_PLATFORM_WIN
 
 // ipv4 or ipv6 bit(0)
@@ -114,7 +115,7 @@
 	handler1.swap(const_cast<type>(handler2));
 
 
-////////////////////////////////////////////////////////////////////////////////
+M_SOCKET_NAMESPACE_BEGIN
 
 inline void IocpService::Access::ConstructImpl(IocpService& service, SocketImpl& impl, s_uint16_t type) {
 	impl.Init();
@@ -207,6 +208,68 @@ inline void IocpService::Access::ExecOp(IocpService& service, Operation* op, s_u
 }
 
 inline void IocpService::Access::Run(IocpService& service, SocketError& error) {
+	IoServiceImpl& simpl = service.GetServiceImpl();
+	if (simpl._handler == 0) {
+		error = SocketError(M_ERR_IOCP_INVALID);
+		return;
+	}
+	simpl._service = &service;
+	service._mutex.lock();
+	service._implmap[simpl._handler] = &simpl;
+	service._implvector.push_back(&simpl);
+	++service._implcnt;
+	service._mutex.unlock();
+
+	base::slist<SocketClose*> closes1;
+	base::slist<SocketClose*> closes2;
+	DWORD trans_bytes = 0;
+	ULONG_PTR comple_key = 0;
+	overlapped_t* overlapped = 0;
+	for (;;) {
+		_DoClose(&simpl, closes1, closes2);
+		trans_bytes = 0;
+		comple_key = 0;
+		overlapped = 0;
+		g_setlasterr(0);
+
+		BOOL ret = g_getqueuedcompletionstatus(simpl._handler, &trans_bytes,
+			&comple_key, &overlapped, 500);
+		if (overlapped) {
+			Operation* op = (Operation*)overlapped;
+			if (op->_type & E_FINISH_OP) {
+				delete op;
+				break;
+			}
+			ExecOp(service, op, trans_bytes, ret ? true : false);
+			continue;
+		}
+		if (!ret) {
+			if (M_ERR_LAST != WAIT_TIMEOUT) {
+				M_DEFAULT_SOCKET_ERROR2(error);
+				break;
+			}
+		}
+	}
+
+	simpl._mutex.lock();
+	while (simpl._closereqs.size()) {
+		SocketClose* close = simpl._closereqs.front();
+		simpl._closereqs.pop_front();
+		delete close;
+	}
+	while (simpl._closereqs2.size()) {
+		SocketClose* close = simpl._closereqs2.front();
+		simpl._closereqs2.pop_front();
+		delete close;
+	}
+	simpl.Close();
+	simpl._mutex.unlock();
+
+	service._mutex.lock();
+	service._implvector.erase(std::find(service._implvector.begin(),
+		service._implvector.end(), &simpl));
+	service._implcnt--;
+	service._mutex.unlock();
 }
 
 inline void IocpService::Access::Stop(IocpService& service, SocketError& error) {
@@ -983,5 +1046,6 @@ namespace iodetail {
 	}
 }
 
+M_SOCKET_NAMESPACE_END
 #endif
 #endif
