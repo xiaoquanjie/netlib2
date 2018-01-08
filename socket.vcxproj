@@ -155,10 +155,15 @@
   <ItemGroup>
     <ClInclude Include="base\circular_queue.hpp" />
     <ClInclude Include="base\config.hpp" />
+    <ClInclude Include="base\mutexlock.hpp" />
     <ClInclude Include="base\slist.hpp" />
     <ClInclude Include="base\svector.hpp" />
     <ClInclude Include="base\thread.hpp" />
     <ClInclude Include="base\tls.hpp" />
+    <ClInclude Include="coroutine\config.hpp" />
+    <ClInclude Include="coroutine\coroutine.hpp" />
+    <ClInclude Include="coroutine\co_linux_impl.hpp" />
+    <ClInclude Include="coroutine\co_win_impl.hpp" />
     <ClInclude Include="netio\config.hpp" />
     <ClInclude Include="netio\hconnector_impl.hpp" />
     <ClInclude Include="netio\hsocket_impl.hpp" />

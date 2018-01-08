@@ -25,6 +25,9 @@
     <Filter Include="synccall">
       <UniqueIdentifier>{d6add2b1-d4e8-4750-89c5-50c2d4e94b71}</UniqueIdentifier>
     </Filter>
+    <Filter Include="coroutine">
+      <UniqueIdentifier>{f9441914-6f15-4a42-9234-9ddae492d6f6}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -197,6 +200,21 @@
     </ClInclude>
     <ClInclude Include="socket\win_iocp.hpp">
       <Filter>socket</Filter>
+    </ClInclude>
+    <ClInclude Include="base\mutexlock.hpp">
+      <Filter>base</Filter>
+    </ClInclude>
+    <ClInclude Include="coroutine\co_linux_impl.hpp">
+      <Filter>coroutine</Filter>
+    </ClInclude>
+    <ClInclude Include="coroutine\co_win_impl.hpp">
+      <Filter>coroutine</Filter>
+    </ClInclude>
+    <ClInclude Include="coroutine\config.hpp">
+      <Filter>coroutine</Filter>
+    </ClInclude>
+    <ClInclude Include="coroutine\coroutine.hpp">
+      <Filter>coroutine</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

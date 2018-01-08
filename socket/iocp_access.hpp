@@ -14,6 +14,7 @@
 #ifndef M_IOCP_ACCESS_INCLUDE
 #define M_IOCP_ACCESS_INCLUDE
 
+#include "coroutine/coroutine.hpp"
 #include "socket/win_iocp.hpp"
 #ifdef M_PLATFORM_WIN
 
@@ -114,6 +115,7 @@
 #define M_Swap_Handler(type,handler1,handler2)\
 	handler1.swap(const_cast<type>(handler2));
 
+using namespace coroutine;
 
 M_SOCKET_NAMESPACE_BEGIN
 
@@ -198,78 +200,23 @@ inline void IocpService::Access::BindIocp(IocpService& service, SocketImpl& impl
 	M_DEFAULT_SOCKET_ERROR(M_Impl_Iocp(impl) != ret, error);
 }
 
-inline void IocpService::Access::ExecOp(IocpService& service, Operation* op, s_uint32_t transbyte, bool ok) {
-	SocketError error;
-	if (!ok) {
-		// op->Internal is not error code
-		M_DEFAULT_SOCKET_ERROR2(error);
+inline void IocpService::Access::Run(IocpService& service, SocketError& error) {
+	IoServiceImpl* psimpl = _CreateIoImpl(service, error);
+	if (psimpl) {
+		_DoRun(service, *psimpl, false, error);
+		_ReleaseIoImpl(service, psimpl);
 	}
-	op->_oper->Complete(service, transbyte, error);
 }
 
-inline void IocpService::Access::Run(IocpService& service, SocketError& error) {
-	IoServiceImpl& simpl = service.GetServiceImpl();
-	if (simpl._handler == 0) {
-		error = SocketError(M_ERR_IOCP_INVALID);
-		return;
+inline void IocpService::Access::CoRun(IocpService& service, SocketError& error) {
+	IoServiceImpl* psimpl = _CreateIoImpl(service, error);
+	if (psimpl) {
+		Coroutine::initEnv();
+		_DoRun(service, *psimpl, true, error);
+		_ReleaseIoImpl(service, psimpl);
+		CoroutineTask::clrTask();
+		Coroutine::close();
 	}
-	simpl._service = &service;
-	service._mutex.lock();
-	service._implmap[simpl._handler] = &simpl;
-	service._implvector.push_back(&simpl);
-	++service._implcnt;
-	service._mutex.unlock();
-
-	base::slist<SocketClose*> closes1;
-	base::slist<SocketClose*> closes2;
-	DWORD trans_bytes = 0;
-	ULONG_PTR comple_key = 0;
-	overlapped_t* overlapped = 0;
-	for (;;) {
-		_DoClose(&simpl, closes1, closes2);
-		trans_bytes = 0;
-		comple_key = 0;
-		overlapped = 0;
-		g_setlasterr(0);
-
-		BOOL ret = g_getqueuedcompletionstatus(simpl._handler, &trans_bytes,
-			&comple_key, &overlapped, 500);
-		if (overlapped) {
-			Operation* op = (Operation*)overlapped;
-			if (op->_type & E_FINISH_OP) {
-				delete op;
-				break;
-			}
-			ExecOp(service, op, trans_bytes, ret ? true : false);
-			continue;
-		}
-		if (!ret) {
-			if (M_ERR_LAST != WAIT_TIMEOUT) {
-				M_DEFAULT_SOCKET_ERROR2(error);
-				break;
-			}
-		}
-	}
-
-	simpl._mutex.lock();
-	while (simpl._closereqs.size()) {
-		SocketClose* close = simpl._closereqs.front();
-		simpl._closereqs.pop_front();
-		delete close;
-	}
-	while (simpl._closereqs2.size()) {
-		SocketClose* close = simpl._closereqs2.front();
-		simpl._closereqs2.pop_front();
-		delete close;
-	}
-	simpl.Close();
-	simpl._mutex.unlock();
-
-	service._mutex.lock();
-	service._implvector.erase(std::find(service._implvector.begin(),
-		service._implvector.end(), &simpl));
-	service._implcnt--;
-	service._mutex.unlock();
 }
 
 inline void IocpService::Access::Stop(IocpService& service, SocketError& error) {
@@ -856,6 +803,127 @@ inline s_int32_t IocpService::Access::Select(SocketImpl& impl, bool rd_or_wr, s_
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+inline IocpService::IoServiceImpl* IocpService::Access::_CreateIoImpl(
+	IocpService& service, SocketError& error) {
+	IoServiceImpl& simpl = service.GetServiceImpl();
+	if (simpl._handler == 0) {
+		error = SocketError(M_ERR_IOCP_INVALID);
+		return 0;
+	}
+	simpl._service = &service;
+	service._mutex.lock();
+	service._implmap[simpl._handler] = &simpl;
+	service._implvector.push_back(&simpl);
+	++service._implcnt;
+	service._mutex.unlock();
+	return &simpl;
+}
+
+inline void IocpService::Access::_ReleaseIoImpl(IocpService& service, IoServiceImpl* simpl) {
+	simpl->_mutex.lock();
+	while (simpl->_closereqs.size()) {
+		SocketClose* close = simpl->_closereqs.front();
+		simpl->_closereqs.pop_front();
+		delete close;
+	}
+	while (simpl->_closereqs2.size()) {
+		SocketClose* close = simpl->_closereqs2.front();
+		simpl->_closereqs2.pop_front();
+		delete close;
+	}
+	while (simpl->_taskvec.size()) {
+		free(simpl->_taskvec.back());
+		simpl->_taskvec.pop_back();
+	}
+	simpl->Close();
+	simpl->_mutex.unlock();
+
+	service._mutex.lock();
+	service._implvector.erase(std::find(service._implvector.begin(),
+		service._implvector.end(), simpl));
+	service._implcnt--;
+	service._mutex.unlock();
+}
+
+inline void IocpService::Access::_DoRun(IocpService& service, IoServiceImpl& simpl, bool isco, 
+	SocketLib::SocketError& error) 
+{
+	base::slist<SocketClose*> closes1;
+	base::slist<SocketClose*> closes2;
+	DWORD trans_bytes = 0;
+	ULONG_PTR comple_key = 0;
+	overlapped_t* overlapped = 0;
+	for (;;) {
+		_DoClose(&simpl, closes1, closes2);
+		trans_bytes = 0;
+		comple_key = 0;
+		overlapped = 0;
+		g_setlasterr(0);
+
+		BOOL ret = g_getqueuedcompletionstatus(simpl._handler, &trans_bytes,
+			&comple_key, &overlapped, 500);
+		if (overlapped) {
+			Operation* op = (Operation*)overlapped;
+			if (op->_type & E_FINISH_OP) {
+				delete op;
+				break;
+			}
+			_ExecOp(isco, service, &simpl, op, trans_bytes, 
+				ret ? true : false);
+			continue;
+		}
+		if (!ret) {
+			if (M_ERR_LAST != WAIT_TIMEOUT) {
+				M_DEFAULT_SOCKET_ERROR2(error);
+				break;
+			}
+		}
+	}
+}
+
+inline void IocpService::Access::_ExecOp(bool isco, IocpService& service, IoServiceImpl* simpl, 
+	Operation* operation,s_uint32_t tb, bool opstate) 
+{
+	if (!isco) {
+		_DoExecOp(&service, operation, tb, opstate);
+	}
+	else {
+		CoEventTask* task = 0;
+		if (simpl->_taskvec.size()) {
+			task = simpl->_taskvec.back();
+			simpl->_taskvec.pop_back();
+		}
+		else 
+			task = (CoEventTask*)malloc(sizeof(CoEventTask));
+		
+		task->service = &service;
+		task->op = operation;
+		task->tb = tb;
+		task->ok = opstate;
+		coroutine::CoroutineTask::doTask(_ExecCoOp, task);
+		if (simpl->_taskvec.size() < 1024)
+			simpl->_taskvec.push_back(task);
+		else
+			free(task);
+	}
+}
+
+inline void IocpService::Access::_ExecCoOp(void* param) {
+	CoEventTask* task = (CoEventTask*)param;
+	_DoExecOp(task->service, task->op, task->tb, task->ok);
+}
+
+inline void IocpService::Access::_DoExecOp(IocpService* service, Operation* operation,
+	s_uint32_t tb, bool opstate) 
+{
+	// op->Internal is not error code
+	SocketError error;
+	if (!opstate) {
+		M_DEFAULT_SOCKET_ERROR2(error);
+	}
+	operation->_oper->Complete(*service, tb, error);
+}
 
 inline void IocpService::Access::_DoClose(IocpService::IoServiceImpl* simpl,
 	base::slist<SocketClose*>&closereqs, base::slist<SocketClose*>&closereqs2)

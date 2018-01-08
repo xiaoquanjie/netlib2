@@ -28,6 +28,14 @@ class IocpService;
 namespace iodetail {
 	struct SocketImpl;
 	struct SocketClose;
+	struct Operation;
+
+	struct CoEventTask {
+		IocpService* service;
+		Operation* op;
+		s_uint32_t tb;
+		bool ok;
+	};
 
 	struct IoServiceImpl {
 		IocpService* _service;
@@ -38,6 +46,8 @@ namespace iodetail {
 			_closereqs;
 		base::slist<SocketClose*>
 			_closereqs2;
+		base::svector<CoEventTask*>
+			_taskvec;
 		IoServiceImpl() {
 			_fdcnt = 0;
 			_service = 0;
@@ -189,6 +199,7 @@ public:
 	typedef iodetail::Operation Operation;
 	typedef iodetail::SocketClose SocketClose;
 	typedef iodetail::SocketImpl Impl;
+	typedef iodetail::CoEventTask CoEventTask;
 
 	class  Access;
 
@@ -199,6 +210,10 @@ public:
 	void Run();
 
 	void Run(SocketError& error);
+
+	void CoRun();
+
+	void CoRun(SocketError& error);
 
 	void Stop();
 
@@ -249,9 +264,9 @@ public:
 
 	static void BindIocp(IocpService& service, SocketImpl& impl, SocketError& error);
 
-	static void ExecOp(IocpService& service, Operation* op, s_uint32_t transbyte, bool ok);
-
 	static void Run(IocpService& service, SocketError& error);
+
+	static void CoRun(IocpService& service, SocketError& error);
 
 	static void Stop(IocpService& service, SocketError& error);
 
@@ -299,6 +314,21 @@ public:
 	static s_int32_t Select(SocketImpl& impl, bool rd_or_wr, s_uint32_t timeo_sec, SocketError& error);
 
 protected:
+	static IoServiceImpl* _CreateIoImpl(IocpService& service, SocketError& error);
+
+	static void _ReleaseIoImpl(IocpService& service, IoServiceImpl* simpl);
+
+	static void _DoRun(IocpService& service, IoServiceImpl& simpl, bool isco,
+		SocketLib::SocketError& error);
+
+	static void _ExecOp(bool isco, IocpService& service, IoServiceImpl* simpl, Operation* operation,
+		s_uint32_t tb, bool opstate);
+
+	static void _ExecCoOp(void* param);
+
+	static void _DoExecOp(IocpService* service, Operation* operation,
+		s_uint32_t tb, bool opstate);
+
 	static void _DoClose(IoServiceImpl* simpl
 		, base::slist<SocketClose*>&closereqs, base::slist<SocketClose*>&closereqs2);
 
@@ -330,6 +360,16 @@ inline void IocpService::Run() {
 
 inline void IocpService::Run(SocketError& error) {
 	Access::Run(*this, error);
+}
+
+inline void IocpService::CoRun() {
+	SocketError error;
+	this->CoRun(error);
+	M_THROW_DEFAULT_SOCKET_ERROR2(error);
+}
+
+inline void IocpService::CoRun(SocketError& error) {
+	Access::CoRun(*this, error);
 }
 
 inline void IocpService::Stop() {
