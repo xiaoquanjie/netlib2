@@ -143,6 +143,16 @@ bool TcpBaseSocket<T, SocketType>::IsConnected()const {
 }
 
 template<typename T, typename SocketType>
+void TcpBaseSocket<T, SocketType>::SetData(unsigned int data) {
+	_data = data;
+}
+
+template<typename T, typename SocketType>
+unsigned int TcpBaseSocket<T, SocketType>::GetData()const {
+	return _data;
+}
+
+template<typename T, typename SocketType>
 void TcpBaseSocket<T, SocketType>::_WriteHandler(SocketLib::s_uint32_t tran_byte, SocketLib::SocketError error) {
 	if (error) {
 		// 出错关闭连接

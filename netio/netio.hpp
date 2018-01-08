@@ -173,6 +173,10 @@ public:
 
 	bool IsConnected()const;
 
+	void SetData(unsigned int data);
+
+	unsigned int GetData()const;
+
 protected:
 	void _WriteHandler(SocketLib::s_uint32_t tran_byte, SocketLib::SocketError error);
 
@@ -195,6 +199,7 @@ protected:
 
 	// ×´Ì¬±êÖ¾
 	unsigned short _flag;
+	unsigned int _data;
 };
 
 // for stream
@@ -257,11 +262,11 @@ protected:
 };
 
 template<typename ConnectorType>
-class BaseTcpConnector :
+class BaseTConnector :
 	public TcpStreamSocket<ConnectorType, SocketLib::TcpConnector<SocketLib::IoService> >
 {
 public:
-	BaseTcpConnector(BaseNetIo<NetIo>& netio);
+	BaseTConnector(BaseNetIo<NetIo>& netio);
 
 	SocketLib::TcpConnector<SocketLib::IoService>& GetSocket();
 
@@ -273,23 +278,16 @@ public:
 
 	void AsyncConnect(const std::string& addr, SocketLib::s_uint16_t port);
 
-	inline void SetData(unsigned int data);
-
-	inline unsigned int GetData()const;
-
 protected:
 	void _ConnectHandler(const SocketLib::SocketError& error, TcpConnectorPtr conector);
-
-protected:
-	unsigned int _data;
 };
 
 // class tcpconnector
-class TcpConnector : public BaseTcpConnector<TcpConnector>
+class TcpConnector : public BaseTConnector<TcpConnector>
 {
 public:
 	TcpConnector(BaseNetIo<NetIo>& netio)
-		:BaseTcpConnector(netio) {
+		:BaseTConnector(netio) {
 	}
 };
 
@@ -362,11 +360,11 @@ protected:
 };
 
 template<typename ConnectorType>
-class BaseHttpConnector :
+class BaseHConnector :
 	public HttpBaseSocket<ConnectorType, SocketLib::TcpConnector<SocketLib::IoService>
 	, HttpCliRecvMsg> {
 public:
-	BaseHttpConnector(BaseNetIo<NetIo>& netio);
+	BaseHConnector(BaseNetIo<NetIo>& netio);
 
 	SocketLib::TcpConnector<SocketLib::IoService>& GetSocket();
 
@@ -389,11 +387,11 @@ protected:
 	unsigned int _data;
 };
 
-class HttpConnector : public BaseHttpConnector<HttpConnector>
+class HttpConnector : public BaseHConnector<HttpConnector>
 {
 public:
 	HttpConnector(BaseNetIo<NetIo>& netio)
-		:BaseHttpConnector(netio) {
+		:BaseHConnector(netio) {
 
 	}
 };
