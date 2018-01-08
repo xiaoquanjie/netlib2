@@ -107,7 +107,6 @@ public:
 	virtual void OnReceiveData(HttpSocketPtr& clisock, HttpSvrRecvMsg& httpmsg);
 	virtual void OnReceiveData(HttpConnectorPtr& clisock, HttpCliRecvMsg& httpmsg);
 
-
 protected:
 	void _AcceptHandler(SocketLib::SocketError error, TcpSocketPtr& clisock, TcpAcceptorPtr& acceptor);
 	void _AcceptHttpHandler(SocketLib::SocketError error, HttpSocketPtr& clisock, TcpAcceptorPtr& acceptor);
@@ -177,6 +176,10 @@ public:
 
 	unsigned int GetData()const;
 
+	void SetExtData(void* data, void(*func)(void*data));
+
+	void* GetExtData();
+
 protected:
 	void _WriteHandler(SocketLib::s_uint32_t tran_byte, SocketLib::SocketError error);
 
@@ -200,6 +203,8 @@ protected:
 	// ×´Ì¬±êÖ¾
 	unsigned short _flag;
 	unsigned int _data;
+	void* _extdata;
+	void(*_extdata_func)(void*data);
 };
 
 // for stream
