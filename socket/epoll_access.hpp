@@ -326,7 +326,7 @@ inline void EpollService::Access::_DoRun(EpollService& service, IoServiceImpl& s
 inline void EpollService::Access::_ExecOp(bool isco, IoServiceImpl& serviceimpl, 
 	EpollService::OperationSet* opset, epoll_event_t* event)
 {
-	if (isco) {
+	if (!isco) {
 		_DoExecOp(&serviceimpl, opset, event);
 	}
 	else {
