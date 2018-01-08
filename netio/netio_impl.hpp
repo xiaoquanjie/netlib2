@@ -73,10 +73,9 @@ bool BaseNetIo<NetIoType>::ListenOneHttp(const std::string& addr, SocketLib::s_u
 }
 
 template<typename NetIoType>
-void BaseNetIo<NetIoType>::ConnectOne(const SocketLib::Tcp::EndPoint& ep, unsigned int data) {
+void BaseNetIo<NetIoType>::ConnectOne(const SocketLib::Tcp::EndPoint& ep) {
 	try {
 		netiolib::TcpConnectorPtr connector(new netiolib::TcpConnector(*this));
-		connector->SetData(data);
 		connector->AsyncConnect(ep);
 		connector.reset();
 	}
@@ -86,16 +85,15 @@ void BaseNetIo<NetIoType>::ConnectOne(const SocketLib::Tcp::EndPoint& ep, unsign
 }
 
 template<typename NetIoType>
-void BaseNetIo<NetIoType>::ConnectOne(const std::string& addr, SocketLib::s_uint16_t port, unsigned int data) {
+void BaseNetIo<NetIoType>::ConnectOne(const std::string& addr, SocketLib::s_uint16_t port) {
 	SocketLib::Tcp::EndPoint ep(SocketLib::AddressV4(addr), port);
-	return ConnectOne(ep, data);
+	return ConnectOne(ep);
 }
 
 template<typename NetIoType>
-void BaseNetIo<NetIoType>::ConnectOneHttp(const SocketLib::Tcp::EndPoint& ep, unsigned int data) {
+void BaseNetIo<NetIoType>::ConnectOneHttp(const SocketLib::Tcp::EndPoint& ep) {
 	try {
 		netiolib::HttpConnectorPtr connector(new netiolib::HttpConnector(*this));
-		connector->SetData(data);
 		connector->AsyncConnect(ep);
 		connector.reset();
 	}
@@ -105,9 +103,9 @@ void BaseNetIo<NetIoType>::ConnectOneHttp(const SocketLib::Tcp::EndPoint& ep, un
 }
 
 template<typename NetIoType>
-void BaseNetIo<NetIoType>::ConnectOneHttp(const std::string& addr, SocketLib::s_uint16_t port, unsigned int data) {
+void BaseNetIo<NetIoType>::ConnectOneHttp(const std::string& addr, SocketLib::s_uint16_t port) {
 	SocketLib::Tcp::EndPoint ep(SocketLib::AddressV4(addr), port);
-	return ConnectOneHttp(ep, data);
+	return ConnectOneHttp(ep);
 }
 
 template<typename NetIoType>

@@ -6,9 +6,14 @@
 using namespace std;
 
 struct TestInfo {
+	base::s_uint32_t count;
 	base::s_uint64_t request;
 	base::s_uint64_t reply;
 };
+
+void free_TestInfo(void* data) {
+	delete ((TestInfo*)data);
+}
 
 class TcpTestIo : public netiolib::NetIo {
 public:
@@ -23,17 +28,15 @@ public:
 		else {
 			cout << "connect success : " << clisock->RemoteEndpoint().Address() << " " << clisock->RemoteEndpoint().Port() << endl;
 			TestInfo* pinfo = new TestInfo;
+			pinfo->count = 10000;
 			pinfo->request = 0;
 			pinfo->reply = 0;
-			clisock->GetSocket().SetData(pinfo);
-
-			unsigned int data = clisock->GetData();
-			pinfo->request += data;
+			pinfo->request += pinfo->count;
+			clisock->SetExtData(pinfo, free_TestInfo);
 
 			SocketLib::Buffer buffer;
-			buffer.Write(data);
-			--data;
-			clisock->SetData(data);
+			buffer.Write(pinfo->count);
+			--pinfo->count;
 			clisock->Send(buffer.Data(), buffer.Length());
 		}
 	}
@@ -55,16 +58,13 @@ public:
 	virtual void OnReceiveData(netiolib::TcpConnectorPtr& clisock, netiolib::Buffer& buffer) {
 		int count = 0;
 		buffer.Read(count);
-		TestInfo* pinfo = (TestInfo*)clisock->GetSocket().GetData();
+		TestInfo* pinfo = (TestInfo*)clisock->GetExtData();
 		pinfo->reply += count;
-
-		unsigned int data = clisock->GetData();
-		if (data > 0) {
-			pinfo->request += data;
+		if (pinfo->count > 0) {
+			pinfo->request += pinfo->count;
 			buffer.Clear();
-			buffer.Write(data);
-			--data;
-			clisock->SetData(data);
+			buffer.Write(pinfo->count);
+			--pinfo->count;
 			clisock->Send(buffer.Data(), buffer.Length());
 		}
 		else {
@@ -94,7 +94,7 @@ void async_tcp_server() {
 	for (int i = 0; i < thread_cnt; ++i) {
 		threads.push_back(new base::thread(&TcpTestIo::Start, &test_io, 0));
 	}
-	while (thread_cnt != threads.size())
+	while (test_io.ServiceCount() != threads.size())
 		;
 
 	if (test_io.ListenOne("0.0.0.0", 3001)) {
@@ -123,14 +123,14 @@ void async_tcp_client() {
 	for (int i = 0; i < thread_cnt; ++i) {
 		threads.push_back(new base::thread(&TcpTestIo::Start, &test_io, 0));
 	}
-	while (thread_cnt != threads.size())
+	while (test_io.ServiceCount() != threads.size())
 		;
 
 	std::string ip;
 	cout << "input ip:";
 	cin >> ip;
 	for (int i = 0; i < thread_cnt; ++i) {
-		test_io.ConnectOne(ip, 3001,10000);
+		test_io.ConnectOne(ip, 3001);
 	}
 
 	tcp_pause();

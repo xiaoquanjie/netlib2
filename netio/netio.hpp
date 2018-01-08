@@ -68,11 +68,11 @@ public:
 	bool ListenOneHttp(const std::string& addr, SocketLib::s_uint16_t port);
 
 	// 异步建接
-	void ConnectOne(const SocketLib::Tcp::EndPoint& ep, unsigned int data = 0);
-	void ConnectOne(const std::string& addr, SocketLib::s_uint16_t port, unsigned int data = 0);
+	void ConnectOne(const SocketLib::Tcp::EndPoint& ep);
+	void ConnectOne(const std::string& addr, SocketLib::s_uint16_t port);
 
-	void ConnectOneHttp(const SocketLib::Tcp::EndPoint& ep, unsigned int data = 0);
-	void ConnectOneHttp(const std::string& addr, SocketLib::s_uint16_t port, unsigned int data = 0);
+	void ConnectOneHttp(const SocketLib::Tcp::EndPoint& ep);
+	void ConnectOneHttp(const std::string& addr, SocketLib::s_uint16_t port);
 
 	virtual void Run();
 	virtual void Stop();
@@ -172,10 +172,6 @@ public:
 
 	bool IsConnected()const;
 
-	void SetData(unsigned int data);
-
-	unsigned int GetData()const;
-
 	void SetExtData(void* data, void(*func)(void*data));
 
 	void* GetExtData();
@@ -202,7 +198,6 @@ protected:
 
 	// 状态标志
 	unsigned short _flag;
-	unsigned int _data;
 	void* _extdata;
 	void(*_extdata_func)(void*data);
 };
