@@ -804,8 +804,8 @@ inline s_int32_t IocpService::Access::Select(SocketImpl& impl, bool rd_or_wr, s_
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-inline IocpService::IoServiceImpl* IocpService::Access::_CreateIoImpl(
-	IocpService& service, SocketError& error) {
+inline IocpService::IoServiceImpl* 
+IocpService::Access::_CreateIoImpl(IocpService& service, SocketError& error) {
 	IoServiceImpl& simpl = service.GetServiceImpl();
 	if (simpl._handler == 0) {
 		error = SocketError(M_ERR_IOCP_INVALID);
@@ -820,7 +820,9 @@ inline IocpService::IoServiceImpl* IocpService::Access::_CreateIoImpl(
 	return &simpl;
 }
 
-inline void IocpService::Access::_ReleaseIoImpl(IocpService& service, IoServiceImpl* simpl) {
+inline void IocpService::Access::_ReleaseIoImpl(
+	IocpService& service, IoServiceImpl* simpl) 
+{
 	simpl->_mutex.lock();
 	while (simpl->_closereqs.size()) {
 		SocketClose* close = simpl->_closereqs.front();
@@ -901,7 +903,7 @@ inline void IocpService::Access::_ExecOp(bool isco, IocpService& service, IoServ
 		task->op = operation;
 		task->tb = tb;
 		task->ok = opstate;
-		coroutine::CoroutineTask::doTask(_ExecCoOp, task);
+		coroutine::CoroutineTask::doTask(_DoExecCoOp, task);
 		if (simpl->_taskvec.size() < 1024)
 			simpl->_taskvec.push_back(task);
 		else
@@ -909,7 +911,7 @@ inline void IocpService::Access::_ExecOp(bool isco, IocpService& service, IoServ
 	}
 }
 
-inline void IocpService::Access::_ExecCoOp(void* param) {
+inline void IocpService::Access::_DoExecCoOp(void* param) {
 	CoEventTask* task = (CoEventTask*)param;
 	_DoExecOp(task->service, task->op, task->tb, task->ok);
 }

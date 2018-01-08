@@ -14,6 +14,7 @@
 #ifndef M_EPOLL_ACCESS_INCLUDE
 #define M_EPOLL_ACCESS_INCLUDE
 
+#include "coroutine/coroutine.hpp"
 #include "socket/linux_epoll.hpp"
 #ifndef M_PLATFORM_WIN
 
@@ -112,6 +113,8 @@
 #define M_Swap_Handler(type,handler1,handler2)\
 	handler1.swap(const_cast<type>(handler2));
 
+using namespace coroutine;
+
 M_SOCKET_NAMESPACE_BEGIN
 
 inline void EpollService::Access::ConstructImpl(EpollService& service, SocketImpl& impl, s_uint16_t type) {
@@ -195,99 +198,23 @@ inline void EpollService::Access::CtlEpoll(EpollService& service, SocketImpl& im
 	M_DEFAULT_SOCKET_ERROR(ret != 0, error);
 }
 
-inline void EpollService::Access::ExecOp(IoServiceImpl& serviceimpl
-	, EpollService::OperationSet* opset, epoll_event_t* event) 
-{
-	if ((opset->_type & E_ACCEPT_OP)) {
-		opset->_aop._oper->Complete(serviceimpl, event);
-		return;
-	}
-	if (opset->_type & E_CONNECT_OP) {
-		opset->_cop._oper->Complete(serviceimpl, event);
-		return;
-	}
-
-	bool flag = false;
-	if (opset->_type & E_READ_OP &&
-		(event->events&M_EPOLLIN || event->events&M_EPOLLERR || event->events&M_EPOLLHUP)) {
-		flag = true;
-		opset->_rop._oper->Complete(serviceimpl, event);
-	}
-	if (opset->_type & E_WRITE_OP &&
-		(event->events&M_EPOLLOUT || event->events&M_EPOLLERR || event->events&M_EPOLLHUP)) {
-		flag = true;
-		opset->_wop._oper->Complete(serviceimpl, event);
-		return;
-	}
-	if (!flag) {
-		//M_DEBUG_PRINT("type: " << opset->_type);
-		//assert(0);
+inline void EpollService::Access::Run(EpollService& service, SocketError& error) {
+	IoServiceImpl* psimpl = _CreateIoImpl(service, error);
+	if (psimpl) {
+		_DoRun(service, *psimpl, false, error);
+		_ReleaseIoImpl(service, psimpl);
 	}
 }
 
-inline void EpollService::Access::Run(EpollService& service, SocketError& error) {
-	IoServiceImpl& simpl = service.GetServiceImpl();
-	if (simpl._handler == 0) {
-		error = SocketError(M_ERR_IOCP_INVALID);
-		return;
+inline void EpollService::Access::CoRun(EpollService& service, SocketError& error) {
+	IoServiceImpl* psimpl = _CreateIoImpl(service, error);
+	if (psimpl) {
+		Coroutine::initEnv();
+		_DoRun(service, *psimpl, true, error);
+		_ReleaseIoImpl(service, psimpl);
+		CoroutineTask::clrTask();
+		Coroutine::close();
 	}
-	simpl._service = &service;
-	service._mutex.lock();
-	service._implmap[simpl._handler] = &simpl;
-	service._implvector.push_back(&simpl);
-	++service._implcnt;
-	service._mutex.unlock();
-
-	base::slist<SocketClose*> closes1;
-	base::slist<SocketClose*> closes2;
-	const int max_events = 128;
-	epoll_event_t events[max_events];
-	for (;;) {
-		_DoClose(&simpl, closes1, closes2);
-		g_setlasterr(0);
-		g_bzero(&events, sizeof(events));
-		s_int32_t ret = g_epoll_wait(simpl._handler, events, max_events, 500);
-		if (ret == 0) {
-			1; // time out
-			continue;
-		}
-		if (ret < 0 && M_ERR_LAST != M_EINTR) {
-			M_DEFAULT_SOCKET_ERROR2(error);
-			break;;
-		}
-		bool brk = false;
-		for (s_int32_t idx = 0; idx < ret; ++idx) {
-			EpollService::OperationSet* opset = (EpollService::OperationSet*)events[idx].data.ptr;
-			if (opset->_type & E_FINISH_OP) {
-				delete opset;
-				brk = true;
-			}
-			else
-				ExecOp(simpl, opset, &events[idx]);
-		}
-		if (brk)
-			break;
-	}
-
-	simpl._mutex.lock();
-	while (simpl._closereqs.size()) {
-		SocketClose* close = simpl._closereqs.front();
-		simpl._closereqs.pop_front();
-		delete close;
-	}
-	while (simpl._closereqs2.size()) {
-		SocketClose* close = simpl._closereqs2.front();
-		simpl._closereqs2.pop_front();
-		delete close;
-	}
-	simpl.Close();
-	simpl._mutex.unlock();
-
-	service._mutex.lock();
-	service._implvector.erase(std::find(service._implvector.begin(),
-		service._implvector.end(), &simpl));
-	service._implcnt--;
-	service._mutex.unlock();
 }
 
 inline void EpollService::Access::Stop(EpollService& service, SocketError& error) {
@@ -314,7 +241,150 @@ inline bool EpollService::Access::Stopped(const EpollService& service) {
 	return (service._implvector.empty() ? true : false);
 }
 
-inline EpollService::IoServiceImpl* EpollService::Access::_GetIoServiceImpl(EpollService& service, SocketImpl& impl) {
+//////////////////////////////////////////////////////////////////////////////////////////
+
+inline EpollService::IoServiceImpl* 
+EpollService::Access::_CreateIoImpl(EpollService& service, SocketError& error)
+{
+	IoServiceImpl& simpl = service.GetServiceImpl();
+	if (simpl._handler == 0) {
+		error = SocketError(M_ERR_IOCP_INVALID);
+		return 0;
+	}
+	simpl._service = &service;
+	service._mutex.lock();
+	service._implmap[simpl._handler] = &simpl;
+	service._implvector.push_back(&simpl);
+	++service._implcnt;
+	service._mutex.unlock();
+	return &simpl;
+}
+
+inline void EpollService::Access::_ReleaseIoImpl(
+	EpollService& service, IoServiceImpl* simpl)
+{
+	simpl->_mutex.lock();
+	while (simpl->_closereqs.size()) {
+		SocketClose* close = simpl->_closereqs.front();
+		simpl->_closereqs.pop_front();
+		delete close;
+	}
+	while (simpl->_closereqs2.size()) {
+		SocketClose* close = simpl->_closereqs2.front();
+		simpl->_closereqs2.pop_front();
+		delete close;
+	}
+	while (simpl->_taskvec.size()) {
+		free(simpl->_taskvec.back());
+		simpl->_taskvec.pop_back();
+	}
+	simpl->Close();
+	simpl->_mutex.unlock();
+
+	service._mutex.lock();
+	service._implvector.erase(std::find(service._implvector.begin(),
+		service._implvector.end(), simpl));
+	service._implcnt--;
+	service._mutex.unlock();
+}
+
+inline void EpollService::Access::_DoRun(EpollService& service, IoServiceImpl& simpl, bool isco,
+	SocketLib::SocketError& error) 
+{
+	base::slist<SocketClose*> closes1;
+	base::slist<SocketClose*> closes2;
+	const int max_events = 128;
+	epoll_event_t events[max_events];
+	for (;;) {
+		_DoClose(&simpl, closes1, closes2);
+		g_setlasterr(0);
+		g_bzero(&events, sizeof(events));
+		s_int32_t ret = g_epoll_wait(simpl._handler, events, max_events, 500);
+		if (ret == 0) {
+			1; // time out
+			continue;
+		}
+		if (ret < 0 && M_ERR_LAST != M_EINTR) {
+			M_DEFAULT_SOCKET_ERROR2(error);
+			break;;
+		}
+		bool brk = false;
+		for (s_int32_t idx = 0; idx < ret; ++idx) {
+			EpollService::OperationSet* opset = (EpollService::OperationSet*)events[idx].data.ptr;
+			if (opset->_type & E_FINISH_OP) {
+				delete opset;
+				brk = true;
+			}
+			else
+				_ExecOp(isco, simpl, opset, &events[idx]);
+		}
+		if (brk)
+			break;
+	}
+}
+
+inline void EpollService::Access::_ExecOp(bool isco, IoServiceImpl& serviceimpl, 
+	EpollService::OperationSet* opset, epoll_event_t* event)
+{
+	if (isco) {
+		_DoExecOp(&serviceimpl, opset, event);
+	}
+	else {
+		CoEventTask* task = 0;
+		if (serviceimpl._taskvec.size()) {
+			task = serviceimpl._taskvec.back();
+			serviceimpl._taskvec.pop_back();
+		}
+		else {
+			task = (CoEventTask*)malloc(sizeof(CoEventTask));
+		}
+		task->simpl = &serviceimpl;
+		task->opset = opset;
+		task->event = event;
+		coroutine::CoroutineTask::doTask(_DoExecCoOp, task);
+		if (serviceimpl._taskvec.size() < 1024)
+			serviceimpl._taskvec.push_back(task);
+		else
+			free(task);
+	}
+}
+
+inline void EpollService::Access::_DoExecCoOp(void* param) {
+	CoEventTask* task = (CoEventTask*)param;
+	_DoExecOp(task->simpl, task->opset, task->event);
+}
+
+inline void EpollService::Access::_DoExecOp(IoServiceImpl* serviceimpl, 
+	EpollService::OperationSet* opset, epoll_event_t* event)
+{
+	if ((opset->_type & E_ACCEPT_OP)) {
+		opset->_aop._oper->Complete(*serviceimpl, event);
+		return;
+	}
+	if (opset->_type & E_CONNECT_OP) {
+		opset->_cop._oper->Complete(*serviceimpl, event);
+		return;
+	}
+
+	bool flag = false;
+	if (opset->_type & E_READ_OP &&
+		(event->events&M_EPOLLIN || event->events&M_EPOLLERR || event->events&M_EPOLLHUP)) {
+		flag = true;
+		opset->_rop._oper->Complete(*serviceimpl, event);
+	}
+	if (opset->_type & E_WRITE_OP &&
+		(event->events&M_EPOLLOUT || event->events&M_EPOLLERR || event->events&M_EPOLLHUP)) {
+		flag = true;
+		opset->_wop._oper->Complete(*serviceimpl, event);
+		return;
+	}
+	if (!flag) {
+	}
+}
+
+inline EpollService::IoServiceImpl* EpollService::Access::_GetIoServiceImpl(
+	EpollService& service, SocketImpl& impl) 
+{
 	if (M_Impl_Epoll(impl) == -1)
 		return 0;
 	EpollService::IoServiceImplMap::iterator iter = service._implmap.find(M_Impl_Epoll(impl));

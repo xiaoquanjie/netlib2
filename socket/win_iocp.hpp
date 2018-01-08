@@ -324,7 +324,7 @@ protected:
 	static void _ExecOp(bool isco, IocpService& service, IoServiceImpl* simpl, Operation* operation,
 		s_uint32_t tb, bool opstate);
 
-	static void _ExecCoOp(void* param);
+	static void _DoExecCoOp(void* param);
 
 	static void _DoExecOp(IocpService* service, Operation* operation,
 		s_uint32_t tb, bool opstate);

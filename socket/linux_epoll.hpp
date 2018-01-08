@@ -26,6 +26,14 @@ class EpollService;
 namespace iodetail {
 	struct SocketImpl;
 	struct SocketClose;
+	struct OperationSet;
+	struct IoServiceImpl;
+
+	struct CoEventTask {
+		IoServiceImpl* simpl;
+		OperationSet* opset;
+		epoll_event_t* event;
+	};
 
 	struct IoServiceImpl {
 		EpollService* _service;
@@ -36,6 +44,8 @@ namespace iodetail {
 			_closereqs;
 		base::slist<SocketClose*>
 			_closereqs2;
+		base::svector<CoEventTask*>
+			_taskvec;
 		IoServiceImpl() {
 			_fdcnt = 0;
 			_service = 0;
@@ -169,6 +179,7 @@ public:
 	typedef iodetail::SocketClose SocketClose;
 	typedef iodetail::OperationSet OperationSet;
 	typedef iodetail::SocketImpl Impl;
+	typedef iodetail::CoEventTask CoEventTask;
 
 	class  Access;
 
@@ -179,6 +190,10 @@ public:
 	void Run();
 
 	void Run(SocketError& error);
+
+	void CoRun();
+
+	void CoRun(SocketError& error);
 
 	void Stop();
 
@@ -229,9 +244,9 @@ public:
 
 	static void CtlEpoll(EpollService& service, SocketImpl& impl, EpollService::OperationSet* opset, s_int32_t flag, s_int32_t events, SocketError& error);
 
-	static void ExecOp(IoServiceImpl& serviceimpl, EpollService::OperationSet* op, epoll_event_t* event);
-
 	static void Run(EpollService& service, SocketError& error);
+
+	static void CoRun(EpollService& service, SocketError& error);
 
 	static void Stop(EpollService& service, SocketError& error);
 
@@ -284,6 +299,19 @@ public:
 	static s_int32_t Select(SocketImpl& impl, bool rd_or_wr, s_uint32_t timeo_sec, SocketError& error);
 
 protected:
+	static IoServiceImpl* _CreateIoImpl(EpollService& service, SocketError& error);
+
+	static void _ReleaseIoImpl(EpollService& service, IoServiceImpl* simpl);
+
+	static void _DoRun(EpollService& service, IoServiceImpl& simpl, bool isco,
+		SocketLib::SocketError& error);
+
+	static void _ExecOp(bool sico, IoServiceImpl& serviceimpl, EpollService::OperationSet* opset, epoll_event_t* event);
+
+	static void _DoExecCoOp(void* param);
+
+	static void _DoExecOp(IoServiceImpl* serviceimpl, EpollService::OperationSet* opset, epoll_event_t* event);
+
 	static IoServiceImpl* _GetIoServiceImpl(EpollService& service, SocketImpl& impl);
 
 	static void _DoClose(IoServiceImpl* simpl
@@ -315,6 +343,16 @@ inline void EpollService::Run() {
 
 inline void EpollService::Run(SocketError& error) {
 	Access::Run(*this, error);
+}
+
+inline void EpollService::CoRun() {
+	SocketError error;
+	this->CoRun(error);
+	M_THROW_DEFAULT_SOCKET_ERROR2(error);
+}
+
+inline void EpollService::CoRun(SocketError& error) {
+	Access::CoRun(*this, error);
 }
 
 inline void EpollService::Stop() {

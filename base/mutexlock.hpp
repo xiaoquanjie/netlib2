@@ -2,10 +2,10 @@
 #define M_BASE_MUTEXLOCK_INCLUDE
 
 #include "base/config.hpp"
-#include <windows.h>
 M_BASE_NAMESPACE_BEGIN
 
 #ifdef M_PLATFORM_WIN
+#include <windows.h>
 class MutexLock
 {
 public:
@@ -30,6 +30,7 @@ private:
 #endif
 
 #ifndef M_PLATFORM_WIN
+#include <pthread.h>
 class MutexLock
 {
 public:
