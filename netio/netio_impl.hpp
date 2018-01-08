@@ -34,7 +34,7 @@ BaseNetIo<NetIoType>::~BaseNetIo() {}
 template<typename NetIoType>
 bool BaseNetIo<NetIoType>::ListenOne(const SocketLib::Tcp::EndPoint& ep) {
 	try {
-		NetIoTcpAcceptorPtr acceptor(new SocketLib::TcpAcceptor<SocketLib::IoService>(_ioservice, ep, _backlog));
+		TcpAcceptorPtr acceptor(new SocketLib::TcpAcceptor<SocketLib::IoService>(_ioservice, ep, _backlog));
 		TcpSocketPtr clisock(new TcpSocket(*this));
 		acceptor->AsyncAccept(bind_t(&BaseNetIo<NetIoType>::_AcceptHandler, this, placeholder_1, clisock, acceptor), clisock->GetSocket());
 	}
@@ -55,7 +55,7 @@ bool BaseNetIo<NetIoType>::ListenOne(const std::string& addr, SocketLib::s_uint1
 template<typename NetIoType>
 bool BaseNetIo<NetIoType>::ListenOneHttp(const SocketLib::Tcp::EndPoint& ep) {
 	try {
-		NetIoTcpAcceptorPtr acceptor(new SocketLib::TcpAcceptor<SocketLib::IoService>(_ioservice, ep, _backlog));
+		TcpAcceptorPtr acceptor(new SocketLib::TcpAcceptor<SocketLib::IoService>(_ioservice, ep, _backlog));
 		HttpSocketPtr clisock(new HttpSocket(*this));
 		acceptor->AsyncAccept(bind_t(&BaseNetIo<NetIoType>::_AcceptHttpHandler, this, placeholder_1, clisock, acceptor), clisock->GetSocket());
 	}
@@ -153,7 +153,7 @@ inline SocketLib::s_uint32_t BaseNetIo<NetIoType>::LocalEndian()const {
 }
 
 template<typename NetIoType>
-void BaseNetIo<NetIoType>::_AcceptHandler(SocketLib::SocketError error, TcpSocketPtr& clisock, NetIoTcpAcceptorPtr& acceptor) {
+void BaseNetIo<NetIoType>::_AcceptHandler(SocketLib::SocketError error, TcpSocketPtr& clisock, TcpAcceptorPtr& acceptor) {
 	if (error) {
 		M_NETIO_LOGGER("accept handler happend error:" << M_NETIO_LOGGER(error));
 	}
@@ -167,7 +167,7 @@ void BaseNetIo<NetIoType>::_AcceptHandler(SocketLib::SocketError error, TcpSocke
 }
 
 template<typename NetIoType>
-void BaseNetIo<NetIoType>::_AcceptHttpHandler(SocketLib::SocketError error, HttpSocketPtr& clisock, NetIoTcpAcceptorPtr& acceptor) {
+void BaseNetIo<NetIoType>::_AcceptHttpHandler(SocketLib::SocketError error, HttpSocketPtr& clisock, TcpAcceptorPtr& acceptor) {
 	if (error) {
 		M_NETIO_LOGGER("accept handler happend error:" << M_NETIO_LOGGER(error));
 	}

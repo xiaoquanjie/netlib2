@@ -105,7 +105,7 @@ void BaseTcpConnector<ConnectorType>::_ConnectHandler(const SocketLib::SocketErr
 
 ////////////////////////////////////////////////////////////////////////////////////////
 
-inline SyncTcpConnector::SyncTcpConnector() {
+inline SyncConnector::SyncConnector() {
 	_socket = new SocketLib::TcpConnector<SocketLib::IoService>(_ioservice);
 	_flag = E_STATE_STOP;
 	_readbuf = (SocketLib::s_byte_t*)g_malloc(M_READ_SIZE);
@@ -114,11 +114,11 @@ inline SyncTcpConnector::SyncTcpConnector() {
 	g_memset(&_curheader, 0, sizeof(_curheader));
 }
 
-inline SyncTcpConnector::~SyncTcpConnector() {
+inline SyncConnector::~SyncConnector() {
 	g_free(_readbuf);
 }
 
-inline bool SyncTcpConnector::Connect(const SocketLib::Tcp::EndPoint& ep, SocketLib::s_uint32_t timeo_sec) {
+inline bool SyncConnector::Connect(const SocketLib::Tcp::EndPoint& ep, SocketLib::s_uint32_t timeo_sec) {
 	try {
 		this->_socket->Connect(ep, timeo_sec);
 		_flag = E_STATE_START;
@@ -131,27 +131,27 @@ inline bool SyncTcpConnector::Connect(const SocketLib::Tcp::EndPoint& ep, Socket
 	}
 }
 
-inline bool SyncTcpConnector::Connect(const std::string& addr, SocketLib::s_uint16_t port, SocketLib::s_uint32_t timeo_sec) {
+inline bool SyncConnector::Connect(const std::string& addr, SocketLib::s_uint16_t port, SocketLib::s_uint32_t timeo_sec) {
 	SocketLib::Tcp::EndPoint ep(SocketLib::AddressV4(addr), port);
 	return Connect(ep, timeo_sec);
 }
 
-inline const SocketLib::Tcp::EndPoint& SyncTcpConnector::LocalEndpoint()const {
+inline const SocketLib::Tcp::EndPoint& SyncConnector::LocalEndpoint()const {
 	return _localep;
 }
 
-inline const SocketLib::Tcp::EndPoint& SyncTcpConnector::RemoteEndpoint()const {
+inline const SocketLib::Tcp::EndPoint& SyncConnector::RemoteEndpoint()const {
 	return _remoteep;
 }
 
 // 调用这个函数不意味着连接立即断开，会等所有的未处理的数据处理完就会断开
-inline void SyncTcpConnector::Close() {
+inline void SyncConnector::Close() {
 	SocketLib::SocketError error;
 	_socket->Close(error);
 	_flag = E_STATE_STOP;
 }
 
-inline bool SyncTcpConnector::Send(const SocketLib::s_byte_t* data, SocketLib::s_uint32_t len) {
+inline bool SyncConnector::Send(const SocketLib::s_byte_t* data, SocketLib::s_uint32_t len) {
 	if (_flag != E_STATE_START)
 		return  false;
 	SocketLib::s_uint32_t hdrlen = (SocketLib::s_uint32_t)sizeof(MessageHeader);
@@ -180,11 +180,11 @@ inline bool SyncTcpConnector::Send(const SocketLib::s_byte_t* data, SocketLib::s
 	return false;
 }
 
-inline bool SyncTcpConnector::IsConnected()const {
+inline bool SyncConnector::IsConnected()const {
 	return (_flag == E_STATE_START);
 }
 
-inline SocketLib::Buffer* SyncTcpConnector::Recv() {
+inline SocketLib::Buffer* SyncConnector::Recv() {
 	if (_flag != E_STATE_START)
 		return 0;
 	_rcvbuffer.Clear();
@@ -207,12 +207,12 @@ inline SocketLib::Buffer* SyncTcpConnector::Recv() {
 	return reply;
 }
 
-inline SocketLib::s_uint32_t SyncTcpConnector::_LocalEndian()const {
+inline SocketLib::s_uint32_t SyncConnector::_LocalEndian()const {
 	static SocketLib::s_uint32_t endian = SocketLib::detail::Util::LocalEndian();
 	return endian;
 }
 
-inline SocketLib::Buffer* SyncTcpConnector::_CutMsgPack(SocketLib::s_byte_t* buf, SocketLib::s_uint32_t& tran_byte) {
+inline SocketLib::Buffer* SyncConnector::_CutMsgPack(SocketLib::s_byte_t* buf, SocketLib::s_uint32_t& tran_byte) {
 	// 减少内存拷贝是此函数的设计关键
 	SocketLib::s_uint32_t hdrlen = (SocketLib::s_uint32_t)sizeof(MessageHeader);
 	do

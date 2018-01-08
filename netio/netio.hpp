@@ -38,7 +38,7 @@ class TcpSocket;
 class TcpConnector;
 class HttpSocket;
 class HttpConnector;
-class SyncTcpConnector;
+class SyncConnector;
 
 typedef SocketLib::Buffer Buffer;
 typedef shard_ptr_t<SocketLib::Buffer> BufferPtr;
@@ -46,8 +46,8 @@ typedef shard_ptr_t<TcpSocket>		   TcpSocketPtr;
 typedef shard_ptr_t<TcpConnector>	   TcpConnectorPtr;
 typedef shard_ptr_t<HttpSocket>		   HttpSocketPtr;
 typedef shard_ptr_t<HttpConnector>	   HttpConnectorPtr;
-typedef shard_ptr_t<SocketLib::TcpAcceptor<SocketLib::IoService> > NetIoTcpAcceptorPtr;
-typedef shard_ptr_t<SyncTcpConnector>  SyncTcpConnectorPtr;
+typedef shard_ptr_t<SocketLib::TcpAcceptor<SocketLib::IoService> > TcpAcceptorPtr;
+typedef shard_ptr_t<SyncConnector>  SyncConnectorPtr;
 
 #define lasterror base::tlsdata<SocketLib::SocketError,0>::data()
 
@@ -109,8 +109,8 @@ public:
 
 
 protected:
-	void _AcceptHandler(SocketLib::SocketError error, TcpSocketPtr& clisock, NetIoTcpAcceptorPtr& acceptor);
-	void _AcceptHttpHandler(SocketLib::SocketError error, HttpSocketPtr& clisock, NetIoTcpAcceptorPtr& acceptor);
+	void _AcceptHandler(SocketLib::SocketError error, TcpSocketPtr& clisock, TcpAcceptorPtr& acceptor);
+	void _AcceptHttpHandler(SocketLib::SocketError error, HttpSocketPtr& clisock, TcpAcceptorPtr& acceptor);
 
 protected:
 	SocketLib::IoService   _ioservice;
@@ -399,11 +399,11 @@ public:
 };
 
 // Í¬²½connector
-class SyncTcpConnector {
+class SyncConnector {
 public:
-	SyncTcpConnector();
+	SyncConnector();
 
-	~SyncTcpConnector();
+	~SyncConnector();
 
 	bool Connect(const SocketLib::Tcp::EndPoint& ep, SocketLib::s_uint32_t timeo_sec = -1);
 

@@ -68,7 +68,7 @@ protected:
 	ScClient& operator=(const ScClient&);
 
 private:
-	netiolib::SyncTcpConnector* _socket;
+	netiolib::SyncConnector* _socket;
 };
 
 inline ScClient::ScClient() {
@@ -150,7 +150,7 @@ inline void ScClient::Close() {
 }
 
 inline bool ScClient::_Reconnect() {
-	_socket = new netiolib::SyncTcpConnector;
+	_socket = new netiolib::SyncConnector;
 	if (_socket->Connect(_ip, _port, _timeo)) {
 		return true;
 	}
