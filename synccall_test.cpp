@@ -87,13 +87,14 @@ void synccall_client() {
 				std::cout << "happend error" << std::endl;
 				break;
 			}
-			
-			int reply_idx = 0;
-			reply->Read(reply_idx);
-			rep_total += reply_idx;
-			++i;
-			if (i >= 100000)
-				break;
+			else {
+				int reply_idx = 0;
+				reply->Read(reply_idx);
+				rep_total += reply_idx;
+				++i;
+				if (i >= 100000)
+					break;
+			}
 		}
 	}
 	std::cout << req_total << " " << rep_total << std::endl;
