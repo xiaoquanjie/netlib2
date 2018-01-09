@@ -109,9 +109,12 @@ void BaseNetIo<NetIoType>::ConnectOneHttp(const std::string& addr, SocketLib::s_
 }
 
 template<typename NetIoType>
-void BaseNetIo<NetIoType>::Run() {
+void BaseNetIo<NetIoType>::Run(bool isco) {
 	try {
-		_ioservice.Run();
+		if (isco)
+			_ioservice.CoRun();
+		else
+			_ioservice.Run();
 	}
 	catch (SocketLib::SocketError& error) {
 		lasterror = error;

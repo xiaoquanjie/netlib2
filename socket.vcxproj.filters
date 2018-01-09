@@ -216,6 +216,9 @@
     <ClInclude Include="socket\ioservice.ipp">
       <Filter>socket</Filter>
     </ClInclude>
+    <ClInclude Include="synccall\synccall_coclient.hpp">
+      <Filter>synccall</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">

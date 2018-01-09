@@ -74,7 +74,7 @@ public:
 	void ConnectOneHttp(const SocketLib::Tcp::EndPoint& ep);
 	void ConnectOneHttp(const std::string& addr, SocketLib::s_uint16_t port);
 
-	virtual void Run();
+	virtual void Run(bool isco = false);
 	virtual void Stop();
 	size_t  ServiceCount();
 

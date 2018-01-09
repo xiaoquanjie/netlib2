@@ -212,6 +212,7 @@
     <ClInclude Include="synccall\server_handler.hpp" />
     <ClInclude Include="synccall\synccall.hpp" />
     <ClInclude Include="synccall\synccall_client.hpp" />
+    <ClInclude Include="synccall\synccall_coclient.hpp" />
     <ClInclude Include="synccall\synccall_svr.hpp" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>

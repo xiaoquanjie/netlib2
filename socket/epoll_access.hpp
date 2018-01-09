@@ -45,11 +45,13 @@ inline void EpollService::Access::CtlEpoll(EpollService& service, SocketImpl& im
 		error = SocketError(M_ERR_NOT_SERVICE);
 		return;
 	}
-	epoll_event_t event;
-	event.events = events;
-	event.data.ptr = opset;
-	s_int32_t ret = g_epoll_ctl(M_Impl_Epoll(impl), flag, M_Impl_Fd(impl), &event);
-	M_DEFAULT_SOCKET_ERROR(ret != 0, error);
+	else {
+		epoll_event_t event;
+		event.events = events;
+		event.data.ptr = opset;
+		s_int32_t ret = g_epoll_ctl(M_Impl_Epoll(impl), flag, M_Impl_Fd(impl), &event);
+		M_DEFAULT_SOCKET_ERROR(ret != 0, error);
+	}
 }
 
 inline void EpollService::Access::Run(EpollService& service, SocketError& error) {
