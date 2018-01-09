@@ -128,7 +128,10 @@ inline int CoScClient::_Sync(int way, int msg_type, const char* msg, SocketLib::
 		}
 		_CoScInfo_* pscinfo = _GetScInfo();
 		pscinfo->mutex.lock();
-		if (pscinfo->valid) {
+		if (!pscinfo->valid) {
+			pscinfo->mutex.unlock();
+		}
+		else {
 			pscinfo->thr_id = base::thread::ctid();
 			pscinfo->co_id = coroutine::Coroutine::curid();
 			pscinfo->mutex.unlock();
@@ -141,9 +144,6 @@ inline int CoScClient::_Sync(int way, int msg_type, const char* msg, SocketLib::
 				preply = &pscinfo->buffer;
 				return 0;
 			} while (false);
-		}
-		else {
-			pscinfo->mutex.unlock();
 		}
 		Close();
 		code = -3;
