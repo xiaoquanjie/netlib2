@@ -903,7 +903,7 @@ inline void IocpService::Access::_ExecOp(bool isco, IocpService& service, IoServ
 		task->op = operation;
 		task->tb = tb;
 		task->ok = opstate;
-		coroutine::CoroutineTask::doTask(_DoExecCoOp, task);
+		CoroutineTask::doTask(_DoExecCoOp, task);
 		if (simpl->_taskvec.size() < 1024)
 			simpl->_taskvec.push_back(task);
 		else

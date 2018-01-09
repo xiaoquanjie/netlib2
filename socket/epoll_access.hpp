@@ -341,7 +341,7 @@ inline void EpollService::Access::_ExecOp(bool isco, IoServiceImpl& serviceimpl,
 		task->simpl = &serviceimpl;
 		task->opset = opset;
 		task->event = event;
-		coroutine::CoroutineTask::doTask(_DoExecCoOp, task);
+		CoroutineTask::doTask(_DoExecCoOp, task);
 		if (serviceimpl._taskvec.size() < 1024)
 			serviceimpl._taskvec.push_back(task);
 		else
