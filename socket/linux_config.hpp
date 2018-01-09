@@ -41,6 +41,8 @@
 #define M_EPOLLLT			EPOLLLT				// 水平触发(default)
 #define M_EPOLLONESHOT		EPOLLONESHOT		// 只监听一次
 #define M_EINTR				EINTR				// interrupted system call
+
+#define M_ESHOULDBLOCK		M_EINPROGRESS // 为了与windows版本保持一致
 #endif // M_PLATFORM_WIN
 
 #endif // LINUX_CONFIG_INCLUDE

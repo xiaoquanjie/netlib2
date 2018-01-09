@@ -22,7 +22,9 @@
 #ifndef M_PLATFORM_WIN
 M_SOCKET_NAMESPACE_BEGIN
 
+struct IIoService;
 class EpollService;
+
 namespace iodetail {
 	struct SocketImpl;
 	struct SocketClose;
@@ -36,7 +38,7 @@ namespace iodetail {
 	};
 
 	struct IoServiceImpl {
-		EpollService* _service;
+		IIoService* _service;
 		s_int32_t _handler;
 		s_uint32_t _fdcnt;
 		MutexLock _mutex;
@@ -65,7 +67,7 @@ namespace iodetail {
 			_handler = g_epoll_create(1);
 			assert(_handler >= 0);
 		}
-		EpollService* GetService() {
+		IIoService* GetService() {
 			return _service;
 		}
 	};
@@ -155,20 +157,9 @@ namespace iodetail {
 	};
 }
 
-#ifndef AptOpType
-#define AptOpType iodetail::AcceptOperation
-#endif
-#ifndef RdOpType 
-#define RdOpType iodetail::ReadOperation
-#endif
-#ifndef WrOpType
-#define WrOpType iodetail::WriteOperation
-#endif
-#ifndef CoOpType
-#define CoOpType iodetail::ConnectOperation
-#endif
+#include "socket/ioservice.ipp"
 
-class EpollService
+class EpollService : public IIoService
 {
 public:
 	typedef iodetail::IoServiceImplVector IoServiceImplVector;
@@ -203,46 +194,20 @@ public:
 
 	s_int32_t ServiceCount()const;
 
-	static IoServiceImpl& GetServiceImpl();
-
-protected:
-	EpollService(const EpollService&);
-	EpollService& operator=(const EpollService&);
-
-private:
-	IoServiceImplVector _implvector;
-	IoServiceImplMap	_implmap;
-	s_int32_t			_implcnt;
-	s_int32_t			_implidx;
-	mutable MutexLock	_mutex;
+	iodetail::IoServiceImpl& GetServiceImpl();
 };
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-class EpollService::Access
+#include "socket/ioaccess.ipp"
+
+class EpollService::Access : public IoAccess
 {
 public:
-	static void ConstructImpl(EpollService& service, SocketImpl& impl, s_uint16_t type);
-
-	static void DestroyImpl(EpollService& service, SocketImpl& impl);
-
-	static bool IsOpen(EpollService& service, SocketImpl& impl, SocketError& error);
-
-	template<typename GettableOptionType>
-	static void GetOption(EpollService& service, SocketImpl& impl, GettableOptionType& opt, SocketError& error);
-
-	template<typename SettableOptionType>
-	static void SetOption(EpollService& service, SocketImpl& impl, const SettableOptionType& opt, SocketError& error);
-
-	template<typename EndPoint>
-	static EndPoint RemoteEndPoint(EndPoint, EpollService& service, const SocketImpl& impl, SocketError& error);
-
-	template<typename EndPoint>
-	static EndPoint LocalEndPoint(EndPoint, EpollService& service, const SocketImpl& impl, SocketError& error);
-
 	static void Cancel(EpollService& service, SocketImpl& impl, SocketError& error);
 
-	static void CtlEpoll(EpollService& service, SocketImpl& impl, EpollService::OperationSet* opset, s_int32_t flag, s_int32_t events, SocketError& error);
+	static void CtlEpoll(EpollService& service, SocketImpl& impl, EpollService::OperationSet* opset,
+			s_int32_t flag, s_int32_t events, SocketError& error);
 
 	static void Run(EpollService& service, SocketError& error);
 
@@ -250,78 +215,35 @@ public:
 
 	static void Stop(EpollService& service, SocketError& error);
 
-	static bool Stopped(const EpollService& service);
-
-	static s_uint32_t GetServiceCount(const EpollService& service);
-
-	////////////////
-	static void Close(EpollService& service, SocketImpl& impl, SocketError& error);
-
-	static void Close(EpollService& service, SocketImpl& impl, function_t<void()> handler
-		, SocketError& error);
-
-	template<typename ProtocolType>
-	static void Open(EpollService& service, SocketImpl& impl, ProtocolType pt, SocketError& error);
-
-	template<typename EndPoint>
-	static void Bind(EpollService& service, SocketImpl& impl, const EndPoint& ep, SocketError& error);
-
-	static void Listen(EpollService& service, SocketImpl& impl, s_int32_t flag, SocketError& error);
-
-	static void Shutdown(EpollService& service, SocketImpl& impl, EShutdownType what, SocketError& error);
-
-	static void Accept(EpollService& service, SocketImpl& impl, SocketImpl& peer, SocketError& error);
-
 	static void AsyncAccept(EpollService& service, SocketImpl& accept_impl, SocketImpl& sock_impl
 		, const M_COMMON_HANDLER_TYPE(IocpService2)& handler, SocketError& error);
-
-	template<typename EndPoint>
-	static void Connect(EpollService& service, SocketImpl& impl, const EndPoint& ep, 
-		SocketError& error, s_uint32_t timeo_sec);
 
 	template<typename EndPoint>
 	static void AsyncConnect(EpollService& service, SocketImpl& impl, const EndPoint& ep
 		, const M_COMMON_HANDLER_TYPE(EpollService)& handler, SocketError& error);
 
-	static s_int32_t RecvSome(EpollService& service, SocketImpl& impl
-		, s_byte_t* data, s_uint32_t size, SocketError& error);
-
 	static void AsyncRecvSome(EpollService& service, SocketImpl& impl, s_byte_t* data, s_uint32_t size
 		, const M_RW_HANDLER_TYPE(EpollService)& hander, SocketError& error);
-
-	static s_int32_t SendSome(EpollService& service, SocketImpl& impl
-		, const s_byte_t* data, s_uint32_t size, SocketError& error);
 
 	static void AsyncSendSome(EpollService& service, SocketImpl& impl, const s_byte_t* data, s_uint32_t size
 		, const M_RW_HANDLER_TYPE(EpollService)& hander, SocketError& error);
 
-	// -1 == time out,0 == ok,other == error
-	static s_int32_t Select(SocketImpl& impl, bool rd_or_wr, s_uint32_t timeo_sec, SocketError& error);
-
 protected:
-	static IoServiceImpl* _CreateIoImpl(EpollService& service, SocketError& error);
-
-	static void _ReleaseIoImpl(EpollService& service, IoServiceImpl* simpl);
-
 	static void _DoRun(EpollService& service, IoServiceImpl& simpl, bool isco,
 		SocketLib::SocketError& error);
 
-	static void _ExecOp(bool sico, IoServiceImpl& serviceimpl, EpollService::OperationSet* opset, epoll_event_t* event);
+	static void _ExecOp(bool sico, IoServiceImpl& serviceimpl, 
+			EpollService::OperationSet* opset, epoll_event_t* event);
 
 	static void _DoExecCoOp(void* param);
 
-	static void _DoExecOp(IoServiceImpl* serviceimpl, EpollService::OperationSet* opset, epoll_event_t* event);
-
-	static IoServiceImpl* _GetIoServiceImpl(EpollService& service, SocketImpl& impl);
-
-	static void _DoClose(IoServiceImpl* simpl
-		, base::slist<SocketClose*>&closereqs, base::slist<SocketClose*>&closereqs2);
+	static void _DoExecOp(IoServiceImpl* serviceimpl, EpollService::OperationSet* opset, 
+			epoll_event_t* event);
 };
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-inline EpollService::EpollService()
-	: _implcnt(0), _implidx(0) {
+inline EpollService::EpollService(){
 }
 
 inline EpollService::~EpollService() {
@@ -373,7 +295,7 @@ inline s_int32_t EpollService::ServiceCount()const {
 	return Access::GetServiceCount(*this);
 }
 
-inline EpollService::IoServiceImpl& EpollService::GetServiceImpl() {
+inline iodetail::IoServiceImpl& EpollService::GetServiceImpl() {
 	return base::tlsdata<EpollService::IoServiceImpl>::data();
 }
 

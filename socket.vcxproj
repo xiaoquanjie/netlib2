@@ -184,13 +184,13 @@
     <ClInclude Include="socket\error.hpp" />
     <ClInclude Include="socket\gfunction.hpp" />
     <ClInclude Include="socket\hdr_helper.hpp" />
+    <ClInclude Include="socket\ioaccess.ipp" />
     <ClInclude Include="socket\iocp_access.hpp" />
+    <ClInclude Include="socket\ioservice.ipp" />
     <ClInclude Include="socket\io_object.hpp" />
     <ClInclude Include="socket\linuxsock_init.hpp" />
     <ClInclude Include="socket\linux_config.hpp" />
     <ClInclude Include="socket\linux_epoll.hpp" />
-    <ClInclude Include="socket\lock_dispatcher.hpp" />
-    <ClInclude Include="socket\mutexlock.hpp" />
     <ClInclude Include="socket\option.hpp" />
     <ClInclude Include="socket\protocol.hpp" />
     <ClInclude Include="socket\pro_hdr.hpp" />

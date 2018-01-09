@@ -123,13 +123,7 @@
     <ClInclude Include="socket\winsock_init.hpp">
       <Filter>socket</Filter>
     </ClInclude>
-    <ClInclude Include="socket\mutexlock.hpp">
-      <Filter>socket</Filter>
-    </ClInclude>
     <ClInclude Include="socket\linuxsock_init.hpp">
-      <Filter>socket</Filter>
-    </ClInclude>
-    <ClInclude Include="socket\lock_dispatcher.hpp">
       <Filter>socket</Filter>
     </ClInclude>
     <ClInclude Include="socket\iocp_access.hpp">
@@ -215,6 +209,12 @@
     </ClInclude>
     <ClInclude Include="coroutine\coroutine.hpp">
       <Filter>coroutine</Filter>
+    </ClInclude>
+    <ClInclude Include="socket\ioaccess.ipp">
+      <Filter>socket</Filter>
+    </ClInclude>
+    <ClInclude Include="socket\ioservice.ipp">
+      <Filter>socket</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
