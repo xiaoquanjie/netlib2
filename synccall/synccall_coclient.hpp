@@ -29,6 +29,9 @@ public:
 protected:
 	bool _Reconnect();
 
+	int _Sync(int way, int msg_type, const char* msg, SocketLib::s_uint32_t len,
+		netiolib::Buffer*& preply);
+
 	inline _CoScInfo_* _GetScInfo() {
 		return (_CoScInfo_*)(_socket->GetExtData());
 	}
@@ -68,63 +71,13 @@ inline bool CoScClient::Connect(const std::string& ip, unsigned short port, unsi
 // 0==ok, -1==time out,-2==connect invalid ,-3 == other error
 inline int CoScClient::SyncCall(int msg_type, const char* msg, SocketLib::s_uint32_t len, netiolib::Buffer*& preply) {
 	preply = 0;
-	if (_socket) {
-		if (!_socket->IsConnected()) {
-			if (!_Reconnect())
-				return -2;
-		}
-		_CoScInfo_* pscinfo = _GetScInfo();
-		pscinfo->mutex.lock();
-		if (pscinfo->valid) {
-			pscinfo->thr_id = base::thread::ctid();
-			pscinfo->co_id = coroutine::Coroutine::curid();
-			pscinfo->mutex.unlock();
-			_FillRequest(M_TWOWAY_TYPE, msg_type, msg, len);
-			_socket->Send(_request.Data(), _request.Length());
-			coroutine::Coroutine::yield();
-			do {
-				if (!_CheckReply(&pscinfo->buffer))
-					break;
-				preply = &pscinfo->buffer;
-				return 0;
-			} while (false);
-		}
-		else {
-			pscinfo->mutex.unlock();
-		}
-		Close();
-	}
-	return -3;
+	return _Sync(M_TWOWAY_TYPE, msg_type, msg, len, preply);
 }
 
 // 0==ok, -1==time out,-2==connect invalid, -3 == other error
 inline int CoScClient::SyncCall(int msg_type, const char* msg, SocketLib::s_uint32_t len) {
-	if (_socket) {
-		if (!_socket->IsConnected()) {
-			if (!_Reconnect())
-				return -2;
-		}
-		_CoScInfo_* pscinfo = _GetScInfo();
-		pscinfo->mutex.lock();
-		if (pscinfo->valid) {
-			pscinfo->thr_id = base::thread::ctid();
-			pscinfo->co_id = coroutine::Coroutine::curid();
-			pscinfo->mutex.unlock();
-			_FillRequest(M_ONEWAY_TYPE, msg_type, msg, len);
-			_socket->Send(_request.Data(), _request.Length());
-			coroutine::Coroutine::yield();
-			do {
-				if (!_CheckReply(&pscinfo->buffer))
-					break;
-				return 0;
-			} while (false);
-		}
-		else {
-			pscinfo->mutex.unlock();
-		}
-		Close();
-	}
-	return -3;
+	netiolib::Buffer* preply = 0;
+	return _Sync(M_ONEWAY_TYPE, msg_type, msg, len, preply);
 }
 
 inline bool CoScClient::IsConnected()const {
@@ -162,6 +115,42 @@ inline bool CoScClient::_Reconnect() {
 	}
 }
 
+inline int CoScClient::_Sync(int way, int msg_type, const char* msg, SocketLib::s_uint32_t len,
+	netiolib::Buffer*& preply) {
+	int code = 0;
+	for (int cnt = 0; cnt < 2; ++cnt) {
+		if (!_socket
+			|| !_socket->IsConnected()) {
+			if (!_Reconnect()) {
+				code = -2;
+				continue;
+			}
+		}
+		_CoScInfo_* pscinfo = _GetScInfo();
+		pscinfo->mutex.lock();
+		if (pscinfo->valid) {
+			pscinfo->thr_id = base::thread::ctid();
+			pscinfo->co_id = coroutine::Coroutine::curid();
+			pscinfo->mutex.unlock();
+			_FillRequest(M_TWOWAY_TYPE, msg_type, msg, len);
+			_socket->Send(_request.Data(), _request.Length());
+			coroutine::Coroutine::yield();
+			do {
+				if (!_CheckReply(&pscinfo->buffer))
+					break;
+				preply = &pscinfo->buffer;
+				return 0;
+			} while (false);
+		}
+		else {
+			pscinfo->mutex.unlock();
+		}
+		Close();
+		code = -3;
+		continue;
+	}
+	return code;
+}
 
 
 M_SYNCCALL_NAMESPACE_END

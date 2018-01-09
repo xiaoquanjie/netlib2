@@ -96,6 +96,7 @@ inline bool ScClient::Connect(const std::string& ip, unsigned short port, unsign
 
 // 0==ok, -1==time out,-2==connect invalid ,-3 == other error
 inline int ScClient::SyncCall(int msg_type, const char* msg, SocketLib::s_uint32_t len, netiolib::Buffer*& preply) {
+	preply = 0;
 	return _Sync(M_TWOWAY_TYPE, msg_type, msg, len, preply);
 }
 
@@ -131,31 +132,28 @@ inline bool ScClient::_Reconnect() {
 }
 
 inline int ScClient::_Sync(int way, int msg_type, const char* msg, SocketLib::s_uint32_t len, 
-	netiolib::Buffer*& preply) 
-{
+	netiolib::Buffer*& preply) {
 	int code = 0;
 	for (int cnt = 0; cnt < 2; ++cnt) {
-		while (true) {
-			if (!_socket
-				|| !_socket->IsConnected()) {
-				if (!_Reconnect()) {
-					code = -2;
-					break;
-				}
+		if (!_socket
+			|| !_socket->IsConnected()) {
+			if (!_Reconnect()) {
+				code = -2;
+				continue;
 			}
-			_FillRequest(way, msg_type, msg, len);
-			do {
-				if (!_socket->Send(_request.Data(), _request.Length()))
-					break;
-				preply = _socket->Recv();
-				if (!_CheckReply(preply))
-					break;
-				return 0;
-			} while (false);
-			Close();
-			code = -3;
-			break;
 		}
+		_FillRequest(way, msg_type, msg, len);
+		do {
+			if (!_socket->Send(_request.Data(), _request.Length()))
+				break;
+			preply = _socket->Recv();
+			if (!_CheckReply(preply))
+				break;
+			return 0;
+		} while (false);
+		Close();
+		code = -3;
+		continue;
 	}
 	return code;
 }
