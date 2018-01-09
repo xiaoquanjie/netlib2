@@ -36,12 +36,10 @@ public:
 
 	M_SOCKET_DECL LPFN_CONNECTEX GetConnectEx()const;
 
-	M_SOCKET_DECL LockDispatcher<>* GetLockDispatcher()const;
 protected:
 	static data _data;
 	static LPFN_ACCEPTEX _acceptex;
 	static LPFN_CONNECTEX _connectex;
-	static LockDispatcher<>* _lockdispatcher;
 };
 
 template<s_int32_t Major, s_int32_t Minor>
@@ -52,9 +50,6 @@ LPFN_ACCEPTEX WinSockInit<Major, Minor>::_acceptex;
 
 template<s_int32_t Major, s_int32_t Minor>
 LPFN_CONNECTEX WinSockInit<Major, Minor>::_connectex;
-
-template<s_int32_t Major, s_int32_t Minor>
-LockDispatcher<>* WinSockInit<Major, Minor>::_lockdispatcher;
 
 template<s_int32_t Major, s_int32_t Minor>
 M_SOCKET_DECL WinSockInit<Major, Minor>::WinSockInit()
@@ -94,18 +89,14 @@ M_SOCKET_DECL WinSockInit<Major, Minor>::WinSockInit()
 			_connectex = lpfnConnectEx;
 
 		g_closesocket(fd);
-		_lockdispatcher = new LockDispatcher<>();
 	}
 }
 
 template<s_int32_t Major, s_int32_t Minor>
 M_SOCKET_DECL WinSockInit<Major, Minor>::~WinSockInit()
 {
-	if (::InterlockedDecrement(&_data._init_cnt) == 0)
-	{
+	if (::InterlockedDecrement(&_data._init_cnt) == 0){
 		g_wsacleanup();
-		delete _lockdispatcher;
-		_lockdispatcher = 0;
 	}
 }
 
@@ -121,22 +112,8 @@ M_SOCKET_DECL LPFN_CONNECTEX WinSockInit<Major, Minor>::GetConnectEx()const
 	return _connectex;
 }
 
-template<s_int32_t Major, s_int32_t Minor>
-M_SOCKET_DECL LockDispatcher<>* WinSockInit<Major, Minor>::GetLockDispatcher()const
-{
-	return _lockdispatcher;
-}
 
 static const WinSockInit<>& gWinSockInstance = WinSockInit<>();
-
-#define M_DISPATCHER_LOCK(idx)\
-	gWinSockInstance.GetLockDispatcher()->GetLock((s_uint32_t)idx)
-#define M_DISPATCHER_SCOPED_LOCK(idx)\
-	ScopedLock scoped_lock_##LINE(gWinSockInstance.GetLockDispatcher()->GetLock((s_uint32_t)idx))
-#define M_DISPATCHER_LOCK_LOCK(idx)\
-	gWinSockInstance.GetLockDispatcher()->GetLock((s_uint32_t)idx).lock()
-#define M_DISPATCHER_LOCK_UNLOCK(idx)\
-	gWinSockInstance.GetLockDispatcher()->GetLock((s_uint32_t)idx).unlock()
 
 
 static LPFN_ACCEPTEX  gAcceptEx = gWinSockInstance.GetAcceptEx();

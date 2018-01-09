@@ -245,7 +245,11 @@
 #include "socket/type.hpp"
 #include "socket/gfunction.hpp"
 #include "socket/error.hpp"
-#include "socket/mutexlock.hpp"
-#include "socket/lock_dispatcher.hpp"
 #include "base/slist.hpp"
 #include "base/svector.hpp"
+#include "base/mutexlock.hpp"
+
+M_SOCKET_NAMESPACE_BEGIN
+typedef base::MutexLock MutexLock;
+typedef base::ScopedLock ScopedLock;
+M_SOCKET_NAMESPACE_END

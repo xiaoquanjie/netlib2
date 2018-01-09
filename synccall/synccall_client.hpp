@@ -64,11 +64,14 @@ public:
 protected:
 	bool _Reconnect();
 
+	int _Sync(int way, int msg_type, const char* msg, SocketLib::s_uint32_t len,
+		netiolib::Buffer*& preply);
+
 	ScClient(const ScClient&);
 	ScClient& operator=(const ScClient&);
 
 private:
-	netiolib::SyncTcpConnector* _socket;
+	netiolib::SyncConnector* _socket;
 };
 
 inline ScClient::ScClient() {
@@ -94,45 +97,13 @@ inline bool ScClient::Connect(const std::string& ip, unsigned short port, unsign
 // 0==ok, -1==time out,-2==connect invalid ,-3 == other error
 inline int ScClient::SyncCall(int msg_type, const char* msg, SocketLib::s_uint32_t len, netiolib::Buffer*& preply) {
 	preply = 0;
-	if (_socket) {
-		if (!_socket->IsConnected()) {
-			if (!_Reconnect())
-				return -2;
-		}
-		_FillRequest(M_TWOWAY_TYPE, msg_type, msg, len);
-		do {
-			if (!_socket->Send(_request.Data(), _request.Length()))
-				break;
-			SocketLib::Buffer* reply = _socket->Recv();
-			if (!_CheckReply(reply))
-				break;
-			preply = reply;
-			return 0; // ok
-		} while (false);
-		Close();
-	}
-	return -3;
+	return _Sync(M_TWOWAY_TYPE, msg_type, msg, len, preply);
 }
 
 // 0==ok, -1==time out,-2==connect invalid, -3 == other error
 inline int ScClient::SyncCall(int msg_type, const char* msg, SocketLib::s_uint32_t len) {
-	if (_socket) {
-		if (!_socket->IsConnected()) {
-			if (!_Reconnect())
-				return -2;
-		}
-		_FillRequest(M_ONEWAY_TYPE, msg_type, msg, len);
-		do {
-			if (!_socket->Send(_request.Data(), _request.Length()))
-				break;
-			SocketLib::Buffer* reply = _socket->Recv();
-			if (!_CheckReply(reply))
-				break;
-			return 0;
-		} while (false);
-		Close();
-	}
-	return -3;
+	netiolib::Buffer* preply = 0;
+	return _Sync(M_ONEWAY_TYPE, msg_type, msg, len, preply);
 }
 
 inline bool ScClient::IsConnected()const {
@@ -150,7 +121,7 @@ inline void ScClient::Close() {
 }
 
 inline bool ScClient::_Reconnect() {
-	_socket = new netiolib::SyncTcpConnector;
+	_socket = new netiolib::SyncConnector;
 	if (_socket->Connect(_ip, _port, _timeo)) {
 		return true;
 	}
@@ -160,6 +131,32 @@ inline bool ScClient::_Reconnect() {
 	}
 }
 
+inline int ScClient::_Sync(int way, int msg_type, const char* msg, SocketLib::s_uint32_t len, 
+	netiolib::Buffer*& preply) {
+	int code = 0;
+	for (int cnt = 0; cnt < 2; ++cnt) {
+		if (!_socket
+			|| !_socket->IsConnected()) {
+			if (!_Reconnect()) {
+				code = -2;
+				continue;
+			}
+		}
+		_FillRequest(way, msg_type, msg, len);
+		do {
+			if (!_socket->Send(_request.Data(), _request.Length()))
+				break;
+			preply = _socket->Recv();
+			if (!_CheckReply(preply))
+				break;
+			return 0;
+		} while (false);
+		Close();
+		code = -3;
+		continue;
+	}
+	return code;
+}
 
 M_SYNCCALL_NAMESPACE_END
 #endif

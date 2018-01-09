@@ -155,10 +155,15 @@
   <ItemGroup>
     <ClInclude Include="base\circular_queue.hpp" />
     <ClInclude Include="base\config.hpp" />
+    <ClInclude Include="base\mutexlock.hpp" />
     <ClInclude Include="base\slist.hpp" />
     <ClInclude Include="base\svector.hpp" />
     <ClInclude Include="base\thread.hpp" />
     <ClInclude Include="base\tls.hpp" />
+    <ClInclude Include="coroutine\config.hpp" />
+    <ClInclude Include="coroutine\coroutine.hpp" />
+    <ClInclude Include="coroutine\co_linux_impl.hpp" />
+    <ClInclude Include="coroutine\co_win_impl.hpp" />
     <ClInclude Include="netio\config.hpp" />
     <ClInclude Include="netio\hconnector_impl.hpp" />
     <ClInclude Include="netio\hsocket_impl.hpp" />
@@ -179,13 +184,13 @@
     <ClInclude Include="socket\error.hpp" />
     <ClInclude Include="socket\gfunction.hpp" />
     <ClInclude Include="socket\hdr_helper.hpp" />
+    <ClInclude Include="socket\ioaccess.ipp" />
     <ClInclude Include="socket\iocp_access.hpp" />
+    <ClInclude Include="socket\ioservice.ipp" />
     <ClInclude Include="socket\io_object.hpp" />
     <ClInclude Include="socket\linuxsock_init.hpp" />
     <ClInclude Include="socket\linux_config.hpp" />
     <ClInclude Include="socket\linux_epoll.hpp" />
-    <ClInclude Include="socket\lock_dispatcher.hpp" />
-    <ClInclude Include="socket\mutexlock.hpp" />
     <ClInclude Include="socket\option.hpp" />
     <ClInclude Include="socket\protocol.hpp" />
     <ClInclude Include="socket\pro_hdr.hpp" />
@@ -207,6 +212,7 @@
     <ClInclude Include="synccall\server_handler.hpp" />
     <ClInclude Include="synccall\synccall.hpp" />
     <ClInclude Include="synccall\synccall_client.hpp" />
+    <ClInclude Include="synccall\synccall_coclient.hpp" />
     <ClInclude Include="synccall\synccall_svr.hpp" />
     <ClInclude Include="targetver.h" />
   </ItemGroup>

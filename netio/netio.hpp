@@ -38,7 +38,7 @@ class TcpSocket;
 class TcpConnector;
 class HttpSocket;
 class HttpConnector;
-class SyncTcpConnector;
+class SyncConnector;
 
 typedef SocketLib::Buffer Buffer;
 typedef shard_ptr_t<SocketLib::Buffer> BufferPtr;
@@ -46,8 +46,8 @@ typedef shard_ptr_t<TcpSocket>		   TcpSocketPtr;
 typedef shard_ptr_t<TcpConnector>	   TcpConnectorPtr;
 typedef shard_ptr_t<HttpSocket>		   HttpSocketPtr;
 typedef shard_ptr_t<HttpConnector>	   HttpConnectorPtr;
-typedef shard_ptr_t<SocketLib::TcpAcceptor<SocketLib::IoService> > NetIoTcpAcceptorPtr;
-typedef shard_ptr_t<SyncTcpConnector>  SyncTcpConnectorPtr;
+typedef shard_ptr_t<SocketLib::TcpAcceptor<SocketLib::IoService> > TcpAcceptorPtr;
+typedef shard_ptr_t<SyncConnector>  SyncConnectorPtr;
 
 #define lasterror base::tlsdata<SocketLib::SocketError,0>::data()
 
@@ -68,13 +68,13 @@ public:
 	bool ListenOneHttp(const std::string& addr, SocketLib::s_uint16_t port);
 
 	// 异步建接
-	void ConnectOne(const SocketLib::Tcp::EndPoint& ep, unsigned int data = 0);
-	void ConnectOne(const std::string& addr, SocketLib::s_uint16_t port, unsigned int data = 0);
+	void ConnectOne(const SocketLib::Tcp::EndPoint& ep);
+	void ConnectOne(const std::string& addr, SocketLib::s_uint16_t port);
 
-	void ConnectOneHttp(const SocketLib::Tcp::EndPoint& ep, unsigned int data = 0);
-	void ConnectOneHttp(const std::string& addr, SocketLib::s_uint16_t port, unsigned int data = 0);
+	void ConnectOneHttp(const SocketLib::Tcp::EndPoint& ep);
+	void ConnectOneHttp(const std::string& addr, SocketLib::s_uint16_t port);
 
-	virtual void Run();
+	virtual void Run(bool isco = false);
 	virtual void Stop();
 	size_t  ServiceCount();
 
@@ -107,10 +107,9 @@ public:
 	virtual void OnReceiveData(HttpSocketPtr& clisock, HttpSvrRecvMsg& httpmsg);
 	virtual void OnReceiveData(HttpConnectorPtr& clisock, HttpCliRecvMsg& httpmsg);
 
-
 protected:
-	void _AcceptHandler(SocketLib::SocketError error, TcpSocketPtr& clisock, NetIoTcpAcceptorPtr& acceptor);
-	void _AcceptHttpHandler(SocketLib::SocketError error, HttpSocketPtr& clisock, NetIoTcpAcceptorPtr& acceptor);
+	void _AcceptHandler(SocketLib::SocketError error, TcpSocketPtr& clisock, TcpAcceptorPtr& acceptor);
+	void _AcceptHttpHandler(SocketLib::SocketError error, HttpSocketPtr& clisock, TcpAcceptorPtr& acceptor);
 
 protected:
 	SocketLib::IoService   _ioservice;
@@ -173,6 +172,10 @@ public:
 
 	bool IsConnected()const;
 
+	void SetExtData(void* data, void(*func)(void*data));
+
+	void* GetExtData();
+
 protected:
 	void _WriteHandler(SocketLib::s_uint32_t tran_byte, SocketLib::SocketError error);
 
@@ -195,6 +198,8 @@ protected:
 
 	// 状态标志
 	unsigned short _flag;
+	void* _extdata;
+	void(*_extdata_func)(void*data);
 };
 
 // for stream
@@ -257,11 +262,11 @@ protected:
 };
 
 template<typename ConnectorType>
-class BaseTcpConnector :
+class BaseTConnector :
 	public TcpStreamSocket<ConnectorType, SocketLib::TcpConnector<SocketLib::IoService> >
 {
 public:
-	BaseTcpConnector(BaseNetIo<NetIo>& netio);
+	BaseTConnector(BaseNetIo<NetIo>& netio);
 
 	SocketLib::TcpConnector<SocketLib::IoService>& GetSocket();
 
@@ -273,23 +278,16 @@ public:
 
 	void AsyncConnect(const std::string& addr, SocketLib::s_uint16_t port);
 
-	inline void SetData(unsigned int data);
-
-	inline unsigned int GetData()const;
-
 protected:
 	void _ConnectHandler(const SocketLib::SocketError& error, TcpConnectorPtr conector);
-
-protected:
-	unsigned int _data;
 };
 
 // class tcpconnector
-class TcpConnector : public BaseTcpConnector<TcpConnector>
+class TcpConnector : public BaseTConnector<TcpConnector>
 {
 public:
 	TcpConnector(BaseNetIo<NetIo>& netio)
-		:BaseTcpConnector(netio) {
+		:BaseTConnector(netio) {
 	}
 };
 
@@ -362,11 +360,11 @@ protected:
 };
 
 template<typename ConnectorType>
-class BaseHttpConnector :
+class BaseHConnector :
 	public HttpBaseSocket<ConnectorType, SocketLib::TcpConnector<SocketLib::IoService>
 	, HttpCliRecvMsg> {
 public:
-	BaseHttpConnector(BaseNetIo<NetIo>& netio);
+	BaseHConnector(BaseNetIo<NetIo>& netio);
 
 	SocketLib::TcpConnector<SocketLib::IoService>& GetSocket();
 
@@ -389,21 +387,21 @@ protected:
 	unsigned int _data;
 };
 
-class HttpConnector : public BaseHttpConnector<HttpConnector>
+class HttpConnector : public BaseHConnector<HttpConnector>
 {
 public:
 	HttpConnector(BaseNetIo<NetIo>& netio)
-		:BaseHttpConnector(netio) {
+		:BaseHConnector(netio) {
 
 	}
 };
 
 // 同步connector
-class SyncTcpConnector {
+class SyncConnector {
 public:
-	SyncTcpConnector();
+	SyncConnector();
 
-	~SyncTcpConnector();
+	~SyncConnector();
 
 	bool Connect(const SocketLib::Tcp::EndPoint& ep, SocketLib::s_uint32_t timeo_sec = -1);
 

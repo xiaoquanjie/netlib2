@@ -44,11 +44,14 @@ template<typename T, typename SocketType>
 TcpBaseSocket<T, SocketType>::TcpBaseSocket(BaseNetIo<NetIo>& netio)
 	:_netio(netio) {
 	_flag = E_STATE_STOP;
+	_extdata_func = 0;
 	_socket = new SocketType(_netio.GetIoService());
 }
 
 template<typename T, typename SocketType>
 TcpBaseSocket<T, SocketType>::~TcpBaseSocket() {
+	if (_extdata_func)
+		_extdata_func(_extdata);
 	delete _socket;
 }
 
@@ -140,6 +143,19 @@ void TcpBaseSocket<T, SocketType>::Send(const SocketLib::s_byte_t* data, SocketL
 template<typename T, typename SocketType>
 bool TcpBaseSocket<T, SocketType>::IsConnected()const {
 	return (_flag == E_STATE_START);
+}
+
+template<typename T, typename SocketType>
+void TcpBaseSocket<T, SocketType>::SetExtData(void* data, void(*func)(void*data)) {
+	if (func) {
+		_extdata = data;
+		_extdata_func = func;
+	}
+}
+
+template<typename T, typename SocketType>
+void* TcpBaseSocket<T, SocketType>::GetExtData() {
+	return _extdata;
 }
 
 template<typename T, typename SocketType>

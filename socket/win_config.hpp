@@ -30,6 +30,8 @@
 #define M_SOCKET_T			SOCKET   //s_int32_t //SOCKET
 #define M_ASYNC_CON_ERR		M_EWOULDBLOCK
 #define M_ERROR_IO_PENDING	ERROR_IO_PENDING
+
+#define M_ESHOULDBLOCK		M_EWOULDBLOCK // 为了与linux版本保持一致
 #endif // M_PLATFORM_WIN
 
 #endif // WIN_CONFIG_INCLUDE
