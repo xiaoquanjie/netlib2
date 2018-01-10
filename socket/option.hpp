@@ -181,6 +181,9 @@ namespace detail
 		}
 
 		TimeVal(s_uint32_t sec, s_uint32_t usec) {
+#ifdef M_PLATFORM_WIN
+			sec *= 1000;
+#endif
 			_Value.tv_sec = sec;
 			_Value.tv_usec = usec;
 		}

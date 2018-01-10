@@ -376,15 +376,8 @@ public:
 
 	void AsyncConnect(const std::string& addr, SocketLib::s_uint16_t port);
 
-	inline void SetData(unsigned int data);
-
-	inline unsigned int GetData()const;
-
 protected:
 	void _ConnectHandler(const SocketLib::SocketError& error, HttpConnectorPtr conector);
-
-protected:
-	unsigned int _data;
 };
 
 class HttpConnector : public BaseHConnector<HttpConnector>
@@ -392,7 +385,6 @@ class HttpConnector : public BaseHConnector<HttpConnector>
 public:
 	HttpConnector(BaseNetIo<NetIo>& netio)
 		:BaseHConnector(netio) {
-
 	}
 };
 
@@ -419,6 +411,8 @@ public:
 	bool IsConnected()const;
 
 	SocketLib::Buffer* Recv();
+
+	void SetTimeOut(SocketLib::s_uint32_t timeo);
 
 protected:
 	SocketLib::s_uint32_t _LocalEndian()const;

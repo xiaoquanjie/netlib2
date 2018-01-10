@@ -64,16 +64,6 @@ void BaseHConnector<ConnectorType>::AsyncConnect(const std::string& addr, Socket
 }
 
 template<typename ConnectorType>
-inline void BaseHConnector<ConnectorType>::SetData(unsigned int data) {
-	_data = data;
-}
-
-template<typename ConnectorType>
-inline unsigned int BaseHConnector<ConnectorType>::GetData()const {
-	return _data;
-}
-
-template<typename ConnectorType>
 void BaseHConnector<ConnectorType>::_ConnectHandler(const SocketLib::SocketError& error, HttpConnectorPtr conector) {
 	if (error) {
 		lasterror = error;
