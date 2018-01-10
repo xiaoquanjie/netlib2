@@ -61,6 +61,8 @@ public:
 	
 	void Close();
 
+	void SetTimeOut(unsigned int timeout);
+
 protected:
 	bool _Reconnect();
 
@@ -120,9 +122,15 @@ inline void ScClient::Close() {
 	}
 }
 
+inline void ScClient::SetTimeOut(unsigned int timeout) {
+	if (_socket)
+		_socket->SetTimeOut(timeout);
+}
+
 inline bool ScClient::_Reconnect() {
 	_socket = new netiolib::SyncConnector;
 	if (_socket->Connect(_ip, _port, _timeo)) {
+		SetTimeOut(3);
 		return true;
 	}
 	else {

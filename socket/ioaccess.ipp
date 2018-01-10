@@ -423,9 +423,9 @@ protected:
 		FD_SET(fd, &set);
 		int ret = 0;
 		if (rd_or_wr)
-			ret = select(fd, &set, NULL, NULL, &tm);
+			ret = select(fd+1, &set, NULL, NULL, &tm);
 		else
-			ret = select(fd, NULL, &set, NULL, &tm);
+			ret = select(fd+1, NULL, &set, NULL, &tm);
 	
 		if (ret == 0) {
 			error = SocketError(M_ERR_TIMEOUT);
