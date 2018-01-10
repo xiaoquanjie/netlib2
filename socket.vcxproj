@@ -218,6 +218,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="async_tcp_test.cpp" />
+    <ClCompile Include="cosynccall_test.cpp" />
     <ClCompile Include="http_test.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="synccall_test.cpp" />

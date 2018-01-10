@@ -348,6 +348,8 @@ inline void IocpService::Access::_DoRun(IocpService& service, IoServiceImpl& sim
 	overlapped_t* overlapped = 0;
 	for (;;) {
 		_DoClose(&simpl, closes1, closes2);
+		if (isco)
+			CoroutineTask::doThrResume();
 		trans_bytes = 0;
 		comple_key = 0;
 		overlapped = 0;
