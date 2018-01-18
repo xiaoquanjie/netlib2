@@ -77,11 +77,24 @@ void http_test() {
 		http_client();
 }
 
+void co_synccall_server();
+void co_synccall_client();
+void co_synccall_test() {
+	int i;
+	cout << "select 1 is server or client:";
+	cin >> i;
+	if (i == 1)
+		co_synccall_server();
+	else
+		co_synccall_client();
+}
+
 int main() {
 	
-	synccall_test();
+	//synccall_test();
 	//async_tcp_test();
 	//http_test();
+	co_synccall_test();
 
 	int pause_i;
 	cin >> pause_i;
