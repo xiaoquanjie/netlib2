@@ -36,34 +36,30 @@ public:
 		_server = server;
 	}
 protected:
-	virtual void OnConnected(netiolib::TcpSocketPtr& clisock);
-	virtual void OnConnected(netiolib::TcpConnectorPtr& clisock, SocketLib::SocketError error);
-	virtual void OnDisconnected(netiolib::TcpSocketPtr& clisock);
-	virtual void OnDisconnected(netiolib::TcpConnectorPtr& clisock);
-	virtual void OnReceiveData(netiolib::TcpSocketPtr& clisock, netiolib::Buffer& buffer);
-	virtual void OnReceiveData(netiolib::TcpConnectorPtr& clisock, netiolib::Buffer& buffer);
+	virtual void OnConnected(netiolib::TcpSocketPtr& clisock) {
+		_server->OnConnected(clisock);
+	}
+	virtual void OnConnected(netiolib::TcpConnectorPtr& clisock, 
+		SocketLib::SocketError error) {
+		_server->OnConnected(clisock, error);
+	}
+	virtual void OnDisconnected(netiolib::TcpSocketPtr& clisock) {
+		_server->OnDisconnected(clisock);
+	}
+	virtual void OnDisconnected(netiolib::TcpConnectorPtr& clisock) {
+		_server->OnDisconnected(clisock);
+	}
+	virtual void OnReceiveData(netiolib::TcpSocketPtr& clisock,
+		netiolib::Buffer& buffer) {
+		_server->OnReceiveData(clisock, buffer);
+	}
+	virtual void OnReceiveData(netiolib::TcpConnectorPtr& clisock,
+		netiolib::Buffer& buffer) {
+		_server->OnReceiveData(clisock, buffer);
+	}
 protected:
 	IScServer* _server;
 };
-
-inline void ScIo::OnConnected(netiolib::TcpSocketPtr& clisock) {
-	_server->OnConnected(clisock);
-}
-inline void ScIo::OnConnected(netiolib::TcpConnectorPtr& clisock, SocketLib::SocketError error) {
-	_server->OnConnected(clisock, error);
-}
-inline void ScIo::OnDisconnected(netiolib::TcpSocketPtr& clisock) {
-	_server->OnDisconnected(clisock);
-}
-inline void ScIo::OnDisconnected(netiolib::TcpConnectorPtr& clisock) {
-	_server->OnDisconnected(clisock);
-}
-inline void ScIo::OnReceiveData(netiolib::TcpSocketPtr& clisock, netiolib::Buffer& buffer) {
-	_server->OnReceiveData(clisock, buffer);
-}
-inline void ScIo::OnReceiveData(netiolib::TcpConnectorPtr& clisock, netiolib::Buffer& buffer) {
-	_server->OnReceiveData(clisock, buffer);
-}
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -202,7 +198,7 @@ inline void ScServer::OnReceiveData(netiolib::TcpSocketPtr& clisock, netiolib::B
 		pscinfo->buffer.Write(way_type);
 		pscinfo->buffer.Write(msg_type);
 		pscinfo->buffer.Write(pack_idx);
-		// don't ask why the way_the is 666 or 999
+		// don't ask why the way_type is 666 or 999
 		if (way_type == M_ONEWAY_TYPE) {
 			_handlers[pscinfo->id]->OnOneWayDealer(msg_type, buffer);
 			clisock->Send(pscinfo->buffer.Data(), pscinfo->buffer.Length());
