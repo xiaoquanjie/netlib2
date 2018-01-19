@@ -51,6 +51,7 @@ private:
 
 inline CoScClient::CoScClient() {
 	_io = 0;
+	_timeo_rw = 10;
 }
 
 inline CoScClient::~CoScClient() {

@@ -168,7 +168,7 @@ void TcpBaseSocket<T, SocketType>::SetKeepAlive(SocketLib::s_uint32_t timeo) {
 		_socket->SetOption(kpcnt);
 #endif
 #ifdef M_TCP_KEEPINTVL
-		SocketLib::Opts::TcpKeepIntvl kpintvl(1);
+		SocketLib::Opts::TcpKeepIntvl kpintvl(2);
 		_socket->SetOption(kpintvl);
 #endif
 #ifdef M_TCP_KEEPIDLE
