@@ -277,7 +277,7 @@ struct Opts
 #endif
 
 #ifdef M_TCP_KEEPCNT
-	typedef detail::Integer<M_SQL_TCP, M_TCP_KEEPCNT> TcpKeepCnt;
+	typedef detail::Integer<M_SOL_TCP, M_TCP_KEEPCNT> TcpKeepCnt;
 #endif
 
 #ifdef M_TCP_KEEPIDLE

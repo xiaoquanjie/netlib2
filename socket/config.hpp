@@ -48,6 +48,7 @@
 #include <unistd.h>					// close函数在这儿
 #include <sys/socket.h>				// 在in.h里已经包含了，可以省了
 #include <netinet/in.h>				//大部分都在这儿
+#include <netinet/tcp.h>
 #include <errno.h>					// 错误处理
 #include <sys/types.h>				// 系统类型定义
 #include <fcntl.h>
