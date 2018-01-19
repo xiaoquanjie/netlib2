@@ -50,6 +50,8 @@ public:
 
 	virtual void OnTwoWayDealer(const int msg_type, netiolib::Buffer& request, netiolib::Buffer& reply) {
 		if (msg_type == 2) {
+			int i;
+			//std::cin >> i;
 			reply.Write(std::string("xiaoquanjie"));
 		}
 		else {
