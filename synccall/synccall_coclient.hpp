@@ -26,6 +26,8 @@ public:
 	
 	void Close();
 
+	void SetTimeOut(unsigned int timeout);
+
 protected:
 	bool _Reconnect();
 
@@ -63,7 +65,7 @@ inline bool CoScClient::Connect(const std::string& ip, unsigned short port, unsi
 	else {
 		_ip = ip;
 		_port = port;
-		_timeo = timeout;
+		_timeo_c = timeout;
 		return _Reconnect();
 	}
 }
@@ -93,6 +95,13 @@ inline void CoScClient::Close() {
 	}
 }
 
+inline void CoScClient::SetTimeOut(unsigned int timeout) {
+	if (_socket) {
+		_timeo_rw = timeout;
+		_socket->SetKeepAlive(timeout);
+	}
+}
+
 inline bool CoScClient::_Reconnect() {
 	if (!_io) {
 		return false;
@@ -104,7 +113,8 @@ inline bool CoScClient::_Reconnect() {
 		pscinfo->thr_id = 0;
 		pscinfo->valid = false;
 		_socket->SetExtData(pscinfo, free_coscinfo);
-		if(_socket->Connect(_ip, _port, _timeo)) {
+		if(_socket->Connect(_ip, _port, _timeo_c)) {
+			SetTimeOut(_timeo_rw);
 			pscinfo->valid = true;
 			return true;
 		}

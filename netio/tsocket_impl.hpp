@@ -159,6 +159,24 @@ void* TcpBaseSocket<T, SocketType>::GetExtData() {
 }
 
 template<typename T, typename SocketType>
+void TcpBaseSocket<T, SocketType>::SetKeepAlive(SocketLib::s_uint32_t timeo) {
+	SocketLib::Opts::Keepalive kpalive(true);
+	_socket->SetOption(kpalive);
+#ifdef M_TCP_KEEPCNT
+	SocketLib::Opts::TcpKeepCnt kpcnt(3);
+	_socket->SetOption(kpcnt);
+#endif
+#ifdef M_TCP_KEEPINTVL
+	SocketLib::Opts::TcpKeepIntvl kpintvl(1);
+	_socket->SetOption(kpintvl);
+#endif
+#ifdef M_TCP_KEEPIDLE
+	SocketLib::Opts::TcpKeepIdle kpidle(timeo);
+	_socket->SetOption(kpidle);
+#endif
+}
+
+template<typename T, typename SocketType>
 void TcpBaseSocket<T, SocketType>::_WriteHandler(SocketLib::s_uint32_t tran_byte, SocketLib::SocketError error) {
 	if (error) {
 		// 出错关闭连接

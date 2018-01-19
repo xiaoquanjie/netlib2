@@ -275,6 +275,18 @@ struct Opts
 #ifdef M_SO_SNDTIMEO
 	typedef detail::TimeVal<M_SOL_SOCKET, M_SO_SNDTIMEO> SndTimeOut;
 #endif
+
+#ifdef M_TCP_KEEPCNT
+	typedef detail::Integer<M_SQL_TCP, M_TCP_KEEPCNT> TcpKeepCnt;
+#endif
+
+#ifdef M_TCP_KEEPIDLE
+	typedef detail::Integer<M_SOL_TCP, M_TCP_KEEPIDLE> TcpKeepIdle;
+#endif
+
+#ifdef M_TCP_KEEPINTVL
+	typedef detail::Integer<M_SOL_TCP, M_TCP_KEEPINTVL> TcpKeepIntvl;
+#endif
 };
 
 

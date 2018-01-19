@@ -8,7 +8,8 @@ class BaseScClient {
 protected:
 	BaseScClient() {
 		_port = 0;
-		_timeo = -1;
+		_timeo_c = -1;
+		_timeo_rw = 3;
 		_packidx = 0;
 	}
 
@@ -38,7 +39,8 @@ protected:
 
 	std::string _ip;
 	unsigned short _port;
-	unsigned int _timeo;
+	unsigned int _timeo_c;
+	unsigned int _timeo_rw;
 	unsigned int _packidx;
 	netiolib::Buffer _request;
 };
@@ -91,7 +93,7 @@ inline bool ScClient::Connect(const std::string& ip, unsigned short port, unsign
 	else {
 		_ip = ip;
 		_port = port;
-		_timeo = timeout;
+		_timeo_c = timeout;
 		return _Reconnect();
 	}
 }
@@ -123,14 +125,16 @@ inline void ScClient::Close() {
 }
 
 inline void ScClient::SetTimeOut(unsigned int timeout) {
-	if (_socket)
+	if (_socket) {
+		_timeo_rw = timeout;
 		_socket->SetTimeOut(timeout);
+	}
 }
 
 inline bool ScClient::_Reconnect() {
 	_socket = new netiolib::SyncConnector;
-	if (_socket->Connect(_ip, _port, _timeo)) {
-		SetTimeOut(3);
+	if (_socket->Connect(_ip, _port, _timeo_c)) {
+		SetTimeOut(_timeo_rw);
 		return true;
 	}
 	else {

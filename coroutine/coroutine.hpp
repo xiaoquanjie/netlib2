@@ -226,7 +226,6 @@ public:
 			unsigned int thrid = base::thread::ctid();
 			intlist tmp;
 			_mutex.lock();
-			base::ScopedLock scoped(_mutex);
 			std::map<int, intlist*>::iterator iter = _queue_map.find(thrid);
 			if (iter != _queue_map.end())
 				tmp.join(*iter->second);

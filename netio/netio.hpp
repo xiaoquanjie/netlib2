@@ -176,6 +176,8 @@ public:
 
 	void* GetExtData();
 
+	void SetKeepAlive(SocketLib::s_uint32_t timeo);
+
 protected:
 	void _WriteHandler(SocketLib::s_uint32_t tran_byte, SocketLib::SocketError error);
 

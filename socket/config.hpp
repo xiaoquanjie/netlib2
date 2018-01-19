@@ -75,6 +75,10 @@
 // socket option define
 #define M_SOL_SOCKET SOL_SOCKET
 #define M_IPPROTO_IPV6 IPPROTO_IPV6
+
+#ifdef SOL_TCP
+#define M_SOL_TCP SOL_TCP
+#endif
 #ifdef  SO_BROADCAST
 #define M_SO_BROADCAST SO_BROADCAST
 #endif
@@ -147,6 +151,19 @@
 #ifdef  TCP_NODELAY
 #define M_TCP_NODELAY TCP_NODELAY
 #endif
+// start with windows 10
+#ifdef TCP_KEEPCNT
+#define M_TCP_KEEPCNT TCP_KEEPCNT
+#endif
+// start with windows 10
+#ifdef TCP_KEEPIDLE
+#define M_TCP_KEEPIDLE TCP_KEEPIDLE
+#endif
+// start with windows 10
+#ifdef TCP_KEEPINTVL
+#define M_TCP_KEEPINTVL TCP_KEEPINTVL 
+#endif
+
 
 // 协议族
 #define M_AF_UNSPEC AF_UNSPEC // 无意义
