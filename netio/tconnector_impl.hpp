@@ -197,10 +197,14 @@ inline SocketLib::Buffer* SyncConnector::Recv() {
 }
 
 inline void SyncConnector::SetTimeOut(SocketLib::s_uint32_t timeo) {
-	SocketLib::Opts::RcvTimeOut rtimeo(timeo, 0);
-	SocketLib::Opts::SndTimeOut stimeo(timeo, 0);
-	_socket->SetOption(rtimeo);
-	_socket->SetOption(stimeo);
+	try {
+		SocketLib::Opts::RcvTimeOut rtimeo(timeo, 0);
+		SocketLib::Opts::SndTimeOut stimeo(timeo, 0);
+		_socket->SetOption(rtimeo);
+		_socket->SetOption(stimeo);
+	}
+	catch (...) {
+	}
 }
 
 inline SocketLib::s_uint32_t SyncConnector::_LocalEndian()const {
