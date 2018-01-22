@@ -74,10 +74,6 @@ public:
 			clisock->Close();
 		}
 	}
-
-	void Start(void*) {
-		Run();
-	}
 };
 
 void tcp_pause() {
@@ -86,16 +82,11 @@ void tcp_pause() {
 }
 
 void async_tcp_server() {
-	std::list<base::thread*> threads;
 	TcpTestIo test_io;
 	cout << "input thread count:";
 	int thread_cnt = 0;
 	cin >> thread_cnt;
-	for (int i = 0; i < thread_cnt; ++i) {
-		threads.push_back(new base::thread(&TcpTestIo::Start, &test_io, 0));
-	}
-	while (test_io.ServiceCount() != threads.size())
-		;
+	test_io.Start(thread_cnt);
 
 	if (test_io.ListenOne("0.0.0.0", 3001)) {
 		cout << "listening....." << endl;
@@ -106,26 +97,16 @@ void async_tcp_server() {
 
 	tcp_pause();
 	test_io.Stop();
-	for (std::list<base::thread*>::iterator iter = threads.begin();
-		iter != threads.end(); ++iter) {
-		(*iter)->join();
-		delete (*iter);
-	}
 	cout << "finish.............." << endl;
 }
 
 void async_tcp_client() {
-	std::list<base::thread*> threads;
 	TcpTestIo test_io;
 	cout << "input thread count:";
 	int thread_cnt = 0;
 	cin >> thread_cnt;
-	for (int i = 0; i < thread_cnt; ++i) {
-		threads.push_back(new base::thread(&TcpTestIo::Start, &test_io, 0));
-	}
-	while (test_io.ServiceCount() != threads.size())
-		;
-
+	test_io.Start(thread_cnt);
+	
 	std::string ip;
 	cout << "input ip:";
 	cin >> ip;
@@ -135,10 +116,5 @@ void async_tcp_client() {
 
 	tcp_pause();
 	test_io.Stop();
-	for (std::list<base::thread*>::iterator iter = threads.begin();
-		iter != threads.end(); ++iter) {
-		(*iter)->join();
-		delete (*iter);
-	}
 	cout << "finish.............." << endl;
 }

@@ -74,7 +74,7 @@ public:
 	void ConnectOneHttp(const SocketLib::Tcp::EndPoint& ep);
 	void ConnectOneHttp(const std::string& addr, SocketLib::s_uint16_t port);
 
-	virtual void Run(bool isco = false);
+	virtual void Start(unsigned int thread_cnt, bool isco = false);
 	virtual void Stop();
 	size_t  ServiceCount();
 
@@ -108,13 +108,18 @@ public:
 	virtual void OnReceiveData(HttpConnectorPtr& clisock, HttpCliRecvMsg& httpmsg);
 
 protected:
-	void _AcceptHandler(SocketLib::SocketError error, TcpSocketPtr& clisock, TcpAcceptorPtr& acceptor);
-	void _AcceptHttpHandler(SocketLib::SocketError error, HttpSocketPtr& clisock, TcpAcceptorPtr& acceptor);
+	void _Start(void*p);
+	void _AcceptHandler(SocketLib::SocketError error, TcpSocketPtr& clisock, 
+		TcpAcceptorPtr& acceptor);
+	void _AcceptHttpHandler(SocketLib::SocketError error, HttpSocketPtr& clisock, 
+		TcpAcceptorPtr& acceptor);
+	void _HeartBeatLoop(void*);
 
 protected:
 	SocketLib::IoService   _ioservice;
 	SocketLib::s_uint32_t  _backlog;
 	SocketLib::s_uint32_t  _endian;
+	base::slist<base::thread*> _threadlist;
 };
 
 // class netio

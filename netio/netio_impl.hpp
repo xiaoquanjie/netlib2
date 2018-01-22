@@ -109,23 +109,27 @@ void BaseNetIo<NetIoType>::ConnectOneHttp(const std::string& addr, SocketLib::s_
 }
 
 template<typename NetIoType>
-void BaseNetIo<NetIoType>::Run(bool isco) {
-	try {
-		if (isco)
-			_ioservice.CoRun();
-		else
-			_ioservice.Run();
+void BaseNetIo<NetIoType>::Start(unsigned int thread_cnt, bool isco = false) {
+	if (_threadlist.empty()) {
+		for (unsigned int idx = 0; idx < thread_cnt; ++idx) {
+			bool* pb = new bool(isco);
+			base::thread* pthread = new base::thread(&BaseNetIo::_Start, this, pb);
+			_threadlist.push_back(pthread);
+		}
 	}
-	catch (SocketLib::SocketError& error) {
-		lasterror = error;
-		M_NETIO_LOGGER("run happend error:"M_ERROR_DESC_STR(error));
-	}
+	while (_ioservice.ServiceCount()
+		!= _threadlist.size());
 }
 
 template<typename NetIoType>
 void BaseNetIo<NetIoType>::Stop() {
 	try {
 		_ioservice.Stop();
+		while (_threadlist.size()) {
+			base::thread* pthread = _threadlist.front();
+			pthread->join();
+			_threadlist.pop_front();
+		}
 	}
 	catch (SocketLib::SocketError& error) {
 		lasterror = error;
@@ -154,9 +158,27 @@ inline SocketLib::s_uint32_t BaseNetIo<NetIoType>::LocalEndian()const {
 }
 
 template<typename NetIoType>
+void BaseNetIo<NetIoType>::_Start(void*p) {
+	printf("%d thread is starting..............\n", base::thread::ctid());
+	bool* pb = (bool*)p;
+	try {
+		if (*pb)
+			_ioservice.CoRun();
+		else
+			_ioservice.Run();
+	}
+	catch (SocketLib::SocketError& error) {
+		lasterror = error;
+		M_NETIO_LOGGER("run happend error:"M_ERROR_DESC_STR(error));
+	}
+	delete pb;
+	printf("%d thread is leaving..............\n", base::thread::ctid());
+}
+
+template<typename NetIoType>
 void BaseNetIo<NetIoType>::_AcceptHandler(SocketLib::SocketError error, TcpSocketPtr& clisock, TcpAcceptorPtr& acceptor) {
 	if (error) {
-		M_NETIO_LOGGER("accept handler happend error:" << M_NETIO_LOGGER(error));
+		M_NETIO_LOGGER("accept handler happend error:" << M_ERROR_DESC_STR(error));
 	}
 	else {
 		clisock->Init();
@@ -170,7 +192,7 @@ void BaseNetIo<NetIoType>::_AcceptHandler(SocketLib::SocketError error, TcpSocke
 template<typename NetIoType>
 void BaseNetIo<NetIoType>::_AcceptHttpHandler(SocketLib::SocketError error, HttpSocketPtr& clisock, TcpAcceptorPtr& acceptor) {
 	if (error) {
-		M_NETIO_LOGGER("accept handler happend error:" << M_NETIO_LOGGER(error));
+		M_NETIO_LOGGER("accept handler happend error:" << M_ERROR_DESC_STR(error));
 	}
 	else {
 		clisock->Init();
@@ -179,6 +201,11 @@ void BaseNetIo<NetIoType>::_AcceptHttpHandler(SocketLib::SocketError error, Http
 	acceptor->AsyncAccept(bind_t(&BaseNetIo<NetIoType>::_AcceptHttpHandler, this, placeholder_1, newclisock, acceptor), newclisock->GetSocket(), error);
 	if (error)
 		lasterror = error;
+}
+
+template<typename NetIoType>
+void BaseNetIo<NetIoType>::_HeartBeatLoop(void*) {
+
 }
 
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
