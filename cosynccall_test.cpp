@@ -66,11 +66,11 @@ private:
 void co_synccall_server() {
 	synccall::ScServer server;
 	server.Start(1, true);
-	if (!server.RegisterHandler("0.0.0.0", 4001, new CoRpcHandler(server))) {
+	if (!server.Register("0.0.0.0", 4001, new CoRpcHandler(server))) {
 		cout << "register handler error" << endl;
 		return;
 	}
-	if (!server.RegisterHandler("0.0.0.0", 3001, new CoRpcHandler2(server))) {
+	if (!server.Register("0.0.0.0", 3001, new CoRpcHandler2(server))) {
 		cout << "register handler2 error" << endl;
 		return;
 	}

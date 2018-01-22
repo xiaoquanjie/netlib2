@@ -68,7 +68,7 @@ class ScServer : public IScServer {
 public:
 	ScServer();
 	~ScServer();
-	bool RegisterHandler(const std::string& ip, unsigned short port, IServerHandler* handler);
+	bool Register(const std::string& ip, unsigned short port, IServerHandler* handler);
 	CoScClient* CreateCoScClient();
 	void Start(unsigned int thread_cnt, bool isco = false);
 	void Stop();
@@ -106,7 +106,7 @@ inline ScServer::~ScServer() {
 	}
 }
 
-inline bool ScServer::RegisterHandler(const std::string& ip, unsigned short port, IServerHandler* handler) {
+inline bool ScServer::Register(const std::string& ip, unsigned short port, IServerHandler* handler) {
 	if (_io.ListenOne(ip, port)) {
 		base::s_uint16_t id = UniqueId(ip, port);
 		_handlers[id] = handler;

@@ -43,7 +43,7 @@ public:
 void synccall_server(){
 	synccall::ScServer server;
 	server.Start(4);
-	server.RegisterHandler("0.0.0.0", 4001, new RpcHandler);
+	server.Register("0.0.0.0", 4001, new RpcHandler);
 	int i = 0;
 	std::cin >> i;
 	server.Stop();
