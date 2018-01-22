@@ -113,7 +113,6 @@ protected:
 		TcpAcceptorPtr& acceptor);
 	void _AcceptHttpHandler(SocketLib::SocketError error, HttpSocketPtr& clisock, 
 		TcpAcceptorPtr& acceptor);
-	void _HeartBeatLoop(void*);
 
 protected:
 	SocketLib::IoService   _ioservice;

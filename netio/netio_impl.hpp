@@ -203,11 +203,6 @@ void BaseNetIo<NetIoType>::_AcceptHttpHandler(SocketLib::SocketError error, Http
 		lasterror = error;
 }
 
-template<typename NetIoType>
-void BaseNetIo<NetIoType>::_HeartBeatLoop(void*) {
-
-}
-
 /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /*
