@@ -68,13 +68,12 @@ class ScServer : public IScServer {
 public:
 	ScServer();
 	~ScServer();
-	bool RegisterHandler(const std::string& ip, unsigned short port, IServerHandler* handler);
+	bool Register(const std::string& ip, unsigned short port, IServerHandler* handler);
 	CoScClient* CreateCoScClient();
 	void Start(unsigned int thread_cnt, bool isco = false);
 	void Stop();
 
 protected:
-	void Run(void*);
 	void OnConnected(netiolib::TcpSocketPtr& clisock);
 	void OnConnected(netiolib::TcpConnectorPtr& clisock, SocketLib::SocketError error);
 	void OnDisconnected(netiolib::TcpSocketPtr& clisock);
@@ -107,7 +106,7 @@ inline ScServer::~ScServer() {
 	}
 }
 
-inline bool ScServer::RegisterHandler(const std::string& ip, unsigned short port, IServerHandler* handler) {
+inline bool ScServer::Register(const std::string& ip, unsigned short port, IServerHandler* handler) {
 	if (_io.ListenOne(ip, port)) {
 		base::s_uint16_t id = UniqueId(ip, port);
 		_handlers[id] = handler;
@@ -125,27 +124,11 @@ inline CoScClient* ScServer::CreateCoScClient() {
 }
 
 inline void ScServer::Start(unsigned int thread_cnt, bool isco) {
-	if (_threads.empty()) {
-		for (unsigned int idx = 0; idx < thread_cnt; ++idx) {
-			bool* pb = new bool(isco);
-			base::thread* pthread = new base::thread(&ScServer::Run, this, pb);
-			_threads.push_back(pthread);
-		}
-	}
-	while (_io.ServiceCount()
-		!= _threads.size());
+	_io.Start(thread_cnt, isco);
 }
 
 inline void ScServer::Stop() {
 	_io.Stop();
-}
-
-inline void ScServer::Run(void*p) {
-	printf("%d thread is starting..............\n", base::thread::ctid());
-	bool* pb = (bool*)p;
-	_io.Run(*pb);
-	delete pb;
-	printf("%d thread is leaving..............\n", base::thread::ctid());
 }
 
 inline void ScServer::OnConnected(netiolib::TcpSocketPtr& clisock) {

@@ -43,10 +43,6 @@ public:
 		cout << httmsg.GetHeader() << endl;
 		cout << httmsg.GetBody() << endl;
 	}
-
-	void Start(void*) {
-		Run();
-	}
 };
 
 void http_pause() {
@@ -55,16 +51,11 @@ void http_pause() {
 }
 
 void http_server() {
-	std::list<base::thread*> threads;
 	HttpTestIo test_io;
 	cout << "input thread count:";
 	int thread_cnt = 0;
 	cin >> thread_cnt;
-	for (int i = 0; i < thread_cnt; ++i) {
-		threads.push_back(new base::thread(&HttpTestIo::Start, &test_io, 0));
-	}
-	while (thread_cnt != threads.size())
-		;
+	test_io.Start(thread_cnt);
 
 	if (test_io.ListenOneHttp("0.0.0.0", 5001)) {
 		cout << "listening....." << endl;
@@ -75,25 +66,15 @@ void http_server() {
 
 	http_pause();
 	test_io.Stop();
-	for (std::list<base::thread*>::iterator iter = threads.begin();
-		iter != threads.end(); ++iter) {
-		(*iter)->join();
-		delete (*iter);
-	}
 	cout << "finish.............." << endl;
 }
 
 void http_client() {
-	std::list<base::thread*> threads;
 	HttpTestIo test_io;
 	cout << "input thread count:";
 	int thread_cnt = 0;
 	cin >> thread_cnt;
-	for (int i = 0; i < thread_cnt; ++i) {
-		threads.push_back(new base::thread(&HttpTestIo::Start, &test_io, 0));
-	}
-	while (thread_cnt != threads.size())
-		;
+	test_io.Start(thread_cnt);
 
 	std::string ip;
 	cout << "input ip:";
@@ -104,10 +85,5 @@ void http_client() {
 
 	http_pause();
 	test_io.Stop();
-	for (std::list<base::thread*>::iterator iter = threads.begin();
-		iter != threads.end(); ++iter) {
-		(*iter)->join();
-		delete (*iter);
-	}
 	cout << "finish.............." << endl;
 }
