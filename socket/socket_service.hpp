@@ -74,6 +74,8 @@ public:
 
 	M_SOCKET_DECL void Cancel(Impl& impl, SocketError& error);
 
+	M_SOCKET_DECL socket_t GetFd(const Impl& impl)const;
+
 	M_SOCKET_DECL IoServiceType& GetIoService() {
 		return _ioservice;
 	}
@@ -166,6 +168,10 @@ M_SOCKET_DECL void BaseSocketService<Protocol, IoServiceType>::Cancel(Impl& impl
 	Access::Cancel(_ioservice, impl, error);
 }
 
+template<typename Protocol, typename IoServiceType>
+M_SOCKET_DECL socket_t BaseSocketService<Protocol, IoServiceType>::GetFd(const Impl& impl)const {
+	return Access::GetFd(_ioservice, impl);
+}
 
 M_SOCKET_NAMESPACE_END
 #endif

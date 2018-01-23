@@ -8,6 +8,7 @@ using namespace std;
 class HttpTestIo : public netiolib::NetIo {
 public:
 	virtual void OnConnected(netiolib::HttpSocketPtr& clisock) {
+		netiolib::NetIo::OnConnected(clisock);
 		cout << "OnConnected one http : " << clisock->RemoteEndpoint().Address()
 			<< " " << clisock->RemoteEndpoint().Port() << endl;
 	}
@@ -23,6 +24,7 @@ public:
 	}
 
 	virtual void OnDisconnected(netiolib::HttpSocketPtr& clisock) {
+		netiolib::NetIo::OnDisconnected(clisock);
 		cout << "OnDisconnected one http : " << clisock->RemoteEndpoint().Address() << " "
 			<< clisock->RemoteEndpoint().Port() << endl;
 	}
@@ -33,6 +35,7 @@ public:
 	}
 
 	virtual void OnReceiveData(netiolib::HttpSocketPtr& clisock, netiolib::HttpSvrRecvMsg& httpmsg) {
+		netiolib::NetIo::OnReceiveData(clisock, httpmsg);
 		netiolib::HttpSvrSendMsg& msg = clisock->GetSvrMsg();
 		msg.SetBody("newxiaoquanjie", 14);
 		clisock->SendHttpMsg();

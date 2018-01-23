@@ -97,6 +97,10 @@ struct IoAccess {
 		return ep;
 	}
 
+	static socket_t GetFd(IIoService& service, const SocketImpl& impl){
+		return M_Impl_Fd(impl);
+	}
+
 	static void Shutdown(IIoService& service, SocketImpl& impl, 
 			EShutdownType what, SocketError& error){
 		if (0 != g_shutdown(M_Impl_Fd(impl), what))

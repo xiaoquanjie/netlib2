@@ -153,6 +153,7 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="base\atomic.hpp" />
     <ClInclude Include="base\circular_queue.hpp" />
     <ClInclude Include="base\config.hpp" />
     <ClInclude Include="base\mutexlock.hpp" />
