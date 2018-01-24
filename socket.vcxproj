@@ -153,6 +153,7 @@
     <Text Include="ReadMe.txt" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="base\atomic.hpp" />
     <ClInclude Include="base\circular_queue.hpp" />
     <ClInclude Include="base\config.hpp" />
     <ClInclude Include="base\mutexlock.hpp" />
@@ -166,6 +167,7 @@
     <ClInclude Include="coroutine\co_win_impl.hpp" />
     <ClInclude Include="netio\config.hpp" />
     <ClInclude Include="netio\hconnector_impl.hpp" />
+    <ClInclude Include="netio\heartbeat.hpp" />
     <ClInclude Include="netio\hsocket_impl.hpp" />
     <ClInclude Include="netio\httpmsg.hpp" />
     <ClInclude Include="netio\log.hpp" />

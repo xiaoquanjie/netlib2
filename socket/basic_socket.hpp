@@ -64,6 +64,8 @@ public:
 	M_SOCKET_DECL EndPoint LocalEndPoint()const;
 
 	M_SOCKET_DECL EndPoint LocalEndPoint(SocketError& error)const;
+
+	socket_t GetFd()const;
 };
 
 template <typename Protocol, typename SocketService>
@@ -186,6 +188,11 @@ template <typename Protocol, typename SocketService>
 M_SOCKET_DECL typename BasicSocket<Protocol, SocketService>::EndPoint BasicSocket<Protocol, SocketService>::LocalEndPoint(SocketError& error)const
 {
 	return this->GetObjectService().LocalEndPoint(this->GetImpl(), error);
+}
+
+template <typename Protocol, typename SocketService>
+M_SOCKET_DECL socket_t BasicSocket<Protocol, SocketService>::GetFd()const {
+	return this->GetObjectService().GetFd(this->GetImpl());
 }
 
 M_SOCKET_NAMESPACE_END

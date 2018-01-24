@@ -219,6 +219,12 @@
     <ClInclude Include="synccall\synccall_coclient.hpp">
       <Filter>synccall</Filter>
     </ClInclude>
+    <ClInclude Include="base\atomic.hpp">
+      <Filter>base</Filter>
+    </ClInclude>
+    <ClInclude Include="netio\heartbeat.hpp">
+      <Filter>netio</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">

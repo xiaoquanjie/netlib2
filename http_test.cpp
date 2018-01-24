@@ -8,6 +8,7 @@ using namespace std;
 class HttpTestIo : public netiolib::NetIo {
 public:
 	virtual void OnConnected(netiolib::HttpSocketPtr& clisock) {
+		_beatmng.OnConnected(clisock);
 		cout << "OnConnected one http : " << clisock->RemoteEndpoint().Address()
 			<< " " << clisock->RemoteEndpoint().Port() << endl;
 	}
@@ -33,6 +34,7 @@ public:
 	}
 
 	virtual void OnReceiveData(netiolib::HttpSocketPtr& clisock, netiolib::HttpSvrRecvMsg& httpmsg) {
+		_beatmng.OnReceiveData(clisock);
 		netiolib::HttpSvrSendMsg& msg = clisock->GetSvrMsg();
 		msg.SetBody("newxiaoquanjie", 14);
 		clisock->SendHttpMsg();
@@ -43,6 +45,8 @@ public:
 		cout << httmsg.GetHeader() << endl;
 		cout << httmsg.GetBody() << endl;
 	}
+
+	netiolib::HeartBeatMng _beatmng;
 };
 
 void http_pause() {
@@ -56,7 +60,7 @@ void http_server() {
 	int thread_cnt = 0;
 	cin >> thread_cnt;
 	test_io.Start(thread_cnt);
-
+	test_io._beatmng.Start(thread_cnt);
 	if (test_io.ListenOneHttp("0.0.0.0", 5001)) {
 		cout << "listening....." << endl;
 	}

@@ -109,7 +109,7 @@ void BaseNetIo<NetIoType>::ConnectOneHttp(const std::string& addr, SocketLib::s_
 }
 
 template<typename NetIoType>
-void BaseNetIo<NetIoType>::Start(unsigned int thread_cnt, bool isco = false) {
+void BaseNetIo<NetIoType>::Start(unsigned int thread_cnt, bool isco) {
 	if (_threadlist.empty()) {
 		for (unsigned int idx = 0; idx < thread_cnt; ++idx) {
 			bool* pb = new bool(isco);

@@ -18,6 +18,7 @@ void free_TestInfo(void* data) {
 class TcpTestIo : public netiolib::NetIo {
 public:
 	virtual void OnConnected(netiolib::TcpSocketPtr& clisock) {
+		netiolib::NetIo::OnConnected(clisock);
 		cout << "OnConnected one : " << clisock->RemoteEndpoint().Address() << " " << clisock->RemoteEndpoint().Port() << endl;
 	}
 	
@@ -42,6 +43,7 @@ public:
 	}
 
 	virtual void OnDisconnected(netiolib::TcpSocketPtr& clisock) {
+		netiolib::NetIo::OnDisconnected(clisock);
 		cout << "OnDisconnected one : " << clisock->RemoteEndpoint().Address() << " " << clisock->RemoteEndpoint().Port() << endl;
 	}
 
@@ -52,6 +54,7 @@ public:
 	}
 
 	virtual void OnReceiveData(netiolib::TcpSocketPtr& clisock, netiolib::Buffer& buffer) {
+		netiolib::NetIo::OnReceiveData(clisock, buffer);
 		clisock->Send(buffer.Data(), buffer.Length());
 	}
 
