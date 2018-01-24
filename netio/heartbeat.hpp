@@ -190,7 +190,6 @@ protected:
 	bool _startflag;
 	unsigned int _svr_cnt;
 	unsigned int _beat;
-	base::atomicint32 _socketid;
 };
 
 M_NETIO_NAMESPACE_END
