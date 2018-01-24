@@ -23,7 +23,7 @@ public:
 
 	M_SOCKET_DECL void Clear();
 
-	M_SOCKET_DECL void RemoveData(s_uint32_t len);
+	M_SOCKET_DECL void RemoveData(s_int32_t len);
 
 	M_SOCKET_DECL s_byte_t* Data();
 
@@ -99,7 +99,7 @@ M_SOCKET_DECL void Buffer::Clear() {
 	_data._pos = _data._offset = (0);
 }
 
-M_SOCKET_DECL void Buffer::RemoveData(s_uint32_t len) {
+M_SOCKET_DECL void Buffer::RemoveData(s_int32_t len) {
 	if (_data._offset + len > _data._pos)
 		_data._offset = _data._pos;
 	_data._offset += len;

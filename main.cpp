@@ -100,8 +100,8 @@ int main() {
 	
 	//synccall_test();
 	//async_tcp_test();
-	http_test();
-	//co_synccall_test();
+	//http_test();
+	co_synccall_test();
 
 	int pause_i;
 	cin >> pause_i;
