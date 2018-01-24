@@ -72,7 +72,6 @@ public:
 	CoScClient* CreateCoScClient();
 	void Start(unsigned int thread_cnt, bool isco = false);
 	void Stop();
-
 protected:
 	void OnConnected(netiolib::TcpSocketPtr& clisock);
 	void OnConnected(netiolib::TcpConnectorPtr& clisock, SocketLib::SocketError error);
@@ -84,6 +83,7 @@ protected:
 
 private:
 	ScIo _io;
+	netiolib::HeartBeatMng _heartmng;
 	std::list<base::thread*> _threads;
 	IServerHandler* _handlers[0xFFFF];
 };
@@ -91,6 +91,11 @@ private:
 inline ScServer::ScServer() 
 	:_io(this) {
 	memset(_handlers, 0, sizeof(_handlers));
+
+	netiolib::Buffer buffer;
+	ScKeepAlive msg;
+	msg.Write(buffer);
+	_heartmng.SetConnSndBuffer(buffer);
 }
 
 inline ScServer::~ScServer() {
@@ -120,15 +125,18 @@ inline bool ScServer::Register(const std::string& ip, unsigned short port, IServ
 inline CoScClient* ScServer::CreateCoScClient() {
 	CoScClient* client = new CoScClient;
 	client->_io = &_io;
+	client->_heartmng = &_heartmng;
 	return client;
 }
 
 inline void ScServer::Start(unsigned int thread_cnt, bool isco) {
 	_io.Start(thread_cnt, isco);
+	_heartmng.Start(thread_cnt);
 }
 
 inline void ScServer::Stop() {
 	_io.Stop();
+	_heartmng.Stop();
 }
 
 inline void ScServer::OnConnected(netiolib::TcpSocketPtr& clisock) {
@@ -170,12 +178,21 @@ inline void ScServer::OnReceiveData(netiolib::TcpSocketPtr& clisock, netiolib::B
 		printf("pscinfo is null\n");
 		return;
 	}
-	if (_handlers[pscinfo->id]) {
-		unsigned int way_type = 0;
+	base::s_uint32_t msgid = 0;
+	buffer.Read(msgid);
+	if (msgid == M_KEEPALIVE_ID) {
+		ScKeepAliveAck msg;
+		buffer.Clear();
+		msg.Write(buffer);
+		clisock->Send(buffer.Data(), buffer.Length());
+	}else if (_handlers[pscinfo->id]) {
+		base::s_int32_t len = sizeof(base::s_uint32_t);
+		buffer.RemoveData(len*-1);
+		base::s_uint32_t way_type = 0;
 		buffer.Read(way_type);
-		unsigned int msg_type = 0;
+		base::s_uint32_t msg_type = 0;
 		buffer.Read(msg_type);
-		unsigned int pack_idx = 0;
+		base::s_uint32_t pack_idx = 0;
 		buffer.Read(pack_idx);
 		pscinfo->buffer.Clear();
 		pscinfo->buffer.Write(way_type);
@@ -197,14 +214,21 @@ inline void ScServer::OnReceiveData(netiolib::TcpSocketPtr& clisock, netiolib::B
 }
 
 inline void ScServer::OnReceiveData(netiolib::TcpConnectorPtr& clisock, netiolib::Buffer& buffer) {
-	_CoScInfo_* pscinfo = (_CoScInfo_*)clisock->GetExtData();
-	int co_id = pscinfo->co_id;
-	int thr_id = pscinfo->thr_id;
-	pscinfo->co_id = -1;
-	pscinfo->thr_id = 0;
-	pscinfo->buffer.Clear();
-	pscinfo->buffer.Swap(buffer);
-	coroutine::CoroutineTask::addResume(thr_id, co_id);
+	_heartmng.OnReceiveData(clisock);
+	base::s_uint32_t msgid = 0;
+	buffer.Read(msgid);
+	if (msgid != M_KEEPALIVE_ACK_ID) {
+		base::s_int32_t len = sizeof(base::s_uint32_t);
+		buffer.RemoveData(len*-1);
+		_CoScInfo_* pscinfo = (_CoScInfo_*)clisock->GetExtData();
+		int co_id = pscinfo->co_id;
+		int thr_id = pscinfo->thr_id;
+		pscinfo->co_id = -1;
+		pscinfo->thr_id = 0;
+		pscinfo->buffer.Clear();
+		pscinfo->buffer.Swap(buffer);
+		coroutine::CoroutineTask::addResume(thr_id, co_id);
+	}
 }
 
 inline base::s_uint16_t ScServer::UniqueId(const std::string& ip, unsigned short port) {

@@ -15,18 +15,18 @@ protected:
 
 	void _FillRequest(int way, int msg_type, const char* msg, SocketLib::s_uint32_t len) {
 		_request.Clear();
-		_request.Write(way);
-		_request.Write(msg_type);
-		_request.Write(++_packidx);
+		_request.Write((base::s_uint32_t)way);
+		_request.Write((base::s_uint32_t)msg_type);
+		_request.Write((base::s_uint32_t)++_packidx);
 		_request.Write(msg, len);
 	}
 	bool _CheckReply(SocketLib::Buffer* reply) {
 		if (reply) {
-			unsigned int way_type = 0;
+			base::s_uint32_t way_type = 0;
 			reply->Read(way_type);
-			unsigned int msg_type = 0;
+			base::s_uint32_t msg_type = 0;
 			reply->Read(msg_type);
-			unsigned int pack_idx = 0;
+			base::s_uint32_t pack_idx = 0;
 			reply->Read(pack_idx);
 			if (pack_idx != _packidx)
 				return false;

@@ -45,10 +45,12 @@ protected:
 private:
 	netiolib::TcpConnectorPtr _socket;
 	ScIo* _io;
+	netiolib::HeartBeatMng* _heartmng;
 };
 
 inline CoScClient::CoScClient() {
 	_io = 0;
+	_heartmng = 0;
 	_timeo_rw = 10;
 }
 
@@ -107,6 +109,7 @@ inline bool CoScClient::_Reconnect() {
 		_socket->SetExtData(pscinfo, free_coscinfo);
 		if(_socket->Connect(_ip, _port, _timeo_c)) {
 			pscinfo->valid = true;
+			_heartmng->OnConnected(_socket,10);
 			return true;
 		}
 		else {

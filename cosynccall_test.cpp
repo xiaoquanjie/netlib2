@@ -24,7 +24,7 @@ public:
 					preply->Read(name);
 				}
 			}
-			delete client;
+			//delete client;
 			reply.Write(name);
 		}
 		else {
@@ -50,7 +50,7 @@ public:
 
 	virtual void OnTwoWayDealer(const int msg_type, netiolib::Buffer& request, netiolib::Buffer& reply) {
 		if (msg_type == 2) {
-			int i;
+			//int i;
 			//std::cin >> i;
 			reply.Write(std::string("xiaoquanjie"));
 		}
