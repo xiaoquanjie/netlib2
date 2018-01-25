@@ -129,9 +129,6 @@
     <ClInclude Include="socket\iocp_access.hpp">
       <Filter>socket</Filter>
     </ClInclude>
-    <ClInclude Include="socket\buffer.hpp">
-      <Filter>socket</Filter>
-    </ClInclude>
     <ClInclude Include="netio\config.hpp">
       <Filter>netio</Filter>
     </ClInclude>
@@ -224,6 +221,9 @@
     </ClInclude>
     <ClInclude Include="netio\heartbeat.hpp">
       <Filter>netio</Filter>
+    </ClInclude>
+    <ClInclude Include="base\buffer.hpp">
+      <Filter>base</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

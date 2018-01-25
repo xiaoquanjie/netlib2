@@ -266,8 +266,10 @@
 #include "base/slist.hpp"
 #include "base/svector.hpp"
 #include "base/mutexlock.hpp"
+#include "base/buffer.hpp"
 
 M_SOCKET_NAMESPACE_BEGIN
 typedef base::MutexLock MutexLock;
 typedef base::ScopedLock ScopedLock;
+typedef base::Buffer Buffer;
 M_SOCKET_NAMESPACE_END

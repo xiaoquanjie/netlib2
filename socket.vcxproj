@@ -154,6 +154,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="base\atomic.hpp" />
+    <ClInclude Include="base\buffer.hpp" />
     <ClInclude Include="base\circular_queue.hpp" />
     <ClInclude Include="base\config.hpp" />
     <ClInclude Include="base\mutexlock.hpp" />
@@ -178,7 +179,6 @@
     <ClInclude Include="socket\acceptor_service.hpp" />
     <ClInclude Include="socket\address.hpp" />
     <ClInclude Include="socket\basic_socket.hpp" />
-    <ClInclude Include="socket\buffer.hpp" />
     <ClInclude Include="socket\config.hpp" />
     <ClInclude Include="socket\connector_service.hpp" />
     <ClInclude Include="socket\endpoint.hpp" />
