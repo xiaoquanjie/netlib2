@@ -1,8 +1,8 @@
 #ifndef M_BUFFER_INCLUDE
 #define M_BUFFER_INCLUDE
 
-#include "socket/config.hpp"
-M_SOCKET_NAMESPACE_BEGIN
+#include "base/config.hpp"
+M_BASE_NAMESPACE_BEGIN
 #define M_BUFFER_DEFAILT_SIZE 1024
 
 class Buffer
@@ -15,36 +15,36 @@ public:
 		s_byte_t*	_data;
 	};
 
-	M_SOCKET_DECL Buffer();
+	Buffer();
 
-	M_SOCKET_DECL Buffer(s_uint32_t hdrlen);
+	Buffer(s_uint32_t hdrlen);
 
-	M_SOCKET_DECL ~Buffer();
+	~Buffer();
 
-	M_SOCKET_DECL void Clear();
+	void Clear();
 
-	M_SOCKET_DECL void RemoveData(s_int32_t len);
+	void RemoveData(s_int32_t len);
 
-	M_SOCKET_DECL s_byte_t* Data();
+	s_byte_t* Data();
 
-	M_SOCKET_DECL const s_byte_t* Data()const;
+	const s_byte_t* Data()const;
 
-	M_SOCKET_DECL s_byte_t* Raw();
+	s_byte_t* Raw();
 
-	M_SOCKET_DECL const s_byte_t* Raw()const;
+	const s_byte_t* Raw()const;
 
-	M_SOCKET_DECL s_uint32_t Capacity()const;
+	s_uint32_t Capacity()const;
 
-	M_SOCKET_DECL s_uint32_t Size()const;
+	s_uint32_t Size()const;
 
-	M_SOCKET_DECL s_uint32_t Length()const;
+	s_uint32_t Length()const;
 
-	M_SOCKET_DECL void Write(const void* data, s_uint32_t len);
+	void Write(const void* data, s_uint32_t len);
 
 	template<typename T>
-	M_SOCKET_DECL void Write(T const& value);
+	void Write(T const& value);
 
-	M_SOCKET_DECL void Write(std::string const& value);
+	void Write(std::string const& value);
 
 	template<typename T>
 	Buffer& operator<<(T const& value){
@@ -52,12 +52,12 @@ public:
 		return *this;
 	}
 
-	M_SOCKET_DECL void Read(void* data, s_uint32_t len);
+	void Read(void* data, s_uint32_t len);
 
 	template<typename T>
-	M_SOCKET_DECL void Read(T& value);
+	void Read(T& value);
 
-	M_SOCKET_DECL void Read(std::string& value);
+	void Read(std::string& value);
 
 	template<typename T>
 	Buffer& operator >> (T& value){
@@ -65,7 +65,7 @@ public:
 		return *this;
 	}
 
-	M_SOCKET_DECL void Swap(Buffer& buffer);
+	void Swap(Buffer& buffer);
 
 protected:
 	Buffer(const Buffer&);
@@ -75,14 +75,13 @@ private:
 	_data_ _data;
 };
 
-M_SOCKET_DECL Buffer::Buffer()
-{
+inline Buffer::Buffer(){
 	_data._pos = _data._offset = (0);
 	_data._size = M_BUFFER_DEFAILT_SIZE;
 	_data._data = (s_byte_t*)g_malloc(_data._size);
 }
 
-M_SOCKET_DECL Buffer::Buffer(s_uint32_t hdrlen) {
+inline Buffer::Buffer(s_uint32_t hdrlen) {
 	// hdrlen 不能大于M_BUFFER_DEFAILT_SIZE
 	_data._pos = _data._offset = (0);
 	_data._size = M_BUFFER_DEFAILT_SIZE;
@@ -91,52 +90,50 @@ M_SOCKET_DECL Buffer::Buffer(s_uint32_t hdrlen) {
 		_data._pos += hdrlen;
 }
 
-M_SOCKET_DECL Buffer::~Buffer(){
+inline Buffer::~Buffer(){
 	g_free(_data._data);
 }
 
-M_SOCKET_DECL void Buffer::Clear() {
+inline void Buffer::Clear() {
 	_data._pos = _data._offset = (0);
 }
 
-M_SOCKET_DECL void Buffer::RemoveData(s_int32_t len) {
+inline void Buffer::RemoveData(s_int32_t len) {
 	if (_data._offset + len > _data._pos)
 		_data._offset = _data._pos;
 	_data._offset += len;
 }
 
-M_SOCKET_DECL s_byte_t* Buffer::Data(){
+inline s_byte_t* Buffer::Data(){
 	return _data._data + _data._offset;
 }
 
-M_SOCKET_DECL const s_byte_t* Buffer::Data()const{
+inline const s_byte_t* Buffer::Data()const{
 	return _data._data + +_data._offset;
 }
 
-M_SOCKET_DECL s_byte_t* Buffer::Raw() {
+inline s_byte_t* Buffer::Raw() {
 	return _data._data;
 }
 
-M_SOCKET_DECL const s_byte_t* Buffer::Raw()const {
+inline const s_byte_t* Buffer::Raw()const {
 	return _data._data;
 }
 
-M_SOCKET_DECL s_uint32_t Buffer::Capacity()const{
+inline s_uint32_t Buffer::Capacity()const{
 	return _data._size;
 }
 
-M_SOCKET_DECL s_uint32_t Buffer::Size()const{
+inline s_uint32_t Buffer::Size()const{
 	return _data._pos;
 }
 
-M_SOCKET_DECL s_uint32_t Buffer::Length()const{
+inline s_uint32_t Buffer::Length()const{
 	return (_data._pos - _data._offset);
 }
 
-M_SOCKET_DECL void Buffer::Write(const void* data, s_uint32_t len)
-{
-	if (_data._pos + len > _data._size)
-	{
+inline void Buffer::Write(const void* data, s_uint32_t len){
+	if (_data._pos + len > _data._size){
 		_data._size = M_BUFFER_DEFAILT_SIZE*((_data._pos + len) / M_BUFFER_DEFAILT_SIZE + 1);
 		s_byte_t* ptmp = (s_byte_t*)g_malloc(_data._size);
 		g_memcpy(ptmp, _data._data, _data._pos);
@@ -148,17 +145,17 @@ M_SOCKET_DECL void Buffer::Write(const void* data, s_uint32_t len)
 }
 
 template<typename T>
-M_SOCKET_DECL void Buffer::Write(T const& value){
+inline void Buffer::Write(T const& value){
 	Write((void*)&value, sizeof(T));
 }
 
-M_SOCKET_DECL void Buffer::Write(std::string const& value) {
+inline void Buffer::Write(std::string const& value) {
 	s_uint32_t len = value.length();
 	Write((void*)&len, sizeof(s_uint32_t));
 	Write((void*)value.c_str(), len);
 }
 
-M_SOCKET_DECL void Buffer::Read(void* data, s_uint32_t len){
+inline void Buffer::Read(void* data, s_uint32_t len){
 	if (_data._offset + len > _data._pos)
 		return;
 
@@ -167,11 +164,11 @@ M_SOCKET_DECL void Buffer::Read(void* data, s_uint32_t len){
 }
 
 template<typename T>
-M_SOCKET_DECL void Buffer::Read(T& value){
+inline void Buffer::Read(T& value){
 	Read((void*)&value, sizeof(T));
 }
 
-M_SOCKET_DECL void Buffer::Read(std::string& value) {
+inline void Buffer::Read(std::string& value) {
 	s_uint32_t len = 0;
 	Read(len);
 	if (len > 0) {
@@ -183,11 +180,11 @@ M_SOCKET_DECL void Buffer::Read(std::string& value) {
 	}
 }
 
-M_SOCKET_DECL void Buffer::Swap(Buffer& buffer) {
+inline void Buffer::Swap(Buffer& buffer) {
 	_data_ d = this->_data;
 	this->_data = buffer._data;
 	buffer._data = d;
 }
 
-M_SOCKET_NAMESPACE_END
+M_BASE_NAMESPACE_END
 #endif

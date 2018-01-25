@@ -24,6 +24,5 @@
 #include "socket/socket_acceptor.hpp"
 #include "socket/socket_connector.hpp"
 #include "socket/service.hpp"
-#include "socket/buffer.hpp"
 
 #endif
