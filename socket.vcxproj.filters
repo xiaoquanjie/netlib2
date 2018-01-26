@@ -28,7 +28,7 @@
     <Filter Include="coroutine">
       <UniqueIdentifier>{f9441914-6f15-4a42-9234-9ddae492d6f6}</UniqueIdentifier>
     </Filter>
-    <Filter Include="transfer">
+    <Filter Include="node_svr">
       <UniqueIdentifier>{6a2db2fb-d944-44cc-acc8-eaa40937123b}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
@@ -228,11 +228,14 @@
     <ClInclude Include="base\buffer.hpp">
       <Filter>base</Filter>
     </ClInclude>
-    <ClInclude Include="transfer\config.hpp">
-      <Filter>transfer</Filter>
+    <ClInclude Include="node_svr\config.hpp">
+      <Filter>node_svr</Filter>
     </ClInclude>
-    <ClInclude Include="transfer\transfer.hpp">
-      <Filter>transfer</Filter>
+    <ClInclude Include="node_svr\node_svr.hpp">
+      <Filter>node_svr</Filter>
+    </ClInclude>
+    <ClInclude Include="base\configreader.hpp">
+      <Filter>base</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -251,8 +254,8 @@
     <ClCompile Include="cosynccall_test.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="transfer\transfer_svr.cpp">
-      <Filter>transfer</Filter>
+    <ClCompile Include="node_svr\transfer_svr.cpp">
+      <Filter>node_svr</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

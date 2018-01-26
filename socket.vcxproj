@@ -157,6 +157,7 @@
     <ClInclude Include="base\buffer.hpp" />
     <ClInclude Include="base\circular_queue.hpp" />
     <ClInclude Include="base\config.hpp" />
+    <ClInclude Include="base\configreader.hpp" />
     <ClInclude Include="base\mutexlock.hpp" />
     <ClInclude Include="base\slist.hpp" />
     <ClInclude Include="base\svector.hpp" />
@@ -176,6 +177,8 @@
     <ClInclude Include="netio\netio_impl.hpp" />
     <ClInclude Include="netio\tconnector_impl.hpp" />
     <ClInclude Include="netio\tsocket_impl.hpp" />
+    <ClInclude Include="node_svr\config.hpp" />
+    <ClInclude Include="node_svr\node_svr.hpp" />
     <ClInclude Include="socket\acceptor_service.hpp" />
     <ClInclude Include="socket\address.hpp" />
     <ClInclude Include="socket\basic_socket.hpp" />
@@ -217,16 +220,14 @@
     <ClInclude Include="synccall\synccall_coclient.hpp" />
     <ClInclude Include="synccall\synccall_svr.hpp" />
     <ClInclude Include="targetver.h" />
-    <ClInclude Include="transfer\config.hpp" />
-    <ClInclude Include="transfer\transfer.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="async_tcp_test.cpp" />
     <ClCompile Include="cosynccall_test.cpp" />
     <ClCompile Include="http_test.cpp" />
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="node_svr\transfer_svr.cpp" />
     <ClCompile Include="synccall_test.cpp" />
-    <ClCompile Include="transfer\transfer_svr.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
