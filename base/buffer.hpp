@@ -2,6 +2,8 @@
 #define M_BUFFER_INCLUDE
 
 #include "base/config.hpp"
+#include <stdlib.h>
+#include <string.h>
 M_BASE_NAMESPACE_BEGIN
 #define M_BUFFER_DEFAILT_SIZE 1024
 
@@ -78,20 +80,20 @@ private:
 inline Buffer::Buffer(){
 	_data._pos = _data._offset = (0);
 	_data._size = M_BUFFER_DEFAILT_SIZE;
-	_data._data = (s_byte_t*)g_malloc(_data._size);
+	_data._data = (s_byte_t*)malloc(_data._size);
 }
 
 inline Buffer::Buffer(s_uint32_t hdrlen) {
 	// hdrlen 不能大于M_BUFFER_DEFAILT_SIZE
 	_data._pos = _data._offset = (0);
 	_data._size = M_BUFFER_DEFAILT_SIZE;
-	_data._data = (s_byte_t*)g_malloc(_data._size);
+	_data._data = (s_byte_t*)malloc(_data._size);
 	if (hdrlen <= _data._size)
 		_data._pos += hdrlen;
 }
 
 inline Buffer::~Buffer(){
-	g_free(_data._data);
+	free(_data._data);
 }
 
 inline void Buffer::Clear() {
@@ -135,12 +137,12 @@ inline s_uint32_t Buffer::Length()const{
 inline void Buffer::Write(const void* data, s_uint32_t len){
 	if (_data._pos + len > _data._size){
 		_data._size = M_BUFFER_DEFAILT_SIZE*((_data._pos + len) / M_BUFFER_DEFAILT_SIZE + 1);
-		s_byte_t* ptmp = (s_byte_t*)g_malloc(_data._size);
-		g_memcpy(ptmp, _data._data, _data._pos);
-		g_free(_data._data);
+		s_byte_t* ptmp = (s_byte_t*)malloc(_data._size);
+		memcpy(ptmp, _data._data, _data._pos);
+		free(_data._data);
 		_data._data = ptmp;
 	}
-	g_memcpy(_data._data + _data._pos, data, len);
+	memcpy(_data._data + _data._pos, data, len);
 	_data._pos += len;
 }
 
@@ -159,7 +161,7 @@ inline void Buffer::Read(void* data, s_uint32_t len){
 	if (_data._offset + len > _data._pos)
 		return;
 
-	g_memcpy(data, _data._data + _data._offset, len);
+	memcpy(data, _data._data + _data._offset, len);
 	_data._offset += len;
 }
 

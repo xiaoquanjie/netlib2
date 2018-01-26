@@ -114,6 +114,26 @@ public:
 			return true;
 		}
 	}
+
+	void swap(circular_queue& queue) {
+		if (this != &queue) {
+			size_t tmp = _cap;
+			_cap = queue._cap;
+			queue._cap = tmp;
+
+			tmp = _head;
+			_head = queue._head;
+			queue._head = tmp;
+
+			tmp = _tail;
+			_tail = queue._tail;
+			queue._tail = tmp;
+
+			T* ele = _element;
+			_element = queue._element;
+			queue._element = ele;
+		}
+	}
 };
 
 M_BASE_NAMESPACE_END
