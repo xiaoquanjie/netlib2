@@ -217,6 +217,8 @@
     <ClInclude Include="synccall\synccall_coclient.hpp" />
     <ClInclude Include="synccall\synccall_svr.hpp" />
     <ClInclude Include="targetver.h" />
+    <ClInclude Include="transfer\config.hpp" />
+    <ClInclude Include="transfer\transfer.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="async_tcp_test.cpp" />
@@ -224,6 +226,7 @@
     <ClCompile Include="http_test.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="synccall_test.cpp" />
+    <ClCompile Include="transfer\transfer_svr.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

@@ -28,6 +28,9 @@
     <Filter Include="coroutine">
       <UniqueIdentifier>{f9441914-6f15-4a42-9234-9ddae492d6f6}</UniqueIdentifier>
     </Filter>
+    <Filter Include="transfer">
+      <UniqueIdentifier>{6a2db2fb-d944-44cc-acc8-eaa40937123b}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <Text Include="ReadMe.txt" />
@@ -225,6 +228,12 @@
     <ClInclude Include="base\buffer.hpp">
       <Filter>base</Filter>
     </ClInclude>
+    <ClInclude Include="transfer\config.hpp">
+      <Filter>transfer</Filter>
+    </ClInclude>
+    <ClInclude Include="transfer\transfer.hpp">
+      <Filter>transfer</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
@@ -241,6 +250,9 @@
     </ClCompile>
     <ClCompile Include="cosynccall_test.cpp">
       <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="transfer\transfer_svr.cpp">
+      <Filter>transfer</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
