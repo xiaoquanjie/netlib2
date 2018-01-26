@@ -187,7 +187,7 @@ inline void ScServer::OnReceiveData(netiolib::TcpSocketPtr& clisock, netiolib::B
 		clisock->Send(buffer.Data(), buffer.Length());
 	}else if (_handlers[pscinfo->id]) {
 		base::s_int32_t len = sizeof(base::s_uint32_t);
-		buffer.RemoveData(len*-1);
+		buffer.CutData(len*-1);
 		base::s_uint32_t way_type = 0;
 		buffer.Read(way_type);
 		base::s_uint32_t msg_type = 0;
@@ -219,7 +219,7 @@ inline void ScServer::OnReceiveData(netiolib::TcpConnectorPtr& clisock, netiolib
 	buffer.Read(msgid);
 	if (msgid != M_KEEPALIVE_ACK_ID) {
 		base::s_int32_t len = sizeof(base::s_uint32_t);
-		buffer.RemoveData(len*-1);
+		buffer.CutData(len*-1);
 		_CoScInfo_* pscinfo = (_CoScInfo_*)clisock->GetExtData();
 		int co_id = pscinfo->co_id;
 		int thr_id = pscinfo->thr_id;

@@ -25,7 +25,7 @@ public:
 
 	void Clear();
 
-	void RemoveData(s_int32_t len);
+	void CutData(s_int32_t len);
 
 	s_byte_t* Data();
 
@@ -100,7 +100,7 @@ inline void Buffer::Clear() {
 	_data._pos = _data._offset = (0);
 }
 
-inline void Buffer::RemoveData(s_int32_t len) {
+inline void Buffer::CutData(s_int32_t len) {
 	if (_data._offset + len > _data._pos)
 		_data._offset = _data._pos;
 	_data._offset += len;

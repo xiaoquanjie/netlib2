@@ -193,7 +193,7 @@ void TcpBaseSocket<T, SocketType>::_WriteHandler(SocketLib::s_uint32_t tran_byte
 	}
 	else {
 		SocketLib::ScopedLock scoped_w(_writer.lock);
-		_writer.msgbuffer->RemoveData(tran_byte);
+		_writer.msgbuffer->CutData(tran_byte);
 		if (!_TrySendData(true) && !(_flag == E_STATE_START)) {
 			// 数据发送完后，如果状态不是E_TCPSOCKET_STATE_START，则需要关闭写
 			_socket->Shutdown(SocketLib::E_Shutdown_WR, error);

@@ -160,7 +160,7 @@ inline bool SyncConnector::Send(const SocketLib::s_byte_t* data, SocketLib::s_ui
 				Close();
 				return false;
 			}
-			_sndbuffer.RemoveData(snd_cnt);
+			_sndbuffer.CutData(snd_cnt);
 			if (_sndbuffer.Length() == 0)
 				break;
 		} while (true);		
