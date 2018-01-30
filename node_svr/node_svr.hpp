@@ -93,45 +93,6 @@ struct protocol_transfer :
 	}
 };
 
-struct protocol_hdr {
-	enum {
-		enum_login_type = 1,
-		enum_logout_type = 2,
-		enum_signle_point_type = 3,
-		enum_type_broadcast_type = 4,
-		enum_all_broadcast_type = 5,
-	};
-	base::s_int32_t msgtype;
-	base::s_int32_t from_token_type;
-	base::s_int32_t from_token_id;
-	base::s_int32_t to_token_type;
-	base::s_int32_t to_token_id;
-
-	protocol_hdr() {
-		msgtype = 0;
-		from_token_type = 0;
-		from_token_id = 0;
-		to_token_type = 0;
-		to_token_id = 0;
-	}
-
-	void Read(base::Buffer& buffer) {
-		buffer.Read(msgtype);
-		buffer.Read(from_token_type);
-		buffer.Read(from_token_id);
-		buffer.Read(to_token_type);
-		buffer.Read(to_token_id);
-	}
-
-	void Write(base::Buffer& buffer) {
-		buffer.Write(msgtype);
-		buffer.Write(from_token_type);
-		buffer.Write(from_token_id);
-		buffer.Write(to_token_type);
-		buffer.Write(to_token_id);
-	}
-};
-
 class ClientNodeSvr;
 
 template<typename ClientNodeType>
@@ -141,6 +102,10 @@ class NodeSvrNetIo :
 public:
 	NodeSvrNetIo(ClientNodeType* node)
 		:_node(node) {
+	}
+
+	netiolib::HeartBeatMng& GetBeatMng() {
+		return _beat;
 	}
 
 protected:
@@ -157,38 +122,37 @@ protected:
 
 	virtual void OnReceiveData(netiolib::TcpConnectorPtr& clisock, SocketLib::Buffer& buffer) {
 		_beat.OnReceiveData(clisock);
-
-		protocol_hdr message;
-		message.Read(buffer);
-		if (message.msgtype
-			== protocol_hdr::enum_login_type) {
-			_node->OnLoginMsg(buffer, message.to_token_type, message.to_token_id,
-				message.from_token_type, message.from_token_id);
+		base::s_int32_t msgid = 0;
+		buffer.Read(msgid);
+		if (msgid == msg_id_transfer) {
+			protocol_transfer message;
+			message.Read(buffer);
+			if (message.msgtype
+				== protocol_transfer::enum_login_type) {
+				_node->OnLoginMsg(buffer, message.to_token_type, message.to_token_id,
+					message.from_token_type, message.from_token_id);
+			}
+			else if (protocol_transfer::enum_logout_type
+				== message.msgtype) {
+				_node->OnLogoutMsg(message.to_token_type, message.to_token_id,
+					message.from_token_type, message.from_token_id);
+			}
+			else if (protocol_transfer::enum_signle_point_type
+				== message.msgtype) {
+				_node->OnMessage(buffer, message.to_token_type, message.to_token_id,
+					message.from_token_type, message.from_token_id);
+			}
+			else if (protocol_transfer::enum_type_broadcast_type
+				== message.msgtype) {
+				_node->OnMessage(buffer, message.to_token_type, message.to_token_id,
+					message.from_token_type, message.from_token_id);
+			}
+			else if (protocol_transfer::enum_all_broadcast_type
+				== message.msgtype) {
+				_node->OnMessage(buffer, message.to_token_type, message.to_token_id,
+					message.from_token_type, message.from_token_id);
+			}
 		}
-		else if (protocol_hdr::enum_logout_type
-			== message.msgtype) {
-			_node->OnLogoutMsg(message.to_token_type, message.to_token_id,
-				message.from_token_type, message.from_token_id);
-		}
-		else if (protocol_hdr::enum_signle_point_type
-			== message.msgtype) {
-			_node->OnMessage(buffer, message.to_token_type, message.to_token_id,
-				message.from_token_type, message.from_token_id);
-		}
-		else if (protocol_hdr::enum_type_broadcast_type
-			== message.msgtype) {
-			_node->OnMessage(buffer, message.to_token_type, message.to_token_id,
-				message.from_token_type, message.from_token_id);
-		}
-		else if (protocol_hdr::enum_all_broadcast_type
-			== message.msgtype) {
-			_node->OnMessage(buffer, message.to_token_type, message.to_token_id,
-				message.from_token_type, message.from_token_id);
-		}
-	}
-
-	netiolib::HeartBeatMng& GetBeatMng() {
-		return _beat;
 	}
 
 protected:
@@ -207,11 +171,16 @@ public:
 
 	virtual void Start(int thread_cnt) {
 		_netio.Start(thread_cnt);
-		//_netio.get
+		protocol_keepalive kpalive_msg;
+		base::Buffer buffer;
+		buffer.Write(kpalive_msg);
+		_netio.GetBeatMng().SetConnSndBuffer(buffer);
+		_netio.GetBeatMng().Start(thread_cnt);
 	}
 
 	virtual void Stop() {
 		_netio.Stop();
+		_netio.GetBeatMng().Stop();
 	}
 
 	void ConnectOne(const std::string& addr, SocketLib::s_uint16_t port) {
@@ -268,7 +237,7 @@ protected:
 
 	base::Buffer* MakeProtocol(base::s_int32_t type, int self_token_type,
 		int self_token_id, int other_token_type, int other_token_id) {
-		protocol_hdr snd_msg;
+		protocol_transfer snd_msg;
 		snd_msg.msgtype = type;
 		snd_msg.from_token_type = self_token_type;
 		snd_msg.from_token_id = self_token_id;
@@ -283,12 +252,12 @@ protected:
 	base::Buffer* MakeProtocol(base::s_int32_t type, int self_token_type,
 		int self_token_id, int other_token_type, int other_token_id,
 		MessageType& message) {
-		protocol_hdr snd_msg;
+		protocol_transfer snd_msg;
 		snd_msg.msgtype = type;
 		snd_msg.from_token_type = self_token_type;
 		snd_msg.from_token_id = self_token_id;
-		snd_msg.to_token_type = 0;
-		snd_msg.to_token_id = 0;
+		snd_msg.to_token_type = other_token_type;
+		snd_msg.to_token_id = other_token_id;
 		base::Buffer* buffer = new base::Buffer;
 		snd_msg.Write(*buffer);
 		message.Write(*buffer);
