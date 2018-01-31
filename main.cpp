@@ -2,6 +2,7 @@
 #include <iostream>
 #include "base/thread.hpp"
 #include "synccall/synccall.hpp"
+#include "base/logger.hpp"
 
 using namespace std;
 
@@ -96,12 +97,22 @@ void test_lock() {
 	}
 }
 
+void test_logger() {
+	//base::logger::logfile lf("Center", 10);
+	//lf.write("xiaoquanjie", 11);
+	//lf.write("xiaoquanjie", 11);
+	base::logger::fixedbuffer<10> buf;
+	buf.append("xiaouqnajie", 11);
+	cout << buf.getstring() << endl;
+}
+
 int main() {
 	
+	test_logger();
 	//synccall_test();
 	//async_tcp_test();
 	//http_test();
-	co_synccall_test();
+	//co_synccall_test();
 
 	int pause_i;
 	cin >> pause_i;
