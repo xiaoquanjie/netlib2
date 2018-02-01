@@ -98,13 +98,14 @@ void test_lock() {
 }
 
 void test_logger() {
-	//base::logger::logfile lf("Center", 10);
-	//lf.write("xiaoquanjie", 11);
-	//lf.write("xiaoquanjie", 11);
-	base::logger::logstream ls;
-	base::logger::logtime lg;
-	lg.to_format(ls);
-	cout << ls.buffer().getstring() << endl;
+	SetLogFileName("mylog");
+	//SetLogLevel();
+	LogDebug("xiaoquanjie " << "taoxinzhi");
+	LogTrace("nihaoma");
+	LogInfo("ÎÒ²»ºÃ");
+	LogWarn("qu ni de");
+	LogFatal("this is a fatal");
+	LogError("this is a error");
 }
 
 int main() {

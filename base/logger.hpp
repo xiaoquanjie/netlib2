@@ -2,6 +2,8 @@
 #define M_BASE_LOGGER_INCLUDE
 
 #include "base/config.hpp"
+#include "base/thread.hpp"
+#include "base/tls.hpp"
 #include <string>
 #include <time.h>
 #include <stdio.h>
@@ -438,7 +440,6 @@ namespace logger {
 		logtime() {
 			_last = 0;
 		}
-
 		void to_format(logstream& ls) {
 			long long now_in_mil = _gettime_();
 			time_t now = now_in_mil / 1000;
@@ -454,9 +455,22 @@ namespace logger {
 				strftime(_time_str, sizeof(_time_str), "%Y%m%d %H:%M:%S", 
 					&ltm);
 			}
-			snprintf(_mil_str, sizeof(_mil_str), ".%03d", mil);
+			snprintf(_mil_str, sizeof(_mil_str), ".%03d ", mil);
 			ls.buffer().append(_time_str, 17);
-			ls.buffer().append(_mil_str, 4);
+			ls.buffer().append(_mil_str, 5);
+		}
+	};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+	struct logthread{
+		std::string _thrid;
+		logthread() {
+			_thrid = thread::ctid_str();
+			_thrid.append(" ");
+		}
+		void to_format(logstream& ls) {
+			ls << _thrid;
 		}
 	};
 
@@ -467,13 +481,179 @@ namespace logger {
 		LOG_LEVEL_WARN = 3,
 		LOG_LEVEL_ERROR = 4,
 		LOG_LEVEL_FATAL = 5,
+		LOG_LEVEL_MAX = 6,
 	};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+	inline void console_output(const char* data, size_t len) {
+		fwrite(data, 1, len, stdout);
+	}
 
 	class logger {
-		//gettimeofday
+	public:
+		const char* _level_desc[LOG_LEVEL_MAX];
+	public:
+		void setlevel(loglevel level);
+
+		loglevel getlevel()const;
+
+		void setfilename(const std::string& filename);
+
+		void setrollsize(const size_t rollsize);
+
+		static logger& instance();
+
+		void log(const char* data, size_t len);
+
+		void setoutput(void(*output)(const char*, size_t)) {
+
+		}
+
+	protected:
+		logger();
+
+		~logger();
+
+		void dump(void*);
+
+	private:
+		std::string _filename;
+		loglevel _level;
+		logfile* _file;
+		thread* _thread;
+		size_t _rollsize;
+		void(*_output)(const char*, size_t);
 	};
+
+	inline logger::logger() {
+		_level = LOG_LEVEL_TRACE;
+		_level_desc[LOG_LEVEL_TRACE] = "TRACE ";
+		_level_desc[LOG_LEVEL_DEBUG] = "DEBUG ";
+		_level_desc[LOG_LEVEL_INFO] = "INFO  ";
+		_level_desc[LOG_LEVEL_WARN] = "WARN  ";
+		_level_desc[LOG_LEVEL_ERROR] = "ERROR ";
+		_level_desc[LOG_LEVEL_FATAL] = "FATAL ";
+		_file = NULL;
+		_thread = NULL;
+		_rollsize = 1024 * 1024 * 300;
+		_output = console_output;
+	}
+
+	inline logger::~logger() {
+		if (_thread) {
+			_thread->join();
+			delete _thread;
+		}
+		if (_file) {
+			delete _file;
+		}
+	}
+
+	inline void logger::setlevel(loglevel level) {
+		_level = level;
+	}
+
+	inline loglevel logger::getlevel()const {
+		return _level;
+	}
+
+	inline void logger::setfilename(const std::string& filename) {
+		if (_filename.empty()) {
+			_filename = filename;
+			_file = new logfile(_filename, _rollsize);
+			_thread = new thread(&logger::dump, this, 0);
+		}
+	}
+
+	inline void logger::setrollsize(const size_t rollsize) {
+		_rollsize = rollsize;
+	}
+
+	inline logger& logger::instance() {
+		static logger static_logger;
+		return static_logger;
+	}
+
+	inline void logger::log(const char* data, size_t len) {
+		if (_output) {
+			_output(data, len);
+		}
+	}
+
+	inline void logger::dump(void*) {
+
+	}
+
+	struct logimpl {
+		logstream _stream;
+		logimpl(loglevel level) {
+			logtime& lg = tlsdata<logtime, 0>::data();
+			lg.to_format(_stream);
+			_stream << logger::instance()._level_desc[level];
+			logthread& lt = tlsdata<logthread, 0>::data();
+			lt.to_format(_stream);
+		}
+		~logimpl() {
+			_stream << "\n\0";
+			logger::instance().log(_stream.buffer().data(), _stream.buffer().length());
+		}
+		logstream& stream() {
+			return _stream;
+		}
+	};
+
 }
 
-
 M_BASE_NAMESPACE_END
+
+#define SetLogLevel(level)\
+	base::logger::logger::instance().setlevel((base::logger::loglevel)level)
+#define GetLogLevel()\
+	base::logger::logger::instance().getlevel()
+#define SetLogFileName(name)\
+	base::logger::logger::instance().setfilename(name)
+
+#define LogTrace(content)\
+{\
+	if (base::logger::LOG_LEVEL_TRACE>=GetLogLevel()){\
+		base::logger::logimpl(base::logger::LOG_LEVEL_TRACE).stream()<<content;\
+	}\
+}
+
+#define LogDebug(content)\
+{\
+	if (base::logger::LOG_LEVEL_DEBUG>=GetLogLevel()){\
+		base::logger::logimpl(base::logger::LOG_LEVEL_DEBUG).stream()<<content;\
+	}\
+}
+
+#define LogInfo(content)\
+{\
+	if (base::logger::LOG_LEVEL_INFO>=GetLogLevel()){\
+		base::logger::logimpl(base::logger::LOG_LEVEL_INFO).stream()<<content;\
+	}\
+}
+
+#define LogWarn(content)\
+{\
+	if (base::logger::LOG_LEVEL_WARN>=GetLogLevel()){\
+		base::logger::logimpl(base::logger::LOG_LEVEL_WARN).stream()<<content;\
+	}\
+}
+
+#define LogError(content)\
+{\
+	if (base::logger::LOG_LEVEL_ERROR>=GetLogLevel()){\
+		base::logger::logimpl(base::logger::LOG_LEVEL_ERROR).stream()<<content;\
+	}\
+}
+
+#define LogFatal(content)\
+{\
+	if (base::logger::LOG_LEVEL_FATAL>=GetLogLevel()){\
+		base::logger::logimpl(base::logger::LOG_LEVEL_FATAL).stream()<<content;\
+	}\
+}
+
 #endif
