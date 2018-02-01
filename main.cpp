@@ -102,7 +102,8 @@ void test_logger() {
 	//lf.write("xiaoquanjie", 11);
 	//lf.write("xiaoquanjie", 11);
 	base::logger::logstream ls;
-	ls << &ls <<" xiaoquanjie " << &ls << " enen ";
+	base::logger::logtime lg;
+	lg.to_format(ls);
 	cout << ls.buffer().getstring() << endl;
 }
 

@@ -9,6 +9,7 @@
 #include <windows.h>
 #else
 #include <unistd.h>
+#include <sys/time.h>
 #endif
 
 M_BASE_NAMESPACE_BEGIN
@@ -57,6 +58,31 @@ namespace logger {
 		return (ltm1.tm_year == ltm2.tm_year
 			&& ltm1.tm_mon == ltm2.tm_mon
 			&& ltm1.tm_mday == ltm2.tm_mday);
+	}
+
+	// 毫秒级
+	static long long _gettime_() {
+		long long t = 0;
+#ifdef M_PLATFORM_WIN
+		SYSTEMTIME st;
+		struct tm  tm;
+		time_t clock;
+		GetLocalTime(&st);
+		tm.tm_year = st.wYear - 1900;
+		tm.tm_mon = st.wMonth - 1;
+		tm.tm_mday = st.wDay;
+		tm.tm_hour = st.wHour;
+		tm.tm_min = st.wMinute;
+		tm.tm_sec = st.wSecond;
+		tm.tm_isdst = -1;
+		clock = mktime(&tm);
+		t = clock * 1000 + st.wMilliseconds;
+#else
+		struct timeval tv;
+		gettimeofday(&tv, NULL);
+		t = tv.tv_sec * 1000 + tv.tv_usec / 1000;
+#endif
+		return t;
 	}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
@@ -262,10 +288,11 @@ namespace logger {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
-	// 日志流
+	// 日志流,一条日志最大4k
 	class logstream {
-		typedef fixedbuffer<4 * 1024> buffer_type;
 	public:
+		typedef fixedbuffer<4 * 1024> buffer_type;
+
 		logstream& operator<<(const bool& value);
 
 		logstream& operator<<(const short& value);
@@ -290,6 +317,8 @@ namespace logger {
 
 		template<int len>
 		logstream& operator<<(const char(&value)[len]);
+
+		logstream& operator<<(const char* value);
 
 		// support for address
 		logstream& operator<<(const void* value);
@@ -365,6 +394,11 @@ namespace logger {
 		return *this;
 	}
 
+	inline logstream& logstream::operator<<(const char* value) {
+		_buffer.append(value, strlen(value));
+		return *this;
+	}
+
 	inline logstream& logstream::operator<<(const void* value) {
 		_convert(value, 2);
 		return *this;
@@ -394,6 +428,50 @@ namespace logger {
 	logstream::buffer_type& logstream::buffer() {
 		return _buffer;
 	}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+	struct logtime {
+		char _time_str[32];
+		char _mil_str[10];
+		time_t _last;
+		logtime() {
+			_last = 0;
+		}
+
+		void to_format(logstream& ls) {
+			long long now_in_mil = _gettime_();
+			time_t now = now_in_mil / 1000;
+			int mil = now_in_mil % 1000;
+			if (now != _last) {
+				_last = now;
+				struct tm ltm;
+#ifdef M_PLATFORM_WIN
+				localtime_s(&ltm, &now);
+#else
+				localtime_r(&now, &ltm);
+#endif
+				strftime(_time_str, sizeof(_time_str), "%Y%m%d %H:%M:%S", 
+					&ltm);
+			}
+			snprintf(_mil_str, sizeof(_mil_str), ".%03d", mil);
+			ls.buffer().append(_time_str, 17);
+			ls.buffer().append(_mil_str, 4);
+		}
+	};
+
+	enum loglevel{
+		LOG_LEVEL_TRACE = 0,
+		LOG_LEVEL_DEBUG = 1,
+		LOG_LEVEL_INFO = 2,
+		LOG_LEVEL_WARN = 3,
+		LOG_LEVEL_ERROR = 4,
+		LOG_LEVEL_FATAL = 5,
+	};
+
+	class logger {
+		//gettimeofday
+	};
 }
 
 
