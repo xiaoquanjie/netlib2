@@ -156,14 +156,14 @@ namespace logger {
 #ifdef M_PLATFORM_WIN
 		fopen_s(&_file, name.c_str(), "w");
 #else
-		_file = fopen_s(name.c_str(), "w");
+		_file = fopen(name.c_str(), "w");
 #endif
 	}
 
 ///////////////////////////////////////////////////////////////////////////////////////////////
 
 	// 固定缓存
-	template<int SIZE>
+	template<size_t SIZE>
 	struct fixedbuffer {
 	public:
 		fixedbuffer();
@@ -174,21 +174,33 @@ namespace logger {
 
 		size_t length()const;
 
+		const char* current()const;
+
+		char* current();
+
+		size_t avail()const;
+
+		void seek(int incr);
+
 		void clear();
 
 		const char* getstring();
+
+	protected:
+		fixedbuffer(const fixedbuffer&);
+		fixedbuffer& operator=(const fixedbuffer&);
 
 	private:
 		char _data[SIZE+1];
 		size_t _pos;
 	};
 
-	template<int SIZE>
+	template<size_t SIZE>
 	fixedbuffer<SIZE>::fixedbuffer() {
 		clear();
 	}
 
-	template<int SIZE>
+	template<size_t SIZE>
 	void fixedbuffer<SIZE>::append(const char* data, size_t len) {
 		if (len > (SIZE - _pos))
 			len = SIZE - _pos;
@@ -196,26 +208,191 @@ namespace logger {
 		_pos += len;
 	}
 
-	template<int SIZE>
+	template<size_t SIZE>
 	const char* fixedbuffer<SIZE>::data()const {
 		return _data;
 	}
 
-	template<int SIZE>
+	template<size_t SIZE>
 	size_t fixedbuffer<SIZE>::length()const {
 		return _pos;
 	}
 	
-	template<int SIZE>
+	template<size_t SIZE>
+	const char* fixedbuffer<SIZE>::current()const {
+		return &_data[_pos];
+	}
+
+	template<size_t SIZE>
+	char* fixedbuffer<SIZE>::current() {
+		return &_data[_pos];
+	}
+
+	template<size_t SIZE>
+	size_t fixedbuffer<SIZE>::avail()const {
+		return (SIZE - _pos);
+	}
+
+	template<size_t SIZE>
+	void fixedbuffer<SIZE>::seek(int incr) {
+		if (incr >= 0) {
+			_pos += incr;
+			if (_pos > SIZE)
+				_pos = SIZE;
+		}
+		else if ((size_t)(incr*-1) > _pos) {
+			_pos = 0;
+		}
+		else {
+			_pos += incr;
+		}
+	}
+
+	template<size_t SIZE>
 	void fixedbuffer<SIZE>::clear() {
 		_pos = 0;
 		memset(_data, 0, SIZE + 1);
 	}
 
-	template<int SIZE>
+	template<size_t SIZE>
 	const char* fixedbuffer<SIZE>::getstring() {
 		_data[_pos] = '\0';
 		return _data;
+	}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
+	// 日志流
+	class logstream {
+		typedef fixedbuffer<4 * 1024> buffer_type;
+	public:
+		logstream& operator<<(const bool& value);
+
+		logstream& operator<<(const short& value);
+
+		logstream& operator<<(const unsigned short& value);
+
+		logstream& operator<<(const int& value);
+
+		logstream& operator<<(const unsigned int& value);
+
+		logstream& operator<<(const long long& value);
+
+		logstream& operator<<(const unsigned long long& value);
+
+		logstream& operator<<(const float& value);
+
+		logstream& operator<<(const double& value);
+
+		logstream& operator<<(const char& value);
+
+		logstream& operator<<(const std::string& value);
+
+		template<int len>
+		logstream& operator<<(const char(&value)[len]);
+
+		// support for address
+		logstream& operator<<(const void* value);
+
+		buffer_type& buffer();
+
+	protected:
+		template<typename T>
+		void _convert(const T&value, size_t type);
+
+	protected:
+		buffer_type _buffer;
+	};
+
+	inline logstream& logstream::operator<<(const bool& value) {
+		_buffer.append(value ? "1" : "0", 1);
+		return *this;
+	}
+
+	inline logstream& logstream::operator<<(const short& value) {
+		*this << static_cast<int>(value);
+		return *this;
+	}
+
+	inline logstream& logstream::operator<<(const unsigned short& value) {
+		*this << static_cast<unsigned int>(value);
+		return *this;
+	}
+
+	inline logstream& logstream::operator<<(const int& value) {
+		_convert(value, 0);
+		return *this;
+	}
+
+	inline logstream& logstream::operator<<(const unsigned int& value) {
+		_convert(value, 0);
+		return *this;
+	}
+
+	inline logstream& logstream::operator<<(const long long& value) {
+		_convert(value, 0);
+		return *this;
+	}
+
+	inline logstream& logstream::operator<<(const unsigned long long& value) {
+		_convert(value, 0);
+		return *this;
+	}
+
+	inline logstream& logstream::operator<<(const float& value) {
+		*this << static_cast<double>(value);
+		return *this;
+	}
+
+	inline logstream& logstream::operator<<(const double& value) {
+		_convert(value, 1);
+		return *this;
+	}
+
+	inline logstream& logstream::operator<<(const char& value) {
+		_buffer.append(&value, 1);
+		return *this;
+	}
+
+	inline logstream& logstream::operator<<(const std::string& value) {
+		_buffer.append(value.c_str(), value.size());
+		return *this;
+	}
+
+	template<int len>
+	inline logstream& logstream::operator<<(const char(&value)[len]) {
+		_buffer.append(value, len - 1);
+		return *this;
+	}
+
+	inline logstream& logstream::operator<<(const void* value) {
+		_convert(value, 2);
+		return *this;
+	}
+
+	template<typename T>
+	void logstream::_convert(const T&value, size_t type) {
+		// 整数最长接受32个字符
+		if (_buffer.avail() >= 32) {
+			const char* ptype = 0;
+			switch (type) {
+			case 0:
+				ptype = "%d";
+				break;
+			case 1:
+				ptype = "%.12g";
+				break;
+			default:
+				ptype = "0x%0X";
+				break;
+			}
+			int len = snprintf(_buffer.current(), _buffer.avail(), ptype, value);
+			_buffer.seek(len);
+		}
+	}
+
+	logstream::buffer_type& logstream::buffer() {
+		return _buffer;
 	}
 }
 

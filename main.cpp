@@ -101,9 +101,9 @@ void test_logger() {
 	//base::logger::logfile lf("Center", 10);
 	//lf.write("xiaoquanjie", 11);
 	//lf.write("xiaoquanjie", 11);
-	base::logger::fixedbuffer<10> buf;
-	buf.append("xiaouqnajie", 11);
-	cout << buf.getstring() << endl;
+	base::logger::logstream ls;
+	ls << &ls <<" xiaoquanjie " << &ls << " enen ";
+	cout << ls.buffer().getstring() << endl;
 }
 
 int main() {
