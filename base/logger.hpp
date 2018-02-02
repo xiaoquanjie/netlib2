@@ -506,14 +506,16 @@ namespace logger {
 
 		void log(const char* data, size_t len);
 
-		void setoutput(void(*output)(const char*, size_t)) {
-
-		}
+		void setoutput(void(*output)(const char*, size_t));
 
 	protected:
 		logger();
 
 		~logger();
+
+		logger(const logger&);
+
+		logger& operator=(const logger&);
 
 		void dump(void*);
 
@@ -581,6 +583,10 @@ namespace logger {
 		}
 	}
 
+	inline void logger::setoutput(void(*output)(const char*, size_t)) {
+		_output = output;
+	}
+
 	inline void logger::dump(void*) {
 
 	}
@@ -595,7 +601,7 @@ namespace logger {
 			lt.to_format(_stream);
 		}
 		~logimpl() {
-			_stream << "\n\0";
+			_stream << "\n";
 			logger::instance().log(_stream.buffer().data(), _stream.buffer().length());
 		}
 		logstream& stream() {

@@ -156,6 +156,7 @@
     <ClInclude Include="base\atomic.hpp" />
     <ClInclude Include="base\buffer.hpp" />
     <ClInclude Include="base\circular_queue.hpp" />
+    <ClInclude Include="base\condition.hpp" />
     <ClInclude Include="base\config.hpp" />
     <ClInclude Include="base\logger.hpp" />
     <ClInclude Include="base\mutexlock.hpp" />

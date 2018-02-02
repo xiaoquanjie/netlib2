@@ -3,6 +3,7 @@
 #include "base/thread.hpp"
 #include "synccall/synccall.hpp"
 #include "base/logger.hpp"
+#include "base/condition.hpp"
 
 using namespace std;
 

@@ -228,6 +228,9 @@
     <ClInclude Include="base\logger.hpp">
       <Filter>base</Filter>
     </ClInclude>
+    <ClInclude Include="base\condition.hpp">
+      <Filter>base</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">
