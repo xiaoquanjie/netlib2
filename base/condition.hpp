@@ -11,11 +11,13 @@ public:
 
 	~Condition();
 
+	// 这个函数会自动解锁互斥量，等条件满足后又会自动锁上互斥量
 	void wait();
 
 	// returns true if time out, false otherwise.
 	bool wait(int second);
 
+	// 会唤配正在等待条件的线程
 	void notify();
 
 	void notifyall();
@@ -58,6 +60,7 @@ inline void Condition::notifyall() {
 	WakeAllConditionVariable(&_cond);
 }
 #else
+#include <sys/time.h>
 inline Condition::Condition(MutexLock& mutex)
 	:_mutex(mutex) {
 	pthread_cond_init(&_cond, NULL);
@@ -72,9 +75,11 @@ inline void Condition::wait() {
 }
 
 inline bool Condition::wait(int second) {
+	struct timeval now;
+	gettimeofday(&now, NULL);
 	struct timespec abstime;
-	clock_gettime(CLOCK_REALTIME, &abstime);
-	abstime.tv_sec += second;
+	//clock_gettime(CLOCK_REALTIME, &abstime);
+	abstime.tv_sec = now.tv_sec + second;
 	return ETIMEDOUT == pthread_cond_timedwait(&_cond, &(_mutex.mutex()), &abstime);
 }
 

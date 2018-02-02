@@ -4,6 +4,7 @@
 #include "base/config.hpp"
 #include "base/thread.hpp"
 #include "base/tls.hpp"
+#include "base/condition.hpp"
 #include <string>
 #include <time.h>
 #include <stdio.h>
@@ -182,9 +183,9 @@ namespace logger {
 		_logidx = newday ? 1 : _logidx + 1;
 		std::string name = _logname_(now, _pid, _filename, _logidx);
 #ifdef M_PLATFORM_WIN
-		fopen_s(&_file, name.c_str(), "w");
+		_file = _fsopen(name.c_str(), "w+", _SH_DENYWR);
 #else
-		_file = fopen(name.c_str(), "w");
+		_file = fopen(name.c_str(), "ae");
 #endif
 	}
 
@@ -494,6 +495,8 @@ namespace logger {
 	public:
 		const char* _level_desc[LOG_LEVEL_MAX];
 	public:
+		void stop();
+
 		void setlevel(loglevel level);
 
 		loglevel getlevel()const;
@@ -501,6 +504,8 @@ namespace logger {
 		void setfilename(const std::string& filename);
 
 		void setrollsize(const size_t rollsize);
+
+		void setflushtime(size_t time);
 
 		static logger& instance();
 
@@ -520,15 +525,25 @@ namespace logger {
 		void dump(void*);
 
 	private:
+		bool _run;
 		std::string _filename;
 		loglevel _level;
 		logfile* _file;
 		thread* _thread;
 		size_t _rollsize;
+		size_t _flushtime;
 		void(*_output)(const char*, size_t);
+		MutexLock _mutex;
+		Condition _condition;
+		typedef fixedbuffer<4 * 1024 * 1024> buffer_type;
+		buffer_type* _buffer1;
+		buffer_type* _buffer2;
+		typedef std::vector<buffer_type*> buffer_type_vector;
+		buffer_type_vector _buffervec;
 	};
 
-	inline logger::logger() {
+	inline logger::logger() 
+		:_condition(_mutex){
 		_level = LOG_LEVEL_TRACE;
 		_level_desc[LOG_LEVEL_TRACE] = "TRACE ";
 		_level_desc[LOG_LEVEL_DEBUG] = "DEBUG ";
@@ -539,16 +554,31 @@ namespace logger {
 		_file = NULL;
 		_thread = NULL;
 		_rollsize = 1024 * 1024 * 300;
+		_flushtime = 1;
 		_output = console_output;
+		_buffer1 = new buffer_type;
+		_buffer2 = new buffer_type;
+		_run = false;
+		_buffervec.reserve(20);
 	}
 
 	inline logger::~logger() {
-		if (_thread) {
-			_thread->join();
-			delete _thread;
-		}
-		if (_file) {
-			delete _file;
+ 		stop();   
+		delete _buffer1;
+		delete _buffer2;
+	}
+
+	inline void logger::stop() {
+ 		if (_run) {
+			_run = false;
+			_condition.notify();
+			if (_thread) {
+				_thread->join();
+				delete _thread;
+			}
+			if (_file) {
+				delete _file;
+			}
 		}
 	}
 
@@ -562,6 +592,7 @@ namespace logger {
 
 	inline void logger::setfilename(const std::string& filename) {
 		if (_filename.empty()) {
+			_run = true;
 			_filename = filename;
 			_file = new logfile(_filename, _rollsize);
 			_thread = new thread(&logger::dump, this, 0);
@@ -572,14 +603,31 @@ namespace logger {
 		_rollsize = rollsize;
 	}
 
+	inline void logger::setflushtime(size_t time) {
+		_flushtime = time;
+	}
+
 	inline logger& logger::instance() {
 		static logger static_logger;
 		return static_logger;
 	}
 
 	inline void logger::log(const char* data, size_t len) {
-		if (_output) {
-			_output(data, len);
+		ScopedLock sl(_mutex);
+		if (_buffer1->avail() > len) {
+			_buffer1->append(data, len);
+		}
+		else {
+			_buffervec.push_back(_buffer1);
+			if (!_buffer2) {
+				_buffer1 = _buffer2;
+				_buffer2 = 0;
+			}
+			else {
+				_buffer1 = new buffer_type;
+			}
+			_buffer1->append(data, len);
+			_condition.notify();
 		}
 	}
 
@@ -588,8 +636,66 @@ namespace logger {
 	}
 
 	inline void logger::dump(void*) {
+		buffer_type_vector buffers_write;
+		buffers_write.reserve(30);
+		buffer_type* buffer1 = new buffer_type;
+		buffer_type* buffer2 = new buffer_type;
+		bool flush_flag = false;
+		while (_run) {
+			flush_flag = false;
+			assert(buffers_write.empty());
+			_mutex.lock();
+			if (_buffervec.empty()) {
+				_condition.wait(_flushtime);
+			}
+			if (_buffer1->length()) {
+				_buffervec.push_back(_buffer1);
+				_buffer1 = buffer1;
+				buffer1 = 0;
+			}
+			buffers_write.swap(_buffervec);
+			if (!_buffer2) {
+				_buffer2 = buffer2;
+				buffer2 = 0;
+			}
+			_mutex.unlock();
 
+			for (buffer_type_vector::iterator iter = buffers_write.begin();
+				iter != buffers_write.end();) {
+				flush_flag = true;
+				_file->write((*iter)->data(), (*iter)->length());
+				if (_output)
+					_output((*iter)->data(), (*iter)->length());
+
+				if (!buffer1) {
+					buffer1 = *iter;
+					buffer1->clear();
+					iter = buffers_write.erase(iter);
+					continue;
+				}
+				if (!buffer2) {
+					buffer2 = *iter;
+					buffer2->clear();
+					iter = buffers_write.erase(iter);
+					continue;
+				}
+				delete (*iter);
+				iter = buffers_write.erase(iter);
+			}
+
+			if (!buffer1)
+				buffer1 = new buffer_type;
+			if (!buffer2)
+				buffer2 = new buffer_type;
+			if (flush_flag)
+				_file->flush();
+		}
+		delete buffer1;
+		delete buffer2;
+		_file->flush();
 	}
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
 
 	struct logimpl {
 		logstream _stream;
@@ -613,12 +719,18 @@ namespace logger {
 
 M_BASE_NAMESPACE_END
 
+/////////////////////////////////////////////////////////////////////////////////////////////////////
+
 #define SetLogLevel(level)\
 	base::logger::logger::instance().setlevel((base::logger::loglevel)level)
 #define GetLogLevel()\
 	base::logger::logger::instance().getlevel()
 #define SetLogFileName(name)\
 	base::logger::logger::instance().setfilename(name)
+#define SetLogOutput(output)\
+	base::logger::logger::instance().setoutput(output)
+#define SetLogFlushTime(time)\
+	base::logger::logger::instance().setflushtime(time)
 
 #define LogTrace(content)\
 {\

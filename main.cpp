@@ -100,13 +100,18 @@ void test_lock() {
 
 void test_logger() {
 	SetLogFileName("mylog");
-	//SetLogLevel();
-	LogDebug("xiaoquanjie " << "taoxinzhi");
+	SetLogOutput(0);
+	cout << "begin........" << endl;
+	for (int i = 0; i < 100000; ++i) {
+		LogDebug("xiaoquanjie " << "taoxinzhi");
+	}
+	cout << "finish........" << endl;
+	/*LogDebug("xiaoquanjie " << "taoxinzhi");
 	LogTrace("nihaoma");
 	LogInfo("ÎÒ²»ºÃ");
 	LogWarn("qu ni de");
 	LogFatal("this is a fatal");
-	LogError("this is a error");
+	LogError("this is a error");*/
 }
 
 int main() {
