@@ -2,6 +2,8 @@
 #include <iostream>
 #include "base/thread.hpp"
 #include "synccall/synccall.hpp"
+#include "base/logger.hpp"
+#include "base/condition.hpp"
 
 using namespace std;
 
@@ -96,12 +98,29 @@ void test_lock() {
 	}
 }
 
+void test_logger() {
+	SetLogFileName("mylog");
+	SetLogOutput(0);
+	cout << "begin........" << endl;
+	for (int i = 0; i < 100000; ++i) {
+		LogDebug("xiaoquanjie " << "taoxinzhi");
+	}
+	cout << "finish........" << endl;
+	/*LogDebug("xiaoquanjie " << "taoxinzhi");
+	LogTrace("nihaoma");
+	LogInfo("ÎÒ²»ºÃ");
+	LogWarn("qu ni de");
+	LogFatal("this is a fatal");
+	LogError("this is a error");*/
+}
+
 int main() {
 	
+	test_logger();
 	//synccall_test();
 	//async_tcp_test();
 	//http_test();
-	co_synccall_test();
+	//co_synccall_test();
 
 	int pause_i;
 	cin >> pause_i;

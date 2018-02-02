@@ -21,6 +21,9 @@ public:
 	void unlock(){
 		LeaveCriticalSection(&_cs);
 	}
+	CRITICAL_SECTION& mutex() {
+		return _cs;
+	}
 private:
 	MutexLock(const MutexLock&);
 	MutexLock& operator=(const MutexLock&);
@@ -46,7 +49,9 @@ public:
 	void unlock(){
 		assert(pthread_mutex_unlock(&_mutex) == 0);
 	}
-
+	pthread_mutex_t& mutex() {
+		return _mutex;
+	}
 private:
 	MutexLock(const MutexLock&);
 	MutexLock& operator=(const MutexLock&);
