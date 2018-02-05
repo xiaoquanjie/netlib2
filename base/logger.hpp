@@ -280,7 +280,7 @@ namespace logger {
 	template<size_t SIZE>
 	void fixedbuffer<SIZE>::clear() {
 		_pos = 0;
-		memset(_data, 0, SIZE + 1);
+		//memset(_data, 0, SIZE + 1);
 	}
 
 	template<size_t SIZE>
