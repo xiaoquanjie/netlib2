@@ -193,7 +193,7 @@ namespace logger {
 #ifdef M_PLATFORM_WIN
 		_file = _fsopen(name.c_str(), "w+", _SH_DENYWR);
 #else
-		_file = fopen(name.c_str(), "ae");
+		_file = fopen(name.c_str(), "w+");
 #endif
 	}
 
@@ -702,34 +702,33 @@ namespace logger {
 	}
 
 	inline void logger::dump(void*) {
-		bool flush_flag = false;
 		while (_run) {
 			_mutex.lock();
-			if (!(_consumer->status == buffer_circular::Enum_Buffer_Full)) {
+			if (_consumer->status == buffer_circular::Enum_Buffer_Free) {
 				_condition.wait(_flushtime);
 				if (_consumer->status == buffer_circular::Enum_Buffer_Free) {
 					if (_consumer->buffer.length() > 0)
 						_consumer->status = buffer_circular::Enum_Buffer_Full;
+					else {
+						_mutex.unlock();
+						continue;
+					}
 				}
 			}
 			_mutex.unlock();
-			if (_consumer->buffer.length() > 0) {
-				flush_flag = true;
-				_file->write(_consumer->buffer.data(), _consumer->buffer.length());
-				if (_output)
-					_output(_consumer->buffer.data(), _consumer->buffer.length());
 
-				_mutex.lock();
-				_consumer->status = buffer_circular::Enum_Buffer_Free;
-				_consumer->buffer.clear();
-				_consumer = _circular->next(_consumer);
-				_mutex.unlock();
-			}
+			_file->write(_consumer->buffer.data(), _consumer->buffer.length());
+			if (_output)
+				_output(_consumer->buffer.data(), _consumer->buffer.length());
 
-			if (flush_flag) {
-				_file->flush();
-				flush_flag = false;
-			}
+			_mutex.lock();
+			if (_consumer == _producer)
+				_producer = _circular->next(_producer);
+			_consumer->status = buffer_circular::Enum_Buffer_Free;
+			_consumer->buffer.clear();
+			_consumer = _circular->next(_consumer);
+			_mutex.unlock();
+			_file->flush();
 		}
 		_file->flush();
 	}
