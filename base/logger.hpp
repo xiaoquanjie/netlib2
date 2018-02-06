@@ -42,10 +42,16 @@ namespace logger {
 	}
 
 	static std::string _logname_(const time_t& now, const std::string& pid, 
-		const std::string& filename, size_t logidx) {
+		const std::string& filename, size_t logidx, bool withpid) {
 		char tmp_buf[100] = { 0 };
-		snprintf(tmp_buf, sizeof(tmp_buf), "%s_%s_%s_%d.log", filename.c_str(),
-			_getcurtime_(now).c_str(), pid.c_str(), logidx);
+		if (withpid) {
+			snprintf(tmp_buf, sizeof(tmp_buf), "%s_%s_%s_%d.log", filename.c_str(),
+				_getcurtime_(now).c_str(), pid.c_str(), logidx);
+		}
+		else {
+			snprintf(tmp_buf, sizeof(tmp_buf), "%s_%s_%d.log", filename.c_str(),
+				_getcurtime_(now).c_str(), logidx);
+		}
 		return std::string(tmp_buf);
 	}
 
@@ -105,9 +111,10 @@ namespace logger {
 		time_t _rolltime;
 		time_t _lastctime;
 		std::string _pid;
+		bool _withpid;
 
 	public:
-		logfile(const std::string filename, size_t rollsize);
+		logfile(const std::string filename, size_t rollsize,bool withpid);
 
 		~logfile();
 
@@ -121,7 +128,7 @@ namespace logger {
 		void _close();
 	};
 
-	inline logfile::logfile(const std::string filename, size_t rollsize)
+	inline logfile::logfile(const std::string filename, size_t rollsize, bool withpid)
 		:_filename(filename) {
 		_rollsize = rollsize;
 		_file = 0;
@@ -129,6 +136,7 @@ namespace logger {
 		_logidx = 0;
 		_rolltime = 0;
 		_lastctime = 0;
+		_withpid = withpid;
 		_pid = _getpid_();
 		_roll_file(true, time(0));
 	}
@@ -181,7 +189,7 @@ namespace logger {
 		_writesize = 0;
 		_rolltime = now;
 		_logidx = newday ? 1 : _logidx + 1;
-		std::string name = _logname_(now, _pid, _filename, _logidx);
+		std::string name = _logname_(now, _pid, _filename, _logidx,_withpid);
 #ifdef M_PLATFORM_WIN
 		_file = _fsopen(name.c_str(), "w+", _SH_DENYWR);
 #else
@@ -280,7 +288,7 @@ namespace logger {
 	template<size_t SIZE>
 	void fixedbuffer<SIZE>::clear() {
 		_pos = 0;
-		memset(_data, 0, SIZE + 1);
+		//memset(_data, 0, SIZE + 1);
 	}
 
 	template<size_t SIZE>
@@ -501,7 +509,7 @@ namespace logger {
 
 		loglevel getlevel()const;
 
-		void setfilename(const std::string& filename);
+		void setfilename(const std::string& filename, bool withpid=true);
 
 		void setrollsize(const size_t rollsize);
 
@@ -590,11 +598,11 @@ namespace logger {
 		return _level;
 	}
 
-	inline void logger::setfilename(const std::string& filename) {
+	inline void logger::setfilename(const std::string& filename, bool withpid) {
 		if (_filename.empty()) {
 			_run = true;
 			_filename = filename;
-			_file = new logfile(_filename, _rollsize);
+			_file = new logfile(_filename, _rollsize,withpid);
 			_thread = new thread(&logger::dump, this, 0);
 		}
 	}
@@ -725,12 +733,14 @@ M_BASE_NAMESPACE_END
 	base::logger::logger::instance().setlevel((base::logger::loglevel)level)
 #define GetLogLevel()\
 	base::logger::logger::instance().getlevel()
-#define SetLogFileName(name)\
-	base::logger::logger::instance().setfilename(name)
+#define SetLogFileName(name, withpid)\
+	base::logger::logger::instance().setfilename(name,withpid)
 #define SetLogOutput(output)\
 	base::logger::logger::instance().setoutput(output)
 #define SetLogFlushTime(time)\
 	base::logger::logger::instance().setflushtime(time)
+#define SetLogRollSize(size)\
+	base::logger::logger::instance().setrollsize(size)
 
 #define LogTrace(content)\
 {\

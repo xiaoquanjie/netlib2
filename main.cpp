@@ -98,20 +98,18 @@ void test_lock() {
 	}
 }
 
-void test_logger() {
-	SetLogFileName("mylog");
-	SetLogOutput(0);
-	cout << "begin........" << endl;
-	for (int i = 0; i < 100000; ++i) {
+void print_logger(void*) {
+	for (int i = 0; i < 500; ++i) {
 		LogDebug("xiaoquanjie " << "taoxinzhi");
 	}
-	cout << "finish........" << endl;
-	/*LogDebug("xiaoquanjie " << "taoxinzhi");
-	LogTrace("nihaoma");
-	LogInfo("ÎÒ²»ºÃ");
-	LogWarn("qu ni de");
-	LogFatal("this is a fatal");
-	LogError("this is a error");*/
+}
+
+void test_logger() {
+	SetLogFileName("mylog",false);
+	base::thread thr1(print_logger,0);
+	base::thread thr2(print_logger, 0);
+	thr2.join();
+	thr1.join();
 }
 
 int main() {
