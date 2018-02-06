@@ -99,17 +99,22 @@ void test_lock() {
 }
 
 void print_logger(void*) {
-	for (int i = 0; i < 500; ++i) {
-		LogDebug("xiaoquanjie " << "taoxinzhi");
+	cout << "begin........" << endl;
+	for (int i = 0; i < 1000000; ++i) {
+		LogDebug("xiaoquanjie " << i << " taoxinzhi.......................\
+			......................................");
 	}
+	cout << "finish........" << endl;
 }
 
 void test_logger() {
-	SetLogFileName("mylog",false);
-	base::thread thr1(print_logger,0);
-	base::thread thr2(print_logger, 0);
-	thr2.join();
+	SetLogFileName("mylog", false);
+	SetLogOutput(0);
+
+	base::thread thr1(print_logger, 0);
+	//base::thread thr2(print_logger, 0);
 	thr1.join();
+	//thr2.join();
 }
 
 int main() {
