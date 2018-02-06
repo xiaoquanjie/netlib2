@@ -495,6 +495,43 @@ namespace logger {
 
 ///////////////////////////////////////////////////////////////////////////////////////////////////
 
+	struct buffer_circular {
+		enum {
+			Enum_Buffer_Free,
+			Enum_Buffer_Full,
+		};
+		typedef fixedbuffer<4 * 1024 * 1024> buffer_type;
+		struct buffer_node {
+			buffer_type buffer;
+			size_t status;
+			size_t idx;
+		};
+		buffer_node* _buffer_node;
+		size_t _node_cnt;
+
+		buffer_circular(size_t node_cnt) {
+			_node_cnt = node_cnt;
+			_buffer_node = new buffer_node[_node_cnt];
+			for (size_t i = 0; i < _node_cnt; ++i) {
+				_buffer_node[i].status = Enum_Buffer_Free;
+				_buffer_node[i].idx = i;
+			}
+		}
+		~buffer_circular() {
+			delete[]_buffer_node;
+		}
+		buffer_node* first() {
+			return &_buffer_node[0];
+		}
+		buffer_node* next(buffer_node* node) {
+			size_t idx = node->idx;
+			idx = (idx + 1) % _node_cnt;
+			return &_buffer_node[idx];
+		}
+	};
+
+///////////////////////////////////////////////////////////////////////////////////////////////////
+
 	inline void console_output(const char* data, size_t len) {
 		fwrite(data, 1, len, stdout);
 	}
@@ -521,6 +558,8 @@ namespace logger {
 
 		void setoutput(void(*output)(const char*, size_t));
 
+		void setnodecnt(size_t cnt);
+
 	protected:
 		logger();
 
@@ -543,11 +582,11 @@ namespace logger {
 		void(*_output)(const char*, size_t);
 		MutexLock _mutex;
 		Condition _condition;
-		typedef fixedbuffer<4 * 1024 * 1024> buffer_type;
-		buffer_type* _buffer1;
-		buffer_type* _buffer2;
-		typedef std::vector<buffer_type*> buffer_type_vector;
-		buffer_type_vector _buffervec;
+		buffer_circular* _circular;
+		size_t _node_cnt;
+		buffer_circular::buffer_node* _producer;
+		buffer_circular::buffer_node* _consumer;
+		const char* _logerror;
 	};
 
 	inline logger::logger() 
@@ -559,21 +598,22 @@ namespace logger {
 		_level_desc[LOG_LEVEL_WARN] = "WARN  ";
 		_level_desc[LOG_LEVEL_ERROR] = "ERROR ";
 		_level_desc[LOG_LEVEL_FATAL] = "FATAL ";
+		_logerror = "The log buffer is full and has been discarded\n";
 		_file = NULL;
 		_thread = NULL;
 		_rollsize = 1024 * 1024 * 300;
 		_flushtime = 1;
-		_output = console_output;
-		_buffer1 = new buffer_type;
-		_buffer2 = new buffer_type;
 		_run = false;
-		_buffervec.reserve(20);
+		_output = console_output;
+		_node_cnt = 5;
+		_circular = 0;
+		_producer = 0;
+		_consumer = 0;
 	}
 
 	inline logger::~logger() {
- 		stop();   
-		delete _buffer1;
-		delete _buffer2;
+ 		stop();
+		delete _circular;
 	}
 
 	inline void logger::stop() {
@@ -601,6 +641,9 @@ namespace logger {
 	inline void logger::setfilename(const std::string& filename, bool withpid) {
 		if (_filename.empty()) {
 			_run = true;
+			_circular = new buffer_circular(_node_cnt);
+			_producer = _circular->first();
+			_consumer = _circular->first();
 			_filename = filename;
 			_file = new logfile(_filename, _rollsize,withpid);
 			_thread = new thread(&logger::dump, this, 0);
@@ -622,19 +665,30 @@ namespace logger {
 
 	inline void logger::log(const char* data, size_t len) {
 		ScopedLock sl(_mutex);
-		if (_buffer1->avail() > len) {
-			_buffer1->append(data, len);
+		if (!_producer) {
+			return;
+		}
+		if (_producer->status
+			== buffer_circular::Enum_Buffer_Full) {
+			// 缓存写满，日志需要丢掉
+			fwrite(_logerror, 1, strlen(_logerror), stderr);
+			return;
+		}
+		if (_producer->buffer.avail() > len) {
+			_producer->buffer.append(data, len);
 		}
 		else {
-			_buffervec.push_back(_buffer1);
-			if (!_buffer2) {
-				_buffer1 = _buffer2;
-				_buffer2 = 0;
+			// 标志为满的
+			_producer->status = buffer_circular::Enum_Buffer_Full;
+			_producer = _circular->next(_producer);
+			if (_producer->status
+				== buffer_circular::Enum_Buffer_Full) {
+				// 缓存写满，日志需要丢掉
+				fwrite(_logerror, 1, strlen(_logerror), stderr);
 			}
 			else {
-				_buffer1 = new buffer_type;
+				_producer->buffer.append(data, len);
 			}
-			_buffer1->append(data, len);
 			_condition.notify();
 		}
 	}
@@ -643,63 +697,40 @@ namespace logger {
 		_output = output;
 	}
 
+	inline void logger::setnodecnt(size_t cnt) {
+		_node_cnt = cnt;
+	}
+
 	inline void logger::dump(void*) {
-		buffer_type_vector buffers_write;
-		buffers_write.reserve(30);
-		buffer_type* buffer1 = new buffer_type;
-		buffer_type* buffer2 = new buffer_type;
 		bool flush_flag = false;
 		while (_run) {
-			flush_flag = false;
-			assert(buffers_write.empty());
 			_mutex.lock();
-			if (_buffervec.empty()) {
+			if (!(_consumer->status == buffer_circular::Enum_Buffer_Full)) {
 				_condition.wait(_flushtime);
-			}
-			if (_buffer1->length()) {
-				_buffervec.push_back(_buffer1);
-				_buffer1 = buffer1;
-				buffer1 = 0;
-			}
-			buffers_write.swap(_buffervec);
-			if (!_buffer2) {
-				_buffer2 = buffer2;
-				buffer2 = 0;
+				if (_consumer->status == buffer_circular::Enum_Buffer_Free) {
+					if (_consumer->buffer.length() > 0)
+						_consumer->status = buffer_circular::Enum_Buffer_Full;
+				}
 			}
 			_mutex.unlock();
-
-			for (buffer_type_vector::iterator iter = buffers_write.begin();
-				iter != buffers_write.end();) {
+			if (_consumer->buffer.length() > 0) {
 				flush_flag = true;
-				_file->write((*iter)->data(), (*iter)->length());
+				_file->write(_consumer->buffer.data(), _consumer->buffer.length());
 				if (_output)
-					_output((*iter)->data(), (*iter)->length());
+					_output(_consumer->buffer.data(), _consumer->buffer.length());
 
-				if (!buffer1) {
-					buffer1 = *iter;
-					buffer1->clear();
-					iter = buffers_write.erase(iter);
-					continue;
-				}
-				if (!buffer2) {
-					buffer2 = *iter;
-					buffer2->clear();
-					iter = buffers_write.erase(iter);
-					continue;
-				}
-				delete (*iter);
-				iter = buffers_write.erase(iter);
+				_mutex.lock();
+				_consumer->status = buffer_circular::Enum_Buffer_Free;
+				_consumer->buffer.clear();
+				_consumer = _circular->next(_consumer);
+				_mutex.unlock();
 			}
 
-			if (!buffer1)
-				buffer1 = new buffer_type;
-			if (!buffer2)
-				buffer2 = new buffer_type;
-			if (flush_flag)
+			if (flush_flag) {
 				_file->flush();
+				flush_flag = false;
+			}
 		}
-		delete buffer1;
-		delete buffer2;
 		_file->flush();
 	}
 
@@ -741,6 +772,8 @@ M_BASE_NAMESPACE_END
 	base::logger::logger::instance().setflushtime(time)
 #define SetLogRollSize(size)\
 	base::logger::logger::instance().setrollsize(size)
+#define SetLogNodeCount(cnt)\
+	base::logger::logger::instance().setnodecnt(cnt)
 
 #define LogTrace(content)\
 {\
