@@ -231,6 +231,12 @@
     <ClInclude Include="base\condition.hpp">
       <Filter>base</Filter>
     </ClInclude>
+    <ClInclude Include="netio\mail.hpp">
+      <Filter>netio</Filter>
+    </ClInclude>
+    <ClInclude Include="base\tool.hpp">
+      <Filter>base</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp">

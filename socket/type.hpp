@@ -50,6 +50,7 @@ typedef sockaddr_in				sockaddr_in_t;
 typedef sockaddr_in6			sockaddr_in6_t;
 typedef sockaddr_storage		sockaddr_storage_t;
 typedef struct linger			linger_t;
+typedef hostent					hostent_t;
 
 enum EShutdownType
 {

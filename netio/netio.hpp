@@ -450,4 +450,5 @@ M_NETIO_NAMESPACE_END
 #include "netio/hsocket_impl.hpp"
 #include "netio/hconnector_impl.hpp"
 #include "netio/heartbeat.hpp"
+#include "netio/mail.hpp"
 #endif

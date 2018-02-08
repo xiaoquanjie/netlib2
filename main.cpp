@@ -117,9 +117,28 @@ void test_logger() {
 	//thr2.join();
 }
 
+void test_mail() {
+	netiolib::Mail mail;
+	mail.SetMailSvrIp("smtp.163.com");
+	mail.SetMailSvrPort(25);
+	mail.SetMailFrom("15620977523@163.com");
+	mail.AddMailTo("xiaoquanjie123@163.com");
+	mail.SetUserName("15620977523@163.com");
+	mail.SetPassWord("");
+	const std::string data = "this is a test";
+	mail.SetData(data.c_str(), data.length());
+	if (mail.Send()) {
+		cout << "send successfully" << endl;
+	}
+	else {
+		cout << mail.Error() << endl;
+	}
+}
+
 int main() {
 	
-	test_logger();
+	test_mail();
+	//test_logger();
 	//synccall_test();
 	//async_tcp_test();
 	//http_test();

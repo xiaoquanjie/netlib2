@@ -164,6 +164,7 @@
     <ClInclude Include="base\svector.hpp" />
     <ClInclude Include="base\thread.hpp" />
     <ClInclude Include="base\tls.hpp" />
+    <ClInclude Include="base\tool.hpp" />
     <ClInclude Include="coroutine\config.hpp" />
     <ClInclude Include="coroutine\coroutine.hpp" />
     <ClInclude Include="coroutine\co_linux_impl.hpp" />
@@ -174,6 +175,7 @@
     <ClInclude Include="netio\hsocket_impl.hpp" />
     <ClInclude Include="netio\httpmsg.hpp" />
     <ClInclude Include="netio\log.hpp" />
+    <ClInclude Include="netio\mail.hpp" />
     <ClInclude Include="netio\netio.hpp" />
     <ClInclude Include="netio\netio_impl.hpp" />
     <ClInclude Include="netio\tconnector_impl.hpp" />
