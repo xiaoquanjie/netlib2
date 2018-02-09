@@ -134,5 +134,82 @@ inline bool Base64Decode(const std::string& input, std::string& output) {
 	return true;
 }
 
+#ifndef M_PLATFORM_WIN
+int code_convert(const char* from_charset, const char* to_charset, 
+	const char* inbuf, size_t inlen, char* outbuf, size_t outlen)
+{
+	iconv_t cd;
+	int rc;
+	char **pin = (char**)&inbuf;
+	char **pout = &outbuf;
+
+	cd = iconv_open(to_charset, from_charset);
+	if (cd == 0) return -1;
+	memset(outbuf, 0, outlen);
+	if (iconv(cd, pin, &inlen, pout, &outlen) == -1) return -1;
+	iconv_close(cd);
+	return 0;
+}
+#endif
+
+inline bool StringToUtf8(const std::string& input, std::string& output) {
+#ifndef M_PLATFORM_WIN
+	char outbuf[1024] = { 0 };
+	int outlen = 1024;
+	code_convert("GB18030", "utf-8", input.c_str(), input.length(), outbuf, outlen);
+	output = outbuf;
+
+#else
+	int nwLen = ::MultiByteToWideChar(CP_ACP, 0, input.c_str(), -1, NULL, 0);
+	wchar_t * pwBuf = new wchar_t[nwLen + 1];//一定要加1，不然会出现尾巴 
+	ZeroMemory(pwBuf, nwLen * 2 + 2);
+
+	::MultiByteToWideChar(CP_ACP, 0, input.c_str(), input.length(), pwBuf, nwLen);
+	int nLen = ::WideCharToMultiByte(CP_UTF8, 0, pwBuf, -1, NULL, NULL, NULL, NULL);
+
+	char* pBuf = new char[nLen + 1];
+	ZeroMemory(pBuf, nLen + 1);
+	::WideCharToMultiByte(CP_UTF8, 0, pwBuf, nwLen, pBuf, nLen, NULL, NULL);
+
+	output = pBuf;;
+	delete[]pwBuf;
+	delete[]pBuf;
+
+	pwBuf = NULL;
+	pBuf = NULL;
+
+#endif
+	return true;
+}
+
+inline bool Utf8ToString(const std::string& input, std::string& output) {
+#ifndef M_PLATFORM_WIN
+	char outbuf[1024] = { 0 };
+	int outlen = 1024;
+	code_convert("utf-8", "GB18030", input.c_str(), input.length(), outbuf, outlen);
+	output = outbuf;
+#else
+	int nwLen = MultiByteToWideChar(CP_UTF8, 0, input.c_str(), -1, NULL, 0);
+	wchar_t * pwBuf = new wchar_t[nwLen + 1]; //一定要加1，不然会出现尾巴 
+	memset(pwBuf, 0, nwLen * 2 + 2);
+
+	MultiByteToWideChar(CP_UTF8, 0, input.c_str(), input.length(), pwBuf, nwLen);
+	int nLen = WideCharToMultiByte(CP_ACP, 0, pwBuf, -1, NULL, NULL, NULL, NULL);
+
+	char * pBuf = new char[nLen + 1];
+	memset(pBuf, 0, nLen + 1);
+	WideCharToMultiByte(CP_ACP, 0, pwBuf, nwLen, pBuf, nLen, NULL, NULL);
+
+	output = pBuf;
+	delete[]pBuf;
+	delete[]pwBuf;
+
+	pBuf = NULL;
+	pwBuf = NULL;
+
+#endif
+	return true;
+}
+
 M_BASE_NAMESPACE_END
 #endif

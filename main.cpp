@@ -118,6 +118,16 @@ void test_logger() {
 }
 
 void test_mail() {
+	netiolib::MimeText text;
+	text.SetContentType("text/plain; charset=\"utf-8\"");
+	text.SetMimeVerion("1.0");
+	text.SetContentEncode("base64");
+	text.SetFrom("xiao", "15620977523@163.com");
+	text.AddTo("xiao2", "xiaoquanjie123@163.com");
+	text.SetSubject("woaini");
+	const std::string data = "wo zai xin ba ke jian ni";
+	text.SetContent(data.c_str(), data.length());
+	
 	netiolib::Mail mail;
 	mail.SetMailSvrIp("smtp.163.com");
 	mail.SetMailSvrPort(25);
@@ -125,9 +135,8 @@ void test_mail() {
 	mail.AddMailTo("xiaoquanjie123@163.com");
 	mail.SetUserName("15620977523@163.com");
 	mail.SetPassWord("");
-	const std::string data = "wo zai xin ba ke jian ni";
-	mail.SetData(data.c_str(), data.length());
-	if (mail.Send()) {
+	
+	if (mail.Send(text)) {
 		cout << "send successfully" << endl;
 	}
 	else {

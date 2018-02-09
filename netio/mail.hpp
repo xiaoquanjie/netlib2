@@ -4,6 +4,84 @@
 #include "base/tool.hpp"
 M_NETIO_NAMESPACE_BEGIN
 
+class MimeText {
+public:
+	void SetFrom(const std::string& name, const std::string& addr);
+
+	void AddTo(const std::string& name, const std::string& addr);
+
+	void SetSubject(const std::string& sub);
+
+	void SetMimeVerion(const std::string& verion);
+
+	void SetContentType(const std::string& type);
+
+	void SetContentEncode(const std::string& encode);
+
+	void SetContent(const char* data, size_t len);
+
+	std::string ToString()const;
+
+protected:
+	std::string _data;
+	std::string _region;
+};
+
+inline void MimeText::SetFrom(const std::string& name, const std::string& addr) {
+	_region.append("From: =?");
+	_region.append(name);
+	_region.append("?= <");
+	_region.append(addr);
+	_region.append(">\r\n");
+}
+
+inline void MimeText::AddTo(const std::string& name, const std::string& addr) {
+	_region.append("To: \"");
+	_region.append(name);
+	_region.append("\" <");
+	_region.append(addr);
+	_region.append(">\r\n");
+}
+
+inline void MimeText::SetSubject(const std::string& sub) {
+	_region.append("Subject: =?");
+	_region.append(sub);
+	_region.append("?=\r\n");
+}
+
+inline void MimeText::SetMimeVerion(const std::string& verion) {
+	_region.append("MIME-Version: ");
+	_region.append(verion);
+	_region.append("\r\n");
+}
+
+inline void MimeText::SetContentType(const std::string& type) {
+	_region.append("Content-Type: ");
+	_region.append(type);
+	_region.append("\r\n");
+}
+
+inline void MimeText::SetContentEncode(const std::string& encode) {
+	_region.append("Content-Transfer-Encoding: ");
+	_region.append(encode);
+	_region.append("\r\n");
+}
+
+inline void MimeText::SetContent(const char* data, size_t len) {
+	_data.append(data, len);
+}
+
+inline std::string MimeText::ToString()const {
+	std::string str;
+	str.append(_region);
+	str.append("\r\n");
+	str.append(_data);
+	str.append("\r\n.\r\n");
+	return str;
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 class Mail {
 public:
 	enum {
@@ -41,6 +119,8 @@ public:
 	void SetData(const char* data, size_t len);
 
 	bool Send();
+
+	bool Send(MimeText& text);
 
 	const std::string& Error()const;
 
@@ -187,8 +267,101 @@ inline bool Mail::Send() {
 				break;
 
 			_flag = enum_state_send;
+			const std::string subject = "subject:this is subject\r\n\r\n";
+			_socket->SendSome(subject.c_str(), subject.length());
 			_socket->SendSome(_data.Data(), _data.Length());
 			_socket->SendSome("\r\n.\r\n", 5);
+			if (!_recv())
+				break;
+
+			_flag = enum_state_quit;
+			_socket->SendSome("QUIT\r\n", 6);
+			delete _socket;
+			_socket = 0;
+			return true;
+
+		} while (false);
+		delete _socket;
+		_socket = 0;
+	}
+	catch (SocketLib::SocketError& error) {
+		_error = error.What();
+	}
+	return false;
+}
+
+inline bool Mail::Send(MimeText& text) {
+	if (_socket)
+		return false;
+	try {
+		do {
+			_flag = enum_state_connect;
+			_socket = _connect();
+			if (!_socket) {
+				_error = "can't connect mail server";
+				break;
+			}
+			if (!_recv())
+				break;
+
+			_flag = enum_state_ehlo;
+			const std::string ehlo = "EHLO " + _from + std::string("\r\n");
+			_socket->SendSome(ehlo.c_str(), ehlo.length());
+			if (!_recv())
+				break;
+
+			_flag = enum_state_auth;
+			const std::string auth = "AUTH LOGIN\r\n";
+			_socket->SendSome(auth.c_str(), auth.length());
+			if (!_recv())
+				break;
+
+			_flag = enum_state_name;
+			std::string codename;
+			if (!base::Base64Encode(_name, codename)) {
+				_error = "user name base64 encode error";
+				break;
+			}
+			codename += "\r\n";
+			_socket->SendSome(codename.c_str(), codename.length());
+			if (!_recv())
+				break;
+
+			_flag = enum_state_pwd;
+			std::string codepwd;
+			if (!base::Base64Encode(_pwd, codepwd)) {
+				_error = "user pwd base64 encode error";
+				break;
+			}
+			codepwd += "\r\n";
+			_socket->SendSome(codepwd.c_str(), codepwd.length());
+			if (!_recv())
+				break;
+
+			_flag = enum_state_from;
+			const std::string from = "MAIL FROM:<" + _from + std::string(">\r\n");
+			_socket->SendSome(from.c_str(), from.length());
+			if (!_recv())
+				break;
+
+			for (std::vector<std::string>::iterator iter = _tos.begin();
+				iter != _tos.end(); ++iter) {
+				_flag = enum_state_to;
+				const std::string to = "RCPT TO:<" + *iter + std::string(">\r\n");
+				_socket->SendSome(to.c_str(), to.length());
+				if (!_recv())
+					break;
+			}
+
+			_flag = enum_state_data;
+			const std::string data_begin = "DATA\r\n";
+			_socket->SendSome(data_begin.c_str(), data_begin.length());
+			if (!_recv())
+				break;
+
+			_flag = enum_state_send;
+			const std::string snd_data = text.ToString();
+			_socket->SendSome(snd_data.c_str(), snd_data.length());
 			if (!_recv())
 				break;
 
