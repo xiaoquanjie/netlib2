@@ -124,7 +124,7 @@ void test_mail() {
 	mail.SetMailFrom("15620977523@163.com");
 	mail.AddMailTo("xiaoquanjie123@163.com");
 	mail.SetUserName("15620977523@163.com");
-	mail.SetPassWord("W9006&@&@w");
+	mail.SetPassWord("");
 	const std::string data = "wo zai xin ba ke jian ni";
 	mail.SetData(data.c_str(), data.length());
 	if (mail.Send()) {
@@ -136,15 +136,7 @@ void test_mail() {
 }
 
 int main() {
-	
-	std::string c = "@!!!xiaoquanjie,\\rnihaoma";
-	std::string ec;
-	base::Base64Encode(c, ec);
-	cout << ec << endl;
-	std::string dc;
-	base::Base64Decode(ec, dc);
-	cout << dc << endl;
-	//test_mail();
+	test_mail();
 	//test_logger();
 	//synccall_test();
 	//async_tcp_test();
