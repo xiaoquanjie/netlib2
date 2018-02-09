@@ -132,7 +132,7 @@ inline bool Mail::Send() {
 				break;
 
 			_flag = enum_state_ehlo;
-			const std::string ehlo = "EHLO " + _ip + std::string("\r\n");
+			const std::string ehlo = "EHLO " + _from + std::string("\r\n");
 			_socket->SendSome(ehlo.c_str(), ehlo.length());
 			if (!_recv())
 				break;
@@ -166,7 +166,7 @@ inline bool Mail::Send() {
 				break;
 
 			_flag = enum_state_from;
-			const std::string from = "mail from:" + _from + std::string("\r\n");
+			const std::string from = "MAIL FROM:<" + _from + std::string(">\r\n");
 			_socket->SendSome(from.c_str(), from.length());
 			if (!_recv())
 				break;
@@ -174,14 +174,15 @@ inline bool Mail::Send() {
 			for (std::vector<std::string>::iterator iter = _tos.begin();
 				iter != _tos.end(); ++iter) {
 				_flag = enum_state_to;
-				const std::string to = "RCPT TO:" + *iter + std::string("\r\n");
+				const std::string to = "RCPT TO:<" + *iter + std::string(">\r\n");
 				_socket->SendSome(to.c_str(), to.length());
 				if (!_recv())
 					break;
 			}
 
 			_flag = enum_state_data;
-			_socket->SendSome("DATA\r\n", 6);
+			const std::string data_begin = "DATA\r\n";
+			_socket->SendSome(data_begin.c_str(), data_begin.length());
 			if (!_recv())
 				break;
 
