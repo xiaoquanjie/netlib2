@@ -124,7 +124,7 @@ void test_mail() {
 	text.SetContentEncode("base64");
 	text.SetFrom("xiao", "15620977523@163.com");
 	text.AddTo("xiao2", "xiaoquanjie123@163.com");
-	text.SetSubject("woaini");
+	text.SetSubject("·ç¶ÈÆ«Æ«");
 	const std::string data = "wo zai xin ba ke jian ni";
 	text.SetContent(data.c_str(), data.length());
 	
@@ -134,7 +134,7 @@ void test_mail() {
 	mail.SetMailFrom("15620977523@163.com");
 	mail.AddMailTo("xiaoquanjie123@163.com");
 	mail.SetUserName("15620977523@163.com");
-	mail.SetPassWord("");
+	mail.SetPassWord("W9006&@&@w");
 	
 	if (mail.Send(text)) {
 		cout << "send successfully" << endl;

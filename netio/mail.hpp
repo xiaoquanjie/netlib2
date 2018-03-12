@@ -44,9 +44,11 @@ inline void MimeText::AddTo(const std::string& name, const std::string& addr) {
 }
 
 inline void MimeText::SetSubject(const std::string& sub) {
-	_region.append("Subject: =?");
-	_region.append(sub);
-	_region.append("?=\r\n");
+	_region.append("Subject: ");
+	std::string output;
+	base::StringToUtf8(sub, output);
+	_region.append(output);
+	_region.append("\r\n");
 }
 
 inline void MimeText::SetMimeVerion(const std::string& verion) {
