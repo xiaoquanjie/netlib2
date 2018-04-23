@@ -157,7 +157,7 @@ namespace thread_
 
 	template<>
 	struct threaddata<IRunnable, void>{
-		std::tr1::shared_ptr<IRunnable> ptr_obj_;
+		M_TR1::shared_ptr<IRunnable> ptr_obj_;
 		void* param_;
 		M_THREAD_DATA_ID;
 		M_THREAD_DATA_ID_STR;
@@ -243,7 +243,7 @@ public:
 #endif
 	}
 
-	thread(std::tr1::shared_ptr<IRunnable> ptrObj, void* param)
+	thread(M_TR1::shared_ptr<IRunnable> ptrObj, void* param)
 		:_thrid(0){
 		thread_::threaddata<IRunnable, void>* threaddata_ = new thread_::threaddata<IRunnable, void>;
 		threaddata_->ptr_obj_ = ptrObj;

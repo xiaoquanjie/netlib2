@@ -215,7 +215,7 @@ namespace detail
 
 struct Opts
 {
-#ifdef M_SO_BROADCAST
+#if (defined M_SO_BROADCAST) && (defined M_SOL_SOCKET)
 	typedef detail::Boolean<M_SOL_SOCKET, M_SO_BROADCAST> Broadcast;
 #endif
 
@@ -247,44 +247,44 @@ struct Opts
 	typedef detail::Boolean<M_IPPROTO_IPV6, M_IPV6_V6ONLY> V6only;
 #endif
 
-#ifdef M_SO_SNDLOWAT
+#if (defined M_SO_SNDLOWAT)
 	typedef detail::Integer<M_SOL_SOCKET, M_SO_SNDLOWAT> SendWatermark;
 #endif
 
-#ifdef M_SO_RCVBUF
+#if (defined M_SO_RCVBUF)
 	/*对于客户端，必须在connect函数调用前，对于服务器端，必须在listen之前调用*/
 	typedef detail::Integer<M_SOL_SOCKET, M_SO_RCVBUF> RecvSize;
 #endif
 
-#ifdef M_SO_RCVLOWAT
+#if (defined M_SO_RCVLOWAT)
 	typedef detail::Integer<M_SOL_SOCKET, M_SO_RCVLOWAT> RecvWatermark;
 #endif
 
-#ifdef M_SO_LINGER
+#if (defined M_SO_LINGER)
 	typedef detail::Linger<M_SOL_SOCKET, M_SO_LINGER> LingerT;
 #endif
 
-#ifdef M_SO_ERROR
+#if (defined M_SO_ERROR)
 	typedef detail::Integer<M_SOL_SOCKET, M_SO_ERROR> SoError;
 #endif
 
-#ifdef M_SO_RCVTIMEO 
+#if (defined M_SO_RCVTIMEO) 
 	typedef detail::TimeVal<M_SOL_SOCKET, M_SO_RCVTIMEO> RcvTimeOut;
 #endif
 
-#ifdef M_SO_SNDTIMEO
+#if (defined M_SO_SNDTIMEO) && (defined M_SOL_SOCKET)
 	typedef detail::TimeVal<M_SOL_SOCKET, M_SO_SNDTIMEO> SndTimeOut;
 #endif
 
-#ifdef M_TCP_KEEPCNT
+#if (defined M_TCP_KEEPCNT) && (defined M_SOL_TCP)
 	typedef detail::Integer<M_SOL_TCP, M_TCP_KEEPCNT> TcpKeepCnt;
 #endif
 
-#ifdef M_TCP_KEEPIDLE
+#if (defined M_TCP_KEEPIDLE) && (defined M_SOL_TCP)
 	typedef detail::Integer<M_SOL_TCP, M_TCP_KEEPIDLE> TcpKeepIdle;
 #endif
 
-#ifdef M_TCP_KEEPINTVL
+#if (defined M_TCP_KEEPINTVL) && (defined M_SOL_TCP)
 	typedef detail::Integer<M_SOL_TCP, M_TCP_KEEPINTVL> TcpKeepIntvl;
 #endif
 };
