@@ -1,5 +1,5 @@
 #include "synccall/synccall.hpp"
-
+#include <iostream>
 struct CDisplayTime
 {
 	clock_t     miStartTime;

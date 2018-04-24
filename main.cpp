@@ -119,9 +119,9 @@ void test_logger() {
 
 int main() {
 	
-	test_logger();
+	//test_logger();
 	//synccall_test();
-	//async_tcp_test();
+	async_tcp_test();
 	//http_test();
 	//co_synccall_test();
 
