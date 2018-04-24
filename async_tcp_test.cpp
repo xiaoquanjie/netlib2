@@ -19,15 +19,11 @@ class TcpTestIo : public netiolib::NetIo {
 public:
 	virtual void OnConnected(netiolib::TcpSocketPtr& clisock) {
 		netiolib::NetIo::OnConnected(clisock);
-		cout << "OnConnected one : " << clisock->RemoteEndpoint().Address() << " " << clisock->RemoteEndpoint().Port() << endl;
 	}
 	
 	virtual void OnConnected(netiolib::TcpConnectorPtr& clisock, SocketLib::SocketError error) {
-		if (error) {
-			cout << "connect fail :" << error.What() << endl;
-		}
-		else {
-			cout << "connect success : " << clisock->RemoteEndpoint().Address() << " " << clisock->RemoteEndpoint().Port() << endl;
+		netiolib::NetIo::OnConnected(clisock, error);
+		if (!error) {
 			TestInfo* pinfo = new TestInfo;
 			pinfo->count = 10000;
 			pinfo->request = 0;
@@ -44,11 +40,10 @@ public:
 
 	virtual void OnDisconnected(netiolib::TcpSocketPtr& clisock) {
 		netiolib::NetIo::OnDisconnected(clisock);
-		cout << "OnDisconnected one : " << clisock->RemoteEndpoint().Address() << " " << clisock->RemoteEndpoint().Port() << endl;
 	}
 
 	virtual void OnDisconnected(netiolib::TcpConnectorPtr& clisock) {
-		cout << "OnDisconnected one : " << clisock->LocalEndpoint().Address() << " " << clisock->LocalEndpoint().Port() << endl;
+		netiolib::NetIo::OnDisconnected(clisock);
 		TestInfo* pinfo = (TestInfo*)clisock->GetSocket().GetData();
 		delete pinfo;
 	}

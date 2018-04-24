@@ -70,15 +70,18 @@
 #define M_TR1 std::tr1
 #endif
 
+#include <stdio.h>
+
 // print debug info
 #define M_DEBUG_PRINT_INFO
 #ifdef M_DEBUG_PRINT_INFO
-#include <iostream>
-#define M_DEBUG_PRINT(info) std::cout << "debug info : " << info << std::endl;
+#define M_DEBUG_PRINT(info) { printf(info);}
 #else
 #define M_DEBUG_PRINT(info)
 #endif
 
+// 
+#define M_PRINT(...) { printf(__VA_ARGS__); }
 
 #ifndef M_SOCKET_DECL
 #define M_SOCKET_DECL inline

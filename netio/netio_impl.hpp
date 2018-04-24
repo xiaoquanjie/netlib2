@@ -214,44 +214,78 @@ void BaseNetIo<NetIoType>::_AcceptHttpHandler(SocketLib::SocketError error, Http
 // 连线通知,这个函数里不要处理业务，防止堵塞
 template<typename NetIoType>
 void BaseNetIo<NetIoType>::OnConnected(TcpSocketPtr& clisock) {
+	M_PRINT("tcp socket | OnConnected one : %s %d\n", clisock->RemoteEndpoint().Address().c_str(),
+		clisock->RemoteEndpoint().Port());
 }
 template<typename NetIoType>
 void BaseNetIo<NetIoType>::OnConnected(TcpConnectorPtr& clisock, SocketLib::SocketError error) {
+	if (error) {
+		M_PRINT("tcp connector | connect fail :%d %s\n", error.Code(), error.What().c_str());
+	}
+	else {
+		M_PRINT("tcp connector | connect success : %s %d\n", clisock->RemoteEndpoint().Address().c_str(),
+			clisock->RemoteEndpoint().Port());
+	}
 }
 template<typename NetIoType>
 void BaseNetIo<NetIoType>::OnConnected(HttpSocketPtr& clisock) {
+	M_PRINT("http socket | OnConnected one : %s %d\n", clisock->RemoteEndpoint().Address().c_str(),
+		clisock->RemoteEndpoint().Port());
 }
 template<typename NetIoType>
 void BaseNetIo<NetIoType>::OnConnected(HttpConnectorPtr& clisock, SocketLib::SocketError error) {
+	if (error) {
+		M_PRINT("http connector | connect fail :%d %s\n", error.Code(), error.What().c_str());
+	}
+	else {
+		M_PRINT("http connector | connect success : %s %d\n", clisock->RemoteEndpoint().Address().c_str(),
+			clisock->RemoteEndpoint().Port());
+	}
 }
 
 
 // 掉线通知,这个函数里不要处理业务，防止堵塞
 template<typename NetIoType>
 void BaseNetIo<NetIoType>::OnDisconnected(TcpSocketPtr& clisock) {
+	M_PRINT("tcp socket | OnDisconnected one : %s %d\n", clisock->RemoteEndpoint().Address().c_str(),
+		clisock->RemoteEndpoint().Port())
 }
 template<typename NetIoType>
 void BaseNetIo<NetIoType>::OnDisconnected(TcpConnectorPtr& clisock) {
+	M_PRINT("tcp connector | OnDisconnected one : %s %d\n", clisock->RemoteEndpoint().Address().c_str(),
+		clisock->RemoteEndpoint().Port())
 }
 template<typename NetIoType>
 void BaseNetIo<NetIoType>::OnDisconnected(HttpSocketPtr& clisock) {
+	M_PRINT("http socket | OnDisconnected one : %s %d\n", clisock->RemoteEndpoint().Address().c_str(),
+		clisock->RemoteEndpoint().Port())
 }
 template<typename NetIoType>
 void BaseNetIo<NetIoType>::OnDisconnected(HttpConnectorPtr& clisock) {
+	M_PRINT("http connector | OnDisconnected one : %s %d\n", clisock->RemoteEndpoint().Address().c_str(),
+		clisock->RemoteEndpoint().Port())
 }
 
 // 数据包通知,这个函数里不要处理业务，防止堵塞
 template<typename NetIoType>
 void BaseNetIo<NetIoType>::OnReceiveData(TcpSocketPtr& clisock, SocketLib::Buffer& buffer) {
+	M_PRINT("tcp socket | OnReceiveData one : %s %d %d\n", clisock->RemoteEndpoint().Address().c_str(),
+		clisock->RemoteEndpoint().Port(), buffer.Length());
 }
 template<typename NetIoType>
 void BaseNetIo<NetIoType>::OnReceiveData(TcpConnectorPtr& clisock, SocketLib::Buffer& buffer) {
+	M_PRINT("tcp connector | OnReceiveData one : %s %d %d\n", clisock->RemoteEndpoint().Address().c_str(),
+		clisock->RemoteEndpoint().Port(), buffer.Length());
 }
 template<typename NetIoType>
 void BaseNetIo<NetIoType>::OnReceiveData(HttpSocketPtr& clisock, HttpSvrRecvMsg& httpmsg) {
+	M_PRINT("http socket | OnReceiveData one : %s %d\n", clisock->RemoteEndpoint().Address().c_str(),
+		clisock->RemoteEndpoint().Port());
 }
 template<typename NetIoType>
 void BaseNetIo<NetIoType>::OnReceiveData(HttpConnectorPtr& clisock, HttpCliRecvMsg& httpmsg) {
+	M_PRINT("http connector | OnReceiveData one : %s %d\n", clisock->RemoteEndpoint().Address().c_str(),
+		clisock->RemoteEndpoint().Port());
 }
 
 M_NETIO_NAMESPACE_END

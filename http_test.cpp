@@ -9,28 +9,20 @@ class HttpTestIo : public netiolib::NetIo {
 public:
 	virtual void OnConnected(netiolib::HttpSocketPtr& clisock) {
 		_beatmng.OnConnected(clisock);
-		cout << "OnConnected one http : " << clisock->RemoteEndpoint().Address()
-			<< " " << clisock->RemoteEndpoint().Port() << endl;
+		netiolib::NetIo::OnConnected(clisock);
 	}
 
 	virtual void OnConnected(netiolib::HttpConnectorPtr& clisock, SocketLib::SocketError error) {
-		if (error) {
-			cout << "http connect fail :" << error.What() << endl;
-		}
-		else {
-			cout << "http connect success : " << clisock->RemoteEndpoint().Address() << " " << clisock->RemoteEndpoint().Port() << endl;
-			clisock->Close();
-		}
+		netiolib::NetIo::OnConnected(clisock, error);
+		clisock->Close();
 	}
 
 	virtual void OnDisconnected(netiolib::HttpSocketPtr& clisock) {
-		cout << "OnDisconnected one http : " << clisock->RemoteEndpoint().Address() << " "
-			<< clisock->RemoteEndpoint().Port() << endl;
+		netiolib::NetIo::OnDisconnected(clisock);
 	}
 
 	virtual void OnDisconnected(netiolib::HttpConnectorPtr& clisock) {
-		cout << "OnDisconnected one http connector: " << clisock->RemoteEndpoint().Address() << " "
-			<< clisock->RemoteEndpoint().Port() << endl;
+		netiolib::NetIo::OnDisconnected(clisock);
 	}
 
 	virtual void OnReceiveData(netiolib::HttpSocketPtr& clisock, netiolib::HttpSvrRecvMsg& httpmsg) {

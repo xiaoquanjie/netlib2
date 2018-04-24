@@ -137,11 +137,11 @@ inline void IocpService::Access::AsyncAccept(IocpService& service, SocketImpl& a
 				0, sizeof(sockaddr_storage_t), sizeof(sockaddr_storage_t), (LPDWORD)&op->_bytes, &M_Impl_Aop(accept_impl));
 
 			if (!ret && M_ERR_LAST == M_ECONNRESET) {
-				M_DEBUG_PRINT("peer connect reset");
+				M_DEBUG_PRINT("peer connect reset\n");
 				continue;
 			}
 			if (!ret && M_ERR_LAST != M_ERROR_IO_PENDING) {
-				M_DEBUG_PRINT("acceptex fail");
+				M_DEBUG_PRINT("acceptex fail\n");
 				M_DEFAULT_SOCKET_ERROR2(error);
 
 				SocketError error2;
