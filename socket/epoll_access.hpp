@@ -443,12 +443,12 @@ namespace iodetail {
 		mlock.unlock();
 
 		SocketError error;
-		if (event->events & M_EPOLLERR) {
+		// if (event->events & M_EPOLLERR) {
 			Opts::SoError error_opt;
 			EpollService::Access::GetOption(*serviceimpl.GetService(), 
 				this->_impl, error_opt, error);
 			error = error ? SocketError(M_ERR_ASYNC_CONNECT_FAIL) : SocketError(error_opt.Value());
-		}
+		//}
 
 		function_t <void(SocketError)> handler;
 		handler.swap(this->_handler);
