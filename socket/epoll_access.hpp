@@ -97,19 +97,22 @@ inline void EpollService::Access::Stop(EpollService& service, SocketError& error
 inline void EpollService::Access::_DoRun(EpollService& service, IoServiceImpl& simpl, bool isco,
 	SocketLib::SocketError& error) 
 {
+	function_t<void()>& runhandler = service.GetRunCallback();
 	base::slist<SocketClose*> closes1;
 	base::slist<SocketClose*> closes2;
 	const int max_events = 128;
 	epoll_event_t events[max_events];
 	for (;;) {
+		if (runhandler)
+			runhandler();
 		_DoClose(&simpl, closes1, closes2);
 		if (isco)
 			CoroutineTask::doThrResume();
 		g_setlasterr(0);
 		g_bzero(&events, sizeof(events));
-		s_int32_t ret = g_epoll_wait(simpl._handler, events, max_events, 500);
+		s_int32_t ret = g_epoll_wait(simpl._handler, events, max_events, 20);
 		if (ret == 0) {
-			1; // time out
+			// time out
 			continue;
 		}
 		if (ret < 0 && M_ERR_LAST != M_EINTR) {

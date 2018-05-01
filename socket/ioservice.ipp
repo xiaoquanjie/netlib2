@@ -34,6 +34,15 @@ struct IIoService {
 	virtual s_int32_t ServiceCount()const = 0;
 
 	virtual iodetail::IoServiceImpl& GetServiceImpl() = 0;
+
+	void SetRunCallback(function_t<void()> handler) {
+		_runhandler = handler;
+	}
+
+	function_t<void()>& GetRunCallback() {
+		return _runhandler;
+	}
+
 protected:
 	IIoService(const IIoService&);
 	IIoService& operator=(const IIoService&);
@@ -46,6 +55,7 @@ protected:
 	s_int32_t _implcnt;
 	s_int32_t _implidx;
 	mutable MutexLock _mutex;
+	function_t<void()> _runhandler;
 };
 
 #ifdef M_PLATFORM_WIN

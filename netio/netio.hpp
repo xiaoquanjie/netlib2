@@ -78,6 +78,7 @@ public:
 
 	virtual void Start(unsigned int thread_cnt, bool isco = false);
 	virtual void Stop();
+	virtual void RunHandler();
 	size_t  ServiceCount();
 
 	// 获取最后的异常

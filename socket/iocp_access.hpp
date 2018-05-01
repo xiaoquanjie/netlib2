@@ -341,12 +341,15 @@ inline void IocpService::Access::AsyncSendSome(IocpService& service, SocketImpl&
 inline void IocpService::Access::_DoRun(IocpService& service, IoServiceImpl& simpl, bool isco, 
 	SocketLib::SocketError& error) 
 {
+	function_t<void()>& runhandler = service.GetRunCallback();
 	base::slist<SocketClose*> closes1;
 	base::slist<SocketClose*> closes2;
 	DWORD trans_bytes = 0;
 	ULONG_PTR comple_key = 0;
 	overlapped_t* overlapped = 0;
 	for (;;) {
+		if (runhandler)
+			runhandler();
 		_DoClose(&simpl, closes1, closes2);
 		if (isco)
 			CoroutineTask::doThrResume();
@@ -356,7 +359,7 @@ inline void IocpService::Access::_DoRun(IocpService& service, IoServiceImpl& sim
 		g_setlasterr(0);
 
 		BOOL ret = g_getqueuedcompletionstatus(simpl._handler, &trans_bytes,
-			&comple_key, &overlapped, 500);
+			&comple_key, &overlapped, 20);
 		if (overlapped) {
 			Operation* op = (Operation*)overlapped;
 			if (op->_type & E_FINISH_OP) {

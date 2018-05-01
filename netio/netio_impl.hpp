@@ -20,12 +20,16 @@ template<typename NetIoType>
 BaseNetIo<NetIoType>::BaseNetIo()
 	:_backlog(20) {
 	_endian = SocketLib::detail::Util::LocalEndian();
+	function_t<void()> handler = bind_t(&BaseNetIo<NetIoType>::RunHandler, this);
+	_ioservice.SetRunCallback(handler);
 }
 
 template<typename NetIoType>
 BaseNetIo<NetIoType>::BaseNetIo(SocketLib::s_uint32_t backlog)
 	: _backlog(backlog) {
 	_endian = SocketLib::detail::Util::LocalEndian();
+	function_t<void()> handler = bind_t(&BaseNetIo<NetIoType>::RunHandler, this);
+	_ioservice.SetRunCallback(handler);
 }
 
 template<typename NetIoType>
@@ -135,6 +139,10 @@ void BaseNetIo<NetIoType>::Stop() {
 		lasterror = error;
 		M_NETIO_LOGGER("stop happend error:"M_ERROR_DESC_STR(error));
 	}
+}
+
+template<typename NetIoType>
+void BaseNetIo<NetIoType>::RunHandler() {
 }
 
 template<typename NetIoType>
