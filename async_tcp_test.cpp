@@ -25,7 +25,7 @@ public:
 		netiolib::NetIo::OnConnected(clisock, error);
 		if (!error) {
 			TestInfo* pinfo = new TestInfo;
-			pinfo->count = 10000;
+			pinfo->count = 100;// 00;
 			pinfo->request = 0;
 			pinfo->reply = 0;
 			pinfo->request += pinfo->count;
@@ -35,6 +35,9 @@ public:
 			buffer.Write(pinfo->count);
 			--pinfo->count;
 			clisock->Send(buffer.Data(), buffer.Length());
+			//clisock->Send(buffer.Data(), buffer.Length());
+			//clisock->Send(buffer.Data(), buffer.Length());
+			printf("begin send data........\n");
 		}
 	}
 
@@ -49,8 +52,12 @@ public:
 	}
 
 	virtual void OnReceiveData(netiolib::TcpSocketPtr& clisock, netiolib::Buffer& buffer) {
-		netiolib::NetIo::OnReceiveData(clisock, buffer);
+		//netiolib::NetIo::OnReceiveData(clisock, buffer);
+		//printf("")
 		clisock->Send(buffer.Data(), buffer.Length());
+		int count = 0;
+		buffer.Read(count);
+		printf("receive data: %d\n", count);
 	}
 
 	virtual void OnReceiveData(netiolib::TcpConnectorPtr& clisock, netiolib::Buffer& buffer) {
@@ -58,6 +65,7 @@ public:
 		buffer.Read(count);
 		TestInfo* pinfo = (TestInfo*)clisock->GetExtData();
 		pinfo->reply += count;
+		printf("receive data:%d\n", count);
 		if (pinfo->count > 0) {
 			pinfo->request += pinfo->count;
 			buffer.Clear();
@@ -69,6 +77,7 @@ public:
 			static SocketLib::MutexLock lock;
 			SocketLib::ScopedLock scoped(lock); // 输出测试，测性能时要去掉
 			cout << clisock->LocalEndpoint().Port() << " request:" << pinfo->request << " reply:" << pinfo->reply << endl;
+			cout.flush();
 			clisock->Close();
 		}
 	}

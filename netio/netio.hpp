@@ -20,16 +20,18 @@ M_NETIO_NAMESPACE_BEGIN
 #ifdef M_PLATFORM_WIN
 #pragma pack(1)
 struct MessageHeader {
-	int			   timestamp;
-	unsigned short size;
-	unsigned char  endian; // 0 == little endian, 1 == big endian
+	int	timestamp;
+	unsigned int size;
+	void n2h();
+	void h2n();
 };
 #pragma pack()
 #else
 struct __attribute__((__packed__)) MessageHeader {
-	int			   timestamp;
-	unsigned short size;
-	unsigned char  endian; // 0 == little endian, 1 == big endian
+	int	timestamp;
+	unsigned int size;
+	void n2h();
+	void h2n();
 };
 #endif
 
@@ -138,21 +140,25 @@ protected:
 };
 
 enum {
-	E_STATE_STOP = 0,
 	E_STATE_START = 1,
-	E_STATE_WRITE = 3,
+	E_STATE_STOP,
+	E_STATE_CLOSE,
 };
+
 
 template<typename T, typename SocketType>
 class TcpBaseSocket : public enable_shared_from_this_t<T>
 {
 protected:
 	struct _writerinfo_ {
-		base::slist<SocketLib::Buffer*> buffer_pool;
-		base::svector<SocketLib::Buffer*> buffer_pool2;
-		SocketLib::Buffer*   msgbuffer;
+		enum {
+			E_MAX_BUFFER_SIZE = 1024 * 1024 * 3,
+		};
+
 		SocketLib::MutexLock lock;
 		bool writing;
+		SocketLib::Buffer msgbuffer1;
+		SocketLib::Buffer msgbuffer2;
 
 		_writerinfo_();
 		~_writerinfo_();
@@ -170,9 +176,9 @@ public:
 	// 调用这个函数不意味着连接立即断开，会等所有的未处理的数据处理完就会断开
 	void Close();
 
-	void Send(SocketLib::Buffer*);
+	bool Send(const SocketLib::Buffer* buffer);
 
-	void Send(const SocketLib::s_byte_t* data, SocketLib::s_uint32_t len);
+	bool Send(const SocketLib::s_byte_t* data, SocketLib::s_uint32_t len);
 
 	bool IsConnected()const;
 
@@ -187,11 +193,11 @@ protected:
 
 	inline void _CloseHandler();
 
-	void _PostClose(unsigned int state);
+	void _PostClose();
 
-	void _Close(unsigned int state);
+	void _Close();
 
-	bool _TrySendData(bool ignore = false);
+	bool _TrySendData();
 
 protected:
 	BaseNetIo<NetIo>& _netio;
@@ -344,6 +350,7 @@ public:
 
 	void SendHttpMsg() {
 		Send(_httpmsg._pbuffer);
+		_httpmsg._pbuffer->Clear();
 		_httpmsg._flag = 0;
 	}
 

@@ -147,9 +147,9 @@ inline bool SyncConnector::Send(const SocketLib::s_byte_t* data, SocketLib::s_ui
 	if (len > 0 && len <= (0xFFFF - hdrlen)) {
 		_sndbuffer.Clear();
 		MessageHeader hdr;
-		hdr.endian = _LocalEndian();
 		hdr.size = len;
 		hdr.timestamp = (unsigned int)time(0);
+		hdr.h2n();
 		_sndbuffer.Write(hdr);
 		_sndbuffer.Write((void*)data, len);
 		SocketLib::SocketError error;
@@ -235,10 +235,8 @@ inline SocketLib::Buffer* SyncConnector::_CutMsgPack(SocketLib::s_byte_t* buf, S
 			}
 
 			// convert byte order
-			if (_curheader.endian != _LocalEndian()) {
-				_curheader.size = g_htons(_curheader.size);
-				_curheader.timestamp = g_htonl(_curheader.timestamp);
-			}
+			_curheader.n2h();
+			
 			// check
 			if (_curheader.size > (0xFFFF - hdrlen))
 				return 0;

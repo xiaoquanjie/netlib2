@@ -18,26 +18,23 @@ M_NETIO_NAMESPACE_BEGIN
 
 #define M_READ_SIZE (4*1024)
 
+inline void MessageHeader::n2h() {
+	timestamp = ::ntohl(timestamp);
+	size = ::ntohl(size);
+}
+
+inline void MessageHeader::h2n() {
+	timestamp = ::htonl(timestamp);
+	size = ::htonl(size);
+}
+
 template<typename T, typename SocketType>
 TcpBaseSocket<T, SocketType>::_writerinfo_::_writerinfo_() {
 	writing = false;
-	msgbuffer = 0;
 }
 
 template<typename T, typename SocketType>
 TcpBaseSocket<T, SocketType>::_writerinfo_::~_writerinfo_() {
-	SocketLib::Buffer* pbuffer;
-	while (buffer_pool.size()) {
-		pbuffer = buffer_pool.front();
-		buffer_pool.pop_front();
-		delete pbuffer;
-	}
-	while (buffer_pool2.size()) {
-		pbuffer = buffer_pool2.back();
-		buffer_pool2.pop_back();
-		delete pbuffer;
-	}
-	delete msgbuffer;
 }
 
 template<typename T, typename SocketType>
@@ -67,25 +64,24 @@ const SocketLib::Tcp::EndPoint& TcpBaseSocket<T, SocketType>::RemoteEndpoint()co
 
 template<typename T, typename SocketType>
 void TcpBaseSocket<T, SocketType>::Close() {
-	_PostClose(E_STATE_START);
+	/* close被调用，并不意味着连接会马上断开，socket会等所有的数据全部
+	 * 发送完后才断开。
+	 */
+	_PostClose();
 }
 
 template<typename T, typename SocketType>
-void TcpBaseSocket<T, SocketType>::_PostClose(unsigned int state) {
+void TcpBaseSocket<T, SocketType>::_PostClose() {
 	SocketLib::ScopedLock scoped_w(_writer.lock);
-	_Close(state);
+	_Close();
 }
 
 template<typename T, typename SocketType>
-void TcpBaseSocket<T, SocketType>::_Close(unsigned int state) {
-	if (_flag == E_STATE_START || _writer.writing) {
-		if (state == E_STATE_START)
-			_flag = E_STATE_STOP;
-		else if (state == E_STATE_WRITE) {
-			_writer.writing = false;
-			_flag = E_STATE_STOP;
-		}
-		if (_flag == E_STATE_STOP && !_writer.writing) {
+void TcpBaseSocket<T, SocketType>::_Close() {
+	if (_flag != E_STATE_CLOSE) {
+		_flag = E_STATE_STOP;
+		if (!_writer.writing) {
+			_flag = E_STATE_CLOSE;
 			SocketLib::SocketError error;
 			_socket->Close(bind_t(&TcpBaseSocket::_CloseHandler, this->shared_from_this()), error);
 		}
@@ -93,51 +89,52 @@ void TcpBaseSocket<T, SocketType>::_Close(unsigned int state) {
 }
 
 template<typename T, typename SocketType>
-void TcpBaseSocket<T, SocketType>::Send(SocketLib::Buffer* buffer) {
-	SocketLib::ScopedLock scoped_w(_writer.lock);
-	if (_flag == E_STATE_START) {
-		SocketLib::Buffer* pBuffer;
-		if (_writer.buffer_pool2.size()) {
-			pBuffer = _writer.buffer_pool2.back();
-			_writer.buffer_pool2.pop_back();
-		}
-		else
-			pBuffer = new SocketLib::Buffer();
+bool TcpBaseSocket<T, SocketType>::Send(const SocketLib::Buffer* buffer) {
+	if (!buffer)
+		return false;
 
-		pBuffer->Swap(*buffer);
-		_writer.buffer_pool.push_back(pBuffer);
-		_TrySendData();
+	SocketLib::ScopedLock scoped_w(_writer.lock);
+	if (_flag != E_STATE_START) {
+		return false;
 	}
-	else
-		delete buffer;
+
+	int snd_len = buffer->Size();
+	if (_writer.msgbuffer2.Size() + snd_len > _writerinfo_::E_MAX_BUFFER_SIZE) {
+		// 堆积的太多了没有发出去
+		M_NETIO_LOGGER(this->_socket->GetFd() << "|There is too much data that is not sent in the cache, so been discarded");
+		return false;
+	}
+
+	_writer.msgbuffer2.Write((void*)buffer->Raw(), snd_len);
+	_TrySendData();
+	return true;
 }
 
 template<typename T, typename SocketType>
-void TcpBaseSocket<T, SocketType>::Send(const SocketLib::s_byte_t* data, SocketLib::s_uint32_t len) {
-	if (len > 0) {
-		SocketLib::ScopedLock scoped_w(_writer.lock);
-		if (_flag != E_STATE_START)
-			return;
+bool TcpBaseSocket<T, SocketType>::Send(const SocketLib::s_byte_t* data, SocketLib::s_uint32_t len) {
+	if (len <= 0)
+		return false;
+	
+	SocketLib::ScopedLock scoped_w(_writer.lock);
+	if (_flag != E_STATE_START)
+		return false;
 
-		MessageHeader hdr;
-		hdr.endian = _netio.LocalEndian();
-		hdr.size = len;
-		hdr.timestamp = (unsigned int)time(0);
-
-		SocketLib::Buffer* buffer;
-		if (_writer.buffer_pool2.size()) {
-			buffer = _writer.buffer_pool2.back();
-			_writer.buffer_pool2.pop_back();
-		}
-		else
-			buffer = new SocketLib::Buffer();
-
-		buffer->Clear();
-		buffer->Write(hdr);
-		buffer->Write((void*)data, len);
-		_writer.buffer_pool.push_back(buffer);
-		_TrySendData();
+	int snd_len = len + sizeof(MessageHeader);
+	if (_writer.msgbuffer2.Size() + snd_len > _writerinfo_::E_MAX_BUFFER_SIZE) {
+		// 堆积的太多了没有发出去
+		M_NETIO_LOGGER(this->_socket->GetFd() <<"|There is too much data that is not sent in the cache, so been discarded");
+		return false;
 	}
+
+	MessageHeader hdr;
+	hdr.size = len;
+	hdr.timestamp = (unsigned int)time(0);
+	hdr.h2n();
+	_writer.msgbuffer2.Write(hdr);
+	_writer.msgbuffer2.Write((void*)data, len);
+
+	_TrySendData();
+	return true;
 }
 
 template<typename T, typename SocketType>
@@ -182,22 +179,27 @@ void TcpBaseSocket<T, SocketType>::SetKeepAlive(SocketLib::s_uint32_t timeo) {
 
 template<typename T, typename SocketType>
 void TcpBaseSocket<T, SocketType>::_WriteHandler(SocketLib::s_uint32_t tran_byte, SocketLib::SocketError error) {
+	/*
+	 *  要注意防止_writer.lock死锁的问题。
+	 */
+	SocketLib::ScopedLock scoped_w(_writer.lock);
+	_writer.writing = false;
+	
 	if (error) {
 		// 出错关闭连接
 		M_NETIO_LOGGER("write handler happend error:"M_ERROR_DESC_STR(error));
-		_PostClose(E_STATE_WRITE);
+		_Close();
 	}
 	else if (tran_byte <= 0) {
 		// 连接已经关闭
-		_PostClose(E_STATE_WRITE);
+		_Close();
 	}
 	else {
-		SocketLib::ScopedLock scoped_w(_writer.lock);
-		_writer.msgbuffer->CutData(tran_byte);
-		if (!_TrySendData(true) && !(_flag == E_STATE_START)) {
-			// 数据发送完后，如果状态不是E_TCPSOCKET_STATE_START，则需要关闭写
+		_writer.msgbuffer1.CutData(tran_byte);
+		if (!_TrySendData() && !(_flag == E_STATE_START)) {
+			// 数据发送完后，如果状态不是E_STATE_START，则需要关闭写
 			_socket->Shutdown(SocketLib::E_Shutdown_WR, error);
-			_Close(E_STATE_WRITE);
+			_Close();
 		}
 	}
 }
@@ -209,36 +211,28 @@ inline void TcpBaseSocket<T, SocketType>::_CloseHandler() {
 }
 
 template<typename T, typename SocketType>
-bool TcpBaseSocket<T, SocketType>::_TrySendData(bool ignore) {
-	if (!_writer.writing || ignore)
-	{
-		if ((!_writer.msgbuffer || _writer.msgbuffer->Length() == 0)
-			&& _writer.buffer_pool.size() > 0) {
-			SocketLib::Buffer* pbuffer = _writer.buffer_pool.front();
-			if (_writer.msgbuffer) {
-				if (_writer.buffer_pool2.size() < 10) {
-					_writer.msgbuffer->Clear();
-					_writer.buffer_pool2.push_back(_writer.msgbuffer);
-				}
-				else
-					delete _writer.msgbuffer;
-			}
-			_writer.msgbuffer = pbuffer;
-			_writer.buffer_pool.pop_front();
-		}
-		if (_writer.msgbuffer && _writer.msgbuffer->Length() != 0) {
-			_writer.writing = true;
-			SocketLib::SocketError error;
-			_socket->AsyncSendSome(bind_t(&TcpBaseSocket::_WriteHandler, this->shared_from_this(), placeholder_1, placeholder_2)
-				, _writer.msgbuffer->Data(), _writer.msgbuffer->Length(), error);
-			if (error)
-				_Close(E_STATE_WRITE);
-			return (!error);
+bool TcpBaseSocket<T, SocketType>::_TrySendData() {
+	if (_writer.writing)
+		return true;
+
+	if (_writer.msgbuffer1.Length() == 0) {
+		_writer.msgbuffer1.Swap(_writer.msgbuffer2);
+		_writer.msgbuffer2.Clear();
+	}
+
+	if (_writer.msgbuffer1.Length() > 0) {
+		SocketLib::SocketError error;
+		_socket->AsyncSendSome(bind_t(&TcpBaseSocket::_WriteHandler, this->shared_from_this(), placeholder_1, placeholder_2)
+			, _writer.msgbuffer1.Data(), _writer.msgbuffer1.Length(), error);
+		if (error) {
+			_Close();
 		}
 		else {
-			_writer.writing = false;
+			_writer.writing = true;
 		}
+		return (!error);
 	}
+
 	return false;
 }
 
@@ -259,30 +253,31 @@ TcpStreamSocket<T, SocketType>::_readerinfo_::~_readerinfo_() {
 
 template<typename T, typename SocketType>
 void TcpStreamSocket<T, SocketType>::_ReadHandler(SocketLib::s_uint32_t tran_byte, SocketLib::SocketError error) {
-	if (error) {
+	do {
 		// 出错关闭连接
-		M_NETIO_LOGGER("read handler happend error:" << M_ERROR_DESC_STR(error));
-		this->_PostClose(E_STATE_START);
-	}
-	else if (tran_byte <= 0) {
+		if (error) {
+			M_NETIO_LOGGER("read handler happend error:" << M_ERROR_DESC_STR(error));
+			break;
+		}
 		// 对方关闭写
-		this->_PostClose(E_STATE_START);
-	}
-	else {
-		if (this->_flag == E_STATE_START) {
-			if (_CutMsgPack(_reader.readbuf, tran_byte)) {
-				_TryRecvData();
-			}
-			else {
-				// 数据检查出错，主动断开连接
-				this->_socket->Shutdown(SocketLib::E_Shutdown_RD, error);
-				this->_PostClose(E_STATE_START);
-			}
+		if (tran_byte <= 0)
+			break;
+
+		// 我方post了关闭
+		if (this->_flag != E_STATE_START)
+			break;
+
+		if (_CutMsgPack(_reader.readbuf, tran_byte)) {
+			_TryRecvData();
+			return;
 		}
 		else {
-			this->_PostClose(E_STATE_START);
+			// 数据检查出错，主动断开连接
+			this->_socket->Shutdown(SocketLib::E_Shutdown_RD, error);
 		}
-	}
+	} while (false);
+
+	this->_PostClose();
 }
 
 template<typename T, typename SocketType>
@@ -310,12 +305,10 @@ bool TcpStreamSocket<T, SocketType>::_CutMsgPack(SocketLib::s_byte_t* buf, Socke
 			}
 
 			// convert byte order
-			if (_reader.curheader.endian != this->_netio.LocalEndian()) {
-				_reader.curheader.size = g_htons(_reader.curheader.size);
-				_reader.curheader.timestamp = g_htonl(_reader.curheader.timestamp);
-			}
+			_reader.curheader.n2h();
+			
 			// check
-			if (_reader.curheader.size > (0xFFFF - hdrlen))
+			if (_reader.curheader.size > (4*1024*1024 - hdrlen))
 				return false;
 		}
 
@@ -350,7 +343,7 @@ void TcpStreamSocket<T, SocketType>::_TryRecvData() {
 	this->_socket->AsyncRecvSome(bind_t(&TcpStreamSocket::_ReadHandler, this->shared_from_this(), placeholder_1, placeholder_2)
 		, _reader.readbuf, M_READ_SIZE, error);
 	if (error)
-		this->_PostClose(E_STATE_START);
+		this->_PostClose();
 }
 
 template<typename T, typename SocketType>

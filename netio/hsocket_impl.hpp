@@ -31,11 +31,11 @@ void HttpBaseSocket<T, SocketType, HttpMsgType>::_ReadHandler(SocketLib::s_uint3
 	if (error) {
 		// 出错关闭连接
 		M_NETIO_LOGGER("read handler happend error:" << M_ERROR_DESC_STR(error));
-		this->_PostClose(E_STATE_START);
+		this->_PostClose();
 	}
 	else if (tran_byte <= 0) {
 		// 对方关闭写
-		this->_PostClose(E_STATE_START);
+		this->_PostClose();
 	}
 	else {
 		if (this->_flag == E_STATE_START) {
@@ -45,11 +45,11 @@ void HttpBaseSocket<T, SocketType, HttpMsgType>::_ReadHandler(SocketLib::s_uint3
 			else {
 				// 数据检查出错，主动断开连接
 				this->_socket->Shutdown(SocketLib::E_Shutdown_RD, error);
-				this->_PostClose(E_STATE_START);
+				this->_PostClose();
 			}
 		}
 		else {
-			this->_PostClose(E_STATE_START);
+			this->_PostClose();
 		}
 	}
 }
@@ -79,7 +79,7 @@ void HttpBaseSocket<T, SocketType, HttpMsgType>::_TryRecvData() {
 	this->_socket->AsyncRecvSome(bind_t(&HttpBaseSocket::_ReadHandler, this->shared_from_this(), placeholder_1, placeholder_2)
 		, _reader.readbuf, M_READ_SIZE, error);
 	if (error)
-		this->_PostClose(E_STATE_START);
+		this->_PostClose();
 }
 
 template<typename T, typename SocketType, typename HttpMsgType>

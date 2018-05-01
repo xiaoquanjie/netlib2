@@ -103,7 +103,8 @@ inline void Buffer::Clear() {
 inline void Buffer::CutData(s_int32_t len) {
 	if (_data._offset + len > _data._pos)
 		_data._offset = _data._pos;
-	_data._offset += len;
+	else
+		_data._offset += len;
 }
 
 inline s_byte_t* Buffer::Data(){
