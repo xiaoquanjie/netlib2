@@ -287,9 +287,9 @@ public:
 
 	bool Connect(const std::string& addr, SocketLib::s_uint16_t port, SocketLib::s_uint32_t timeo_sec = -1);
 
-	void AsyncConnect(const SocketLib::Tcp::EndPoint& ep);
+	void AsyncConnect(const SocketLib::Tcp::EndPoint& ep, SocketLib::SocketError error);
 
-	void AsyncConnect(const std::string& addr, SocketLib::s_uint16_t port);
+	void AsyncConnect(const std::string& addr, SocketLib::s_uint16_t port, SocketLib::SocketError error);
 
 protected:
 	void _ConnectHandler(const SocketLib::SocketError& error, TcpConnectorPtr conector);

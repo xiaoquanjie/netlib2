@@ -78,14 +78,10 @@ bool BaseNetIo<NetIoType>::ListenOneHttp(const std::string& addr, SocketLib::s_u
 
 template<typename NetIoType>
 void BaseNetIo<NetIoType>::ConnectOne(const SocketLib::Tcp::EndPoint& ep) {
-	try {
-		netiolib::TcpConnectorPtr connector(new netiolib::TcpConnector(*this));
-		connector->AsyncConnect(ep);
-		connector.reset();
-	}
-	catch (SocketLib::SocketError& error) {
-		lasterror = error;
-	}
+	SocketLib::SocketError error;
+	netiolib::TcpConnectorPtr connector(new netiolib::TcpConnector(*this));
+	connector->AsyncConnect(ep, error);
+	connector.reset();
 }
 
 template<typename NetIoType>

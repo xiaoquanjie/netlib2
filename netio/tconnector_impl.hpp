@@ -52,21 +52,18 @@ bool BaseTConnector<ConnectorType>::Connect(const std::string& addr, SocketLib::
 }
 
 template<typename ConnectorType>
-void BaseTConnector<ConnectorType>::AsyncConnect(const SocketLib::Tcp::EndPoint& ep) {
-	try {
-		function_t<void(SocketLib::SocketError)> handler = bind_t(&BaseTConnector<ConnectorType>::_ConnectHandler, this,
-			placeholder_1, this->shared_from_this());
-		this->_socket->AsyncConnect(handler, ep);
-	}
-	catch (SocketLib::SocketError& error) {
+void BaseTConnector<ConnectorType>::AsyncConnect(const SocketLib::Tcp::EndPoint& ep, SocketLib::SocketError error) {
+	function_t<void(SocketLib::SocketError)> handler = bind_t(&BaseTConnector<ConnectorType>::_ConnectHandler, this,
+		placeholder_1, this->shared_from_this());
+	this->_socket->AsyncConnect(handler, ep, error);
+	if (error)
 		lasterror = error;
-	}
 }
 
 template<typename ConnectorType>
-void BaseTConnector<ConnectorType>::AsyncConnect(const std::string& addr, SocketLib::s_uint16_t port) {
+void BaseTConnector<ConnectorType>::AsyncConnect(const std::string& addr, SocketLib::s_uint16_t port, SocketLib::SocketError error) {
 	SocketLib::Tcp::EndPoint ep(SocketLib::AddressV4(addr), port);
-	return AsyncConnect(ep);
+	return AsyncConnect(ep, error);
 }
 
 template<typename ConnectorType>
