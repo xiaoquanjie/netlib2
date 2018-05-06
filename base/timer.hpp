@@ -149,10 +149,10 @@ public:
 		return !(*this<rhs);
 	}
 	long millisecond()const {
-		return tv_.tv_usec / 1000;
+		return (this->tv_.tv_sec * 1000 + this->tv_.tv_usec / 1000);
 	}
 	long microsecond()const {
-		return tv_.tv_usec;
+		return (this->tv_.tv_sec * 1000000 + this->tv_.tv_usec);
 	}
 	time_t second()const {
 		return (tv_.tv_sec + tv_.tv_usec / (1000 * 1000));
