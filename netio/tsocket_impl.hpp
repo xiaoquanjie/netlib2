@@ -16,7 +16,8 @@
 
 M_NETIO_NAMESPACE_BEGIN
 
-#define M_READ_SIZE (4*1024)
+#define M_SOCKET_READ_SIZE (4*1024)
+#define M_SOCKET_PACK_SIZE (400*1024)
 
 inline void MessageHeader::n2h() {
 	timestamp = ::ntohl(timestamp);
@@ -92,13 +93,20 @@ template<typename T, typename SocketType>
 bool TcpBaseSocket<T, SocketType>::Send(const SocketLib::Buffer* buffer) {
 	if (!buffer)
 		return false;
+	if (buffer->Length() == 0)
+		return false;
+
+	int snd_len = buffer->Size();
+	if (snd_len > M_SOCKET_PACK_SIZE) {
+		M_NETIO_LOGGER(this->_socket->GetFd() << "|The package is too big to sent in the cache, so been discarded");
+		return false;
+	}
 
 	SocketLib::ScopedLock scoped_w(_writer.lock);
 	if (_flag != E_STATE_START) {
 		return false;
 	}
 
-	int snd_len = buffer->Size();
 	if (_writer.msgbuffer2.Size() + snd_len > _writerinfo_::E_MAX_BUFFER_SIZE) {
 		// 堆积的太多了没有发出去
 		M_NETIO_LOGGER(this->_socket->GetFd() << "|There is too much data that is not sent in the cache, so been discarded");
@@ -115,6 +123,11 @@ bool TcpBaseSocket<T, SocketType>::Send(const SocketLib::s_byte_t* data, SocketL
 	if (len <= 0)
 		return false;
 	
+	if (len > M_SOCKET_PACK_SIZE) {
+		M_NETIO_LOGGER(this->_socket->GetFd() << "|The package is too big to sent in the cache, so been discarded");
+		return false;
+	}
+
 	SocketLib::ScopedLock scoped_w(_writer.lock);
 	if (_flag != E_STATE_START)
 		return false;
@@ -247,8 +260,8 @@ bool TcpBaseSocket<T, SocketType>::_TrySendData() {
 template<typename T, typename SocketType>
 TcpStreamSocket<T, SocketType>::_readerinfo_::_readerinfo_() {
 	g_memset(&curheader, 0, sizeof(curheader));
-	readbuf = new SocketLib::s_byte_t[M_READ_SIZE];
-	g_memset(readbuf, 0, M_READ_SIZE);
+	readbuf = new SocketLib::s_byte_t[M_SOCKET_READ_SIZE];
+	g_memset(readbuf, 0, M_SOCKET_READ_SIZE);
 }
 
 template<typename T, typename SocketType>
@@ -313,7 +326,7 @@ bool TcpStreamSocket<T, SocketType>::_CutMsgPack(SocketLib::s_byte_t* buf, Socke
 			_reader.curheader.n2h();
 			
 			// check
-			if (_reader.curheader.size > (4*1024*1024 - hdrlen))
+			if (_reader.curheader.size > (M_SOCKET_PACK_SIZE /*- hdrlen*/))
 				return false;
 		}
 
@@ -328,15 +341,12 @@ bool TcpStreamSocket<T, SocketType>::_CutMsgPack(SocketLib::s_byte_t* buf, Socke
 			buf += (_reader.curheader.size - datalen);
 			tran_byte -= (_reader.curheader.size - datalen);
 
-			// swap
-			_reader.msgbuffer2.Swap(_reader.msgbuffer);
-
 			// notify
 			_reader.curheader.size = 0;
 			if (!ref)
 				ref = this->shared_from_this();
-			this->_netio.OnReceiveData(ref, _reader.msgbuffer2);
-			_reader.msgbuffer2.Clear();
+			this->_netio.OnReceiveData(ref, _reader.msgbuffer);
+			_reader.msgbuffer.Clear();
 		}
 	} while (true);
 	return true;
@@ -346,7 +356,7 @@ template<typename T, typename SocketType>
 void TcpStreamSocket<T, SocketType>::_TryRecvData() {
 	SocketLib::SocketError error;
 	this->_socket->AsyncRecvSome(bind_t(&TcpStreamSocket::_ReadHandler, this->shared_from_this(), placeholder_1, placeholder_2)
-		, _reader.readbuf, M_READ_SIZE, error);
+		, _reader.readbuf, M_SOCKET_READ_SIZE, error);
 	if (error)
 		this->_PostClose();
 }

@@ -17,8 +17,8 @@ M_NETIO_NAMESPACE_BEGIN
 
 template<typename T, typename SocketType, typename HttpMsgType>
 HttpBaseSocket<T, SocketType, HttpMsgType>::_readerinfo_::_readerinfo_() {
-	readbuf = new SocketLib::s_byte_t[M_READ_SIZE];
-	g_memset(readbuf, 0, M_READ_SIZE);
+	readbuf = new SocketLib::s_byte_t[M_SOCKET_READ_SIZE];
+	g_memset(readbuf, 0, M_SOCKET_READ_SIZE);
 }
 
 template<typename T, typename SocketType, typename HttpMsgType>
@@ -77,7 +77,7 @@ template<typename T, typename SocketType, typename HttpMsgType>
 void HttpBaseSocket<T, SocketType, HttpMsgType>::_TryRecvData() {
 	SocketLib::SocketError error;
 	this->_socket->AsyncRecvSome(bind_t(&HttpBaseSocket::_ReadHandler, this->shared_from_this(), placeholder_1, placeholder_2)
-		, _reader.readbuf, M_READ_SIZE, error);
+		, _reader.readbuf, M_SOCKET_READ_SIZE, error);
 	if (error)
 		this->_PostClose();
 }

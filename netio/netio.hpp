@@ -225,7 +225,6 @@ protected:
 	struct _readerinfo_ {
 		SocketLib::s_byte_t*  readbuf;
 		SocketLib::Buffer	  msgbuffer;
-		SocketLib::Buffer	  msgbuffer2;
 		MessageHeader		  curheader;
 
 		_readerinfo_();

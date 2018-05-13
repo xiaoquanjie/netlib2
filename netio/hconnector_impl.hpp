@@ -79,7 +79,7 @@ void BaseHConnector<ConnectorType>::_ConnectHandler(const SocketLib::SocketError
 		this->_netio.OnConnected(ref, error);
 		function_t<void(SocketLib::s_uint32_t, SocketLib::SocketError)> handler =
 			bind_t(&BaseHConnector<ConnectorType>::_ReadHandler, ref, placeholder_1, placeholder_2);
-		this->_socket->AsyncRecvSome(handler, this->_reader.readbuf, M_READ_SIZE);
+		this->_socket->AsyncRecvSome(handler, this->_reader.readbuf, M_SOCKET_READ_SIZE);
 	}
 	catch (SocketLib::SocketError& err) {
 		lasterror = err;

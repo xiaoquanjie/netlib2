@@ -36,7 +36,7 @@ bool BaseTConnector<ConnectorType>::Connect(const SocketLib::Tcp::EndPoint& ep, 
 		shard_ptr_t<ConnectorType> ref = this->shared_from_this();
 		function_t<void(SocketLib::s_uint32_t, SocketLib::SocketError)> handler =
 			bind_t(&BaseTConnector<ConnectorType>::_ReadHandler, ref, placeholder_1, placeholder_2);
-		this->_socket->AsyncRecvSome(handler, this->_reader.readbuf, M_READ_SIZE);
+		this->_socket->AsyncRecvSome(handler, this->_reader.readbuf, M_SOCKET_READ_SIZE);
 		return true;
 	}
 	catch (SocketLib::SocketError& error) {
@@ -82,7 +82,7 @@ void BaseTConnector<ConnectorType>::_ConnectHandler(const SocketLib::SocketError
 		this->_netio.OnConnected(ref, error);
 		function_t<void(SocketLib::s_uint32_t, SocketLib::SocketError)> handler =
 			bind_t(&BaseTConnector<ConnectorType>::_ReadHandler, ref, placeholder_1, placeholder_2);
-		this->_socket->AsyncRecvSome(handler, this->_reader.readbuf, M_READ_SIZE);
+		this->_socket->AsyncRecvSome(handler, this->_reader.readbuf, M_SOCKET_READ_SIZE);
 	}
 	catch (SocketLib::SocketError& err) {
 		lasterror = err;
@@ -94,8 +94,8 @@ void BaseTConnector<ConnectorType>::_ConnectHandler(const SocketLib::SocketError
 inline SyncConnector::SyncConnector() {
 	_socket = new SocketLib::TcpConnector<SocketLib::IoService>(_ioservice);
 	_flag = E_STATE_STOP;
-	_readbuf = (SocketLib::s_byte_t*)g_malloc(M_READ_SIZE);
-	g_memset(_readbuf, 0, M_READ_SIZE);
+	_readbuf = (SocketLib::s_byte_t*)g_malloc(M_SOCKET_READ_SIZE);
+	g_memset(_readbuf, 0, M_SOCKET_READ_SIZE);
 	_readsize = 0;
 	g_memset(&_curheader, 0, sizeof(_curheader));
 }
@@ -180,7 +180,7 @@ inline SocketLib::Buffer* SyncConnector::Recv() {
 	if (!reply) {
 		SocketLib::SocketError error;
 		do {
-			_readsize = _socket->RecvSome(_readbuf, M_READ_SIZE, error);
+			_readsize = _socket->RecvSome(_readbuf, M_SOCKET_READ_SIZE, error);
 			if (_readsize == 0 || error) {
 				Close();
 				return 0;
