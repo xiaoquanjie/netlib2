@@ -235,6 +235,10 @@ bool TcpBaseSocket<T, SocketType>::_TrySendData() {
 
 	if (_writer.msgbuffer1.Length() == 0) {
 		_writer.msgbuffer1.Swap(_writer.msgbuffer2);
+		if (_writer.msgbuffer2.Capacity() >= (1024*1024)) {
+			SocketLib::Buffer tmp;
+			_writer.msgbuffer2.Swap(tmp);
+		}
 		_writer.msgbuffer2.Clear();
 	}
 
