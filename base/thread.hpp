@@ -19,6 +19,9 @@
 
 #else
 #include <memory>
+#ifndef M_WIN32_LEAN_AND_MEAN  
+#define WIN32_LEAN_AND_MEAN // 在所有Windows.h包含的地方加上它
+#endif
 #include <Windows.h>
 #include <process.h>
 #endif

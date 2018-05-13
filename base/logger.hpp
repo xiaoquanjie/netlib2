@@ -9,6 +9,9 @@
 #include <time.h>
 #include <stdio.h>
 #ifdef M_PLATFORM_WIN
+#ifndef M_WIN32_LEAN_AND_MEAN  
+#define WIN32_LEAN_AND_MEAN // 在所有Windows.h包含的地方加上它
+#endif
 #include <windows.h>
 #else
 #include <unistd.h>

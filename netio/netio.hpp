@@ -185,6 +185,8 @@ public:
 
 	void SetExtData(void* data, void(*func)(void*data));
 
+	void SetExtData(void* data);
+
 	void* GetExtData();
 
 	void SetKeepAlive(SocketLib::s_uint32_t timeo);

@@ -4,13 +4,16 @@
 #include "base/config.hpp"
 #include <time.h>
 #include <limits>
+#include <string>
 
 #ifndef M_PLATFORM_WIN
 #include <sys/time.h>
 #else
-#include <WinBase.h>
-// #pragma warning(push)
-// #pragma warning(disable:4996) 
+#ifndef M_WIN32_LEAN_AND_MEAN  
+#define WIN32_LEAN_AND_MEAN // 在所有Windows.h包含的地方加上它
+#endif
+#include <windows.h>
+#include <WinSock2.h>	// // for timeval 
 #endif
 
 M_BASE_NAMESPACE_BEGIN

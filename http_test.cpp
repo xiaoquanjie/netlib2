@@ -27,6 +27,7 @@ public:
 
 	virtual void OnReceiveData(netiolib::HttpSocketPtr& clisock, netiolib::HttpSvrRecvMsg& httpmsg) {
 		_beatmng.OnReceiveData(clisock);
+		//cout << httpmsg.GetUrl() << endl;
 		netiolib::HttpSvrSendMsg& msg = clisock->GetSvrMsg();
 		msg.SetBody("newxiaoquanjie", 14);
 		clisock->SendHttpMsg();
